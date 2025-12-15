@@ -2,6 +2,13 @@
 
 Hackathon 25 Winter, Team 16; Dashboard Client for Plutus.
 
+## githooks
+
+```
+git config core.hooksPath ./.githooks
+chmod +x -R ./.githooks
+```
+
 ## Get started
 
 ```
