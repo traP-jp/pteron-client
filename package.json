@@ -10,8 +10,6 @@
         "preview:with-build": "npm run build && npm run preview",
         "lint": "prettier --check ./src && eslint --max-warnings=0 && tsc --noEmit",
         "format": "prettier --write ./src && eslint --fix",
-        "lint": "prettier --check ./src && eslint --max-warnings=0",
-        "format": "prettier --write ./src && eslint --fix",
         "gen-api": "./scripts/gen-api.sh"
     },
     "dependencies": {
