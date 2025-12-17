@@ -16,7 +16,7 @@ body:
     id: dev-tasks
     attributes:
       label: "Tasks"
-      description: "実装に必要なタスク（ハッカソンなので具体的なファイル名や粒度で）"
+      description: "実装に必要なタスク"
       placeholder: |
         - [ ] components/Article/LikeButton.tsx のUI作成
         - [ ] APIつなぎ込み (POST /api/likes)
