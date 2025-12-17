@@ -1,18 +1,23 @@
-import "@mantine/core/styles.css";
+import { Suspense } from "react";
+import { RouterProvider } from "react-router-dom";
+
 import "@mantine/charts/styles.css";
 import { MantineProvider } from "@mantine/core";
+import "@mantine/core/styles.css";
 import { ModalsProvider } from "@mantine/modals";
 
-import { RouterProvider } from "react-router-dom";
-import { router } from "./router";
-
-import { theme } from "./theme";
 import "./index.css";
+import { router } from "./router";
+import { theme } from "./theme";
 
 export default function App() {
-    return <MantineProvider theme={theme}>
-        <ModalsProvider>
-            <RouterProvider router={router}></RouterProvider>
-        </ModalsProvider>
-    </MantineProvider>;
+    return (
+        <MantineProvider theme={theme}>
+            <ModalsProvider>
+                <Suspense fallback={<div>Loading...</div>}>
+                    <RouterProvider router={router}></RouterProvider>
+                </Suspense>
+            </ModalsProvider>
+        </MantineProvider>
+    );
 }
