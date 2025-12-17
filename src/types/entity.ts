@@ -9,3 +9,4 @@ export const toBranded = <T>(value: BaseType<T>): T => value as T;
 export type UserName = BrandedType<string, "UserName">;
 export type ProjectName = BrandedType<string, "ProjectName">;
 export type Url = BrandedType<string, "Url">;
+export type Copia = BrandedType<bigint, "Copia">;

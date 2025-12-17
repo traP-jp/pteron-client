@@ -1,9 +1,9 @@
+import { type Url, type UserName, toBranded } from "/@/types/entity";
+
 import Api from "./client";
 import type { paths as internalApiPath } from "./schema/internal";
 import type { paths as publicApiPath } from "./schema/public";
 import type { paths as traqApiPath } from "./schema/traq";
-
-import { type Url, type UserName, toBranded } from "../types/entity";
 
 export const api = {
     internal: new Api<internalApiPath>({ baseUrl: toBranded<Url>("/api/internal") }),
