@@ -16,6 +16,12 @@ npm i -g pnpm
 pnpm i
 ```
 
+## Generate api
+
+```
+pnpm gen-api
+```
+
 ### Run development server
 
 ```
