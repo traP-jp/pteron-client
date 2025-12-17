@@ -2,7 +2,6 @@ name: "Enhancement"
 description: "新しい機能や既存機能の改善を提案"
 title: "[Enhancement] "
 labels: ["type/enhancement", "area/client", "need/triage"]
-
 body:
   - type: textarea
     id: overview
