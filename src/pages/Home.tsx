@@ -1,10 +1,10 @@
-import { PAvater } from "/@/components/PAvatar";
+import { PAvatar } from "/@/components/PAvatar";
 import { toBranded } from "/@/types/entity";
 import type { ProjectName, UserName } from "/@/types/entity";
 
 import { TrendIndicator } from "../components/TrendIndicator";
 
-export const Home = () => {
+const Home = () => {
     return (
         <div>
             <h1>Home</h1>
@@ -12,14 +12,16 @@ export const Home = () => {
             <TrendIndicator diff={100} />
             <TrendIndicator diff={-100} />
 
-            <PAvater
+            <PAvatar
                 type="user"
                 name={toBranded<UserName>("uni_kakurenbo")}
             />
-            <PAvater
+            <PAvatar
                 type="project"
                 name={toBranded<ProjectName>("awesome_project")}
             />
         </div>
     );
 };
+
+export default Home;
