@@ -1,4 +1,4 @@
-import { Avatar, createTheme } from "@mantine/core";
+import { Avatar, Text, createTheme } from "@mantine/core";
 
 import avatarClasses from "/@/styles/p-avatar.module.scss";
 
@@ -10,5 +10,6 @@ export const theme = createTheme({
     headings: { fontFamily: fontStack },
     components: {
         Avatar: Avatar.extend({ classNames: avatarClasses }),
+        Text: Text.extend({ classNames: textClasses }),
     },
 });
