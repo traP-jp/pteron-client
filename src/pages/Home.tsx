@@ -1,9 +1,31 @@
+import { Button } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+
 import { PAvatar } from "/@/components/PAvatar";
 import { type Copia, toBranded } from "/@/types/entity";
 import type { ProjectName, UserName } from "/@/types/entity";
 
+import { CreateProjectModal } from "../components/CreateProjectModal";
 import { PAmount } from "../components/PAmount";
 import { TrendIndicator } from "../components/TrendIndicator";
+
+const CreateProjectModalSample = () => {
+    const [opened, { open, close }] = useDisclosure(false);
+    return (
+        <>
+            <CreateProjectModal
+                opened={opened}
+                onClose={close}
+            />
+            <Button
+                variant="default"
+                onClick={open}
+            >
+                新規プロジェクトを作成
+            </Button>
+        </>
+    );
+};
 
 const Home = () => {
     return (
@@ -37,6 +59,7 @@ const Home = () => {
                     useGrouping: false,
                 }}
             />
+            <CreateProjectModalSample />
         </div>
     );
 };
