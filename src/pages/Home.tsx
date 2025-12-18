@@ -1,6 +1,5 @@
-import { type Copia, toBranded } from "/@/types/entity";
 import { PAvatar } from "/@/components/PAvatar";
-import { toBranded } from "/@/types/entity";
+import { type Copia, toBranded } from "/@/types/entity";
 import type { ProjectName, UserName } from "/@/types/entity";
 
 import { PAmount } from "../components/PAmount";
