@@ -1,19 +1,16 @@
 import { Avatar, type AvatarProps, type MantineSize } from "@mantine/core";
 
 import { buildFallbackIconUrl, buildTraqIconUrl } from "/@/api/api";
-import { type ProjectName, type UserName, toBranded } from "/@/types/entity";
 
-type AvatarType = "user" | "project";
+import { type UserOrProject, type UserOrProjectType, isUser } from "../types/userOrProject";
 
-export type PAvatarProps<Type extends AvatarType> = AvatarProps & {
+export type PAvatarProps<Type extends UserOrProjectType> = AvatarProps & {
     size?: MantineSize | "checkout";
-    type: Type;
-    name: Type extends "user" ? UserName : ProjectName;
-};
+} & UserOrProject<Type>;
 
-export const PAvatar = <Type extends AvatarType>({ type, name, ...props }: PAvatarProps<Type>) => {
-    const src =
-        type === "user" ? buildTraqIconUrl(toBranded<UserName>(name)) : buildFallbackIconUrl(name);
+export const PAvatar = <Type extends UserOrProjectType>(_props: PAvatarProps<Type>) => {
+    const src = isUser(_props) ? buildTraqIconUrl(_props.name) : buildFallbackIconUrl(_props.name);
+    const { name, ...props } = _props;
 
     return (
         <Avatar
