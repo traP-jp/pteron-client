@@ -1,6 +1,6 @@
 import { Avatar, createTheme } from "@mantine/core";
 
-import avatarClasses from "/@/styles/p-avater.module.scss";
+import avatarClasses from "/@/styles/p-avatar.module.scss";
 
 const fontStack =
     "'M PLUS 1', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";

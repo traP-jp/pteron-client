@@ -1,7 +1,7 @@
 import { Card, Group, Stack, Text } from "@mantine/core";
 import { IconCrown } from "@tabler/icons-react";
 
-import { PAvater } from "/@/components/PAvatar";
+import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
 import { toBranded } from "/@/types/entity";
 import type { UserName } from "/@/types/entity";
@@ -80,7 +80,7 @@ const RankingTop3Item = ({ rankedUser, onUserClick }: RankingTop3ItemProps) => {
                     gap="xs"
                     wrap="nowrap"
                 >
-                    <PAvater
+                    <PAvatar
                         name={toBranded<UserName>(user.name ?? "")}
                         size="sm"
                         type="user"

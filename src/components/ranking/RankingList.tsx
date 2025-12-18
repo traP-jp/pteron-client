@@ -1,6 +1,6 @@
 import { Group, Paper, Text } from "@mantine/core";
 
-import { PAvater } from "/@/components/PAvatar";
+import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
 import { toBranded } from "/@/types/entity";
 import type { UserName } from "/@/types/entity";
@@ -52,7 +52,7 @@ const RankingListItem = ({ rankedUser, onUserClick }: RankingListItemProps) => {
                 )}
 
                 {/* アバター */}
-                <PAvater
+                <PAvatar
                     name={toBranded<UserName>(user.name ?? "")}
                     size="sm"
                     type="user"

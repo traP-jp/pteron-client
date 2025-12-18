@@ -1,12 +1,11 @@
 import { Divider, Stack, Title } from "@mantine/core";
 
-import { PAvater } from "/@/components/PAvatar";
+import { PAvatar } from "/@/components/PAvatar";
+import { TrendIndicator } from "/@/components/TrendIndicator";
 import type { RankedUser } from "/@/components/ranking";
 import { RankingFull } from "/@/components/ranking";
 import { toBranded } from "/@/types/entity";
 import type { ProjectName, UserName } from "/@/types/entity";
-
-import { TrendIndicator } from "../components/TrendIndicator";
 
 // モックデータ（デバッグ用）
 const mockUsers: RankedUser[] = [
@@ -55,11 +54,11 @@ export const Home = () => {
             <Stack gap="xs">
                 <Title order={3}>PAvatar</Title>
                 <div className="flex gap-2">
-                    <PAvater
+                    <PAvatar
                         name={toBranded<UserName>("uni_kakurenbo")}
                         type="user"
                     />
-                    <PAvater
+                    <PAvatar
                         name={toBranded<ProjectName>("awesome_project")}
                         type="project"
                     />
@@ -81,3 +80,5 @@ export const Home = () => {
         </Stack>
     );
 };
+
+export default Home;
