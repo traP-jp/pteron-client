@@ -11,7 +11,7 @@ export type PAvatarProps<Type extends AvatarType> = AvatarProps & {
     name: Type extends "user" ? UserName : ProjectName;
 };
 
-export const PAvater = <Type extends AvatarType>({ type, name, ...props }: PAvatarProps<Type>) => {
+export const PAvatar = <Type extends AvatarType>({ type, name, ...props }: PAvatarProps<Type>) => {
     const src =
         type === "user" ? buildTraqIconUrl(toBranded<UserName>(name)) : buildFallbackIconUrl(name);
 
