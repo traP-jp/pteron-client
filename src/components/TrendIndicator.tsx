@@ -1,54 +1,35 @@
-import { Text } from "@mantine/core";
+import { Text, type TextProps } from "@mantine/core";
 import { IconArrowDownRight, IconArrowUpRight, IconMinus } from "@tabler/icons-react";
 
-export const TrendIndicator = (diff: number) => {
-    const iconSize = 16;
-    const strokeWidth = 3;
+export interface TrendIndicatorProps extends TextProps {
+    diff: number;
+}
 
-    if (diff > 0) {
-        return (
-            <Text
-                c="green"
-                className="flex flex-row items-center h-7"
-                fw={700}
-            >
-                <IconArrowUpRight
-                    stroke={strokeWidth}
-                    color="var(--mantine-color-green-text)"
-                    size={iconSize}
-                    className="inline"
-                />
-                {diff}
-            </Text>
+export const TrendIndicator = ({ diff, ...props }: TrendIndicatorProps) => {
+    const color = diff > 0 ? "green" : diff < 0 ? "red" : "gray";
+    const iconProps = {
+        stroke: 3,
+        size: 16,
+        className: "inline",
+    };
+    const icon =
+        diff > 0 ? (
+            <IconArrowUpRight {...iconProps} />
+        ) : diff < 0 ? (
+            <IconArrowDownRight {...iconProps} />
+        ) : (
+            <IconMinus {...iconProps} />
         );
-    } else if (diff < 0) {
-        return (
-            <Text
-                c="red"
-                className="flex flex-row items-center h-7"
-                fw={700}
-            >
-                <IconArrowDownRight
-                    stroke={strokeWidth}
-                    size={iconSize}
-                    className="inline"
-                />
-                {-diff}
-            </Text>
-        );
-    } else {
-        return (
-            <Text
-                c="gray"
-                className="flex flex-row items-center h-7"
-                fw={700}
-            >
-                <IconMinus
-                    stroke={strokeWidth}
-                    size={iconSize}
-                    className="inline"
-                />
-            </Text>
-        );
-    }
+
+    return (
+        <Text
+            c={color}
+            className="flex flex-row items-center h-7"
+            fw={700}
+            {...props}
+        >
+            {icon}
+            {diff !== 0 ? Math.abs(diff) : ""}
+        </Text>
+    );
 };

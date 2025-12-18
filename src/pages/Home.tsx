@@ -7,10 +7,10 @@ import { TrendIndicator } from "../components/TrendIndicator";
 export const Home = () => {
     return (
         <div>
-            {TrendIndicator(0)}
-            {TrendIndicator(1)}
-            {TrendIndicator(-100)}
             <h1>Home</h1>
+            <TrendIndicator diff={0} />
+            <TrendIndicator diff={100} />
+            <TrendIndicator diff={-100} />
 
             <PAvater
                 type="user"
