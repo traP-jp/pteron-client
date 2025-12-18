@@ -1,11 +1,11 @@
 import { Divider, Stack, Title } from "@mantine/core";
 
+import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
 import type { RankedUser } from "/@/components/ranking";
 import { RankingFull } from "/@/components/ranking";
-import { toBranded } from "/@/types/entity";
-import type { ProjectName, UserName } from "/@/types/entity";
+import { type Copia, type ProjectName, type UserName, toBranded } from "/@/types/entity";
 
 // モックデータ（デバッグ用）
 const mockUsers: RankedUser[] = [
@@ -77,6 +77,28 @@ export const Home = () => {
                 title="ポイントランキング"
                 users={mockUsers}
             />
+
+            <Divider my="lg" />
+
+            <Stack gap="xs">
+                <Title order={3}>PAmount</Title>
+                <PAmount
+                    value={toBranded<Copia>(100000000n)}
+                    coloring
+                    size="custom"
+                    customSize={5}
+                    leadingIcon
+                    trailingDash
+                />
+                <PAmount
+                    value={toBranded<Copia>(-100000000n)}
+                    coloring
+                    size="xl"
+                    formatOptions={{
+                        useGrouping: false,
+                    }}
+                />
+            </Stack>
         </Stack>
     );
 };
