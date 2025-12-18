@@ -31,11 +31,182 @@ const mockUsers: RankedUser[] = [
     { rank: 20, rankDiff: -1, user: { id: "20", name: "tina", balance: 200 } },
 ];
 
-export const Sandbox = () => {
+const TrendIndicatorSample = () => (
+    <Accordion.Item value="trend-indicator">
+        <Accordion.Control>
+            <Group>
+                <Text fw={500}>TrendIndicator</Text>
+                <Text
+                    c="dimmed"
+                    size="xs"
+                >
+                    トレンド表示
+                </Text>
+            </Group>
+        </Accordion.Control>
+        <Accordion.Panel>
+            <Stack gap="xs">
+                <Group>
+                    <Text
+                        size="sm"
+                        w={80}
+                    >
+                        diff=0:
+                    </Text>
+                    <TrendIndicator diff={0} />
+                </Group>
+                <Group>
+                    <Text
+                        size="sm"
+                        w={80}
+                    >
+                        diff=100:
+                    </Text>
+                    <TrendIndicator diff={100} />
+                </Group>
+                <Group>
+                    <Text
+                        size="sm"
+                        w={80}
+                    >
+                        diff=-100:
+                    </Text>
+                    <TrendIndicator diff={-100} />
+                </Group>
+            </Stack>
+        </Accordion.Panel>
+    </Accordion.Item>
+);
+
+const PAmountSample = () => (
+    <Accordion.Item value="p-amount">
+        <Accordion.Control>
+            <Group>
+                <Text fw={500}>PAmount</Text>
+                <Text
+                    c="dimmed"
+                    size="xs"
+                >
+                    金額表示
+                </Text>
+            </Group>
+        </Accordion.Control>
+        <Accordion.Panel>
+            <Stack gap="sm">
+                <div>
+                    <Text
+                        size="xs"
+                        c="dimmed"
+                        mb={4}
+                    >
+                        正の値（カスタムサイズ・アイコン付き・ダッシュ付き）
+                    </Text>
+                    <PAmount
+                        value={toBranded<Copia>(100000000n)}
+                        coloring
+                        size="custom"
+                        customSize={5}
+                        leadingIcon
+                        trailingDash
+                    />
+                </div>
+                <div>
+                    <Text
+                        size="xs"
+                        c="dimmed"
+                        mb={4}
+                    >
+                        負の値（グループなし）
+                    </Text>
+                    <PAmount
+                        value={toBranded<Copia>(-100000000n)}
+                        coloring
+                        size="xl"
+                        formatOptions={{ useGrouping: false }}
+                    />
+                </div>
+            </Stack>
+        </Accordion.Panel>
+    </Accordion.Item>
+);
+
+export const PAvatarSample = () => (
+    <Accordion.Item value="p-avatar">
+        <Accordion.Control>
+            <Group>
+                <Text fw={500}>PAvatar</Text>
+                <Text
+                    c="dimmed"
+                    size="xs"
+                >
+                    アバター表示
+                </Text>
+            </Group>
+        </Accordion.Control>
+        <Accordion.Panel>
+            <Stack gap="sm">
+                <div>
+                    <Text
+                        size="xs"
+                        c="dimmed"
+                        mb={4}
+                    >
+                        {'type="user"'}
+                    </Text>
+                    <PAvatar
+                        name={toBranded<UserName>("uni_kakurenbo")}
+                        type="user"
+                    />
+                </div>
+                <div>
+                    <Text
+                        size="xs"
+                        c="dimmed"
+                        mb={4}
+                    >
+                        {'type="project"'}
+                    </Text>
+                    <PAvatar
+                        name={toBranded<ProjectName>("awesome_project")}
+                        type="project"
+                    />
+                </div>
+            </Stack>
+        </Accordion.Panel>
+    </Accordion.Item>
+);
+
+const RankingFullSample = () => {
     const handleUserClick = (rankedUser: RankedUser) => {
         console.log("Clicked user:", rankedUser);
     };
 
+    return (
+        <Accordion.Item value="ranking-full">
+            <Accordion.Control>
+                <Group>
+                    <Text fw={500}>RankingFull</Text>
+                    <Text
+                        c="dimmed"
+                        size="xs"
+                    >
+                        ランキング全体表示（Top3 + リスト）
+                    </Text>
+                </Group>
+            </Accordion.Control>
+            <Accordion.Panel>
+                <RankingFull
+                    maxItems={20}
+                    onUserClick={handleUserClick}
+                    title="This is Ranking"
+                    users={mockUsers}
+                />
+            </Accordion.Panel>
+        </Accordion.Item>
+    );
+};
+
+export const Sandbox = () => {
     return (
         <Stack
             gap="md"
@@ -62,144 +233,11 @@ export const Sandbox = () => {
                     基本部品
                 </Title>
 
-                <Accordion.Item value="trend-indicator">
-                    <Accordion.Control>
-                        <Group>
-                            <Text fw={500}>TrendIndicator</Text>
-                            <Text
-                                c="dimmed"
-                                size="xs"
-                            >
-                                トレンド表示
-                            </Text>
-                        </Group>
-                    </Accordion.Control>
-                    <Accordion.Panel>
-                        <Stack gap="xs">
-                            <Group>
-                                <Text
-                                    size="sm"
-                                    w={80}
-                                >
-                                    diff=0:
-                                </Text>
-                                <TrendIndicator diff={0} />
-                            </Group>
-                            <Group>
-                                <Text
-                                    size="sm"
-                                    w={80}
-                                >
-                                    diff=100:
-                                </Text>
-                                <TrendIndicator diff={100} />
-                            </Group>
-                            <Group>
-                                <Text
-                                    size="sm"
-                                    w={80}
-                                >
-                                    diff=-100:
-                                </Text>
-                                <TrendIndicator diff={-100} />
-                            </Group>
-                        </Stack>
-                    </Accordion.Panel>
-                </Accordion.Item>
+                <TrendIndicatorSample />
 
-                <Accordion.Item value="p-amount">
-                    <Accordion.Control>
-                        <Group>
-                            <Text fw={500}>PAmount</Text>
-                            <Text
-                                c="dimmed"
-                                size="xs"
-                            >
-                                金額表示
-                            </Text>
-                        </Group>
-                    </Accordion.Control>
-                    <Accordion.Panel>
-                        <Stack gap="sm">
-                            <div>
-                                <Text
-                                    size="xs"
-                                    c="dimmed"
-                                    mb={4}
-                                >
-                                    正の値（カスタムサイズ・アイコン付き・ダッシュ付き）
-                                </Text>
-                                <PAmount
-                                    value={toBranded<Copia>(100000000n)}
-                                    coloring
-                                    size="custom"
-                                    customSize={5}
-                                    leadingIcon
-                                    trailingDash
-                                />
-                            </div>
-                            <div>
-                                <Text
-                                    size="xs"
-                                    c="dimmed"
-                                    mb={4}
-                                >
-                                    負の値（グループなし）
-                                </Text>
-                                <PAmount
-                                    value={toBranded<Copia>(-100000000n)}
-                                    coloring
-                                    size="xl"
-                                    formatOptions={{ useGrouping: false }}
-                                />
-                            </div>
-                        </Stack>
-                    </Accordion.Panel>
-                </Accordion.Item>
+                <PAmountSample />
 
-                <Accordion.Item value="p-avatar">
-                    <Accordion.Control>
-                        <Group>
-                            <Text fw={500}>PAvatar</Text>
-                            <Text
-                                c="dimmed"
-                                size="xs"
-                            >
-                                アバター表示
-                            </Text>
-                        </Group>
-                    </Accordion.Control>
-                    <Accordion.Panel>
-                        <Stack gap="sm">
-                            <div>
-                                <Text
-                                    size="xs"
-                                    c="dimmed"
-                                    mb={4}
-                                >
-                                    {'type="user"'}
-                                </Text>
-                                <PAvatar
-                                    name={toBranded<UserName>("uni_kakurenbo")}
-                                    type="user"
-                                />
-                            </div>
-                            <div>
-                                <Text
-                                    size="xs"
-                                    c="dimmed"
-                                    mb={4}
-                                >
-                                    {'type="project"'}
-                                </Text>
-                                <PAvatar
-                                    name={toBranded<ProjectName>("awesome_project")}
-                                    type="project"
-                                />
-                            </div>
-                        </Stack>
-                    </Accordion.Panel>
-                </Accordion.Item>
+                <PAvatarSample />
             </Accordion>
 
             {/* 複合コンポーネント */}
@@ -214,27 +252,7 @@ export const Sandbox = () => {
                     複合コンポーネント
                 </Title>
 
-                <Accordion.Item value="ranking-full">
-                    <Accordion.Control>
-                        <Group>
-                            <Text fw={500}>RankingFull</Text>
-                            <Text
-                                c="dimmed"
-                                size="xs"
-                            >
-                                ランキング全体表示（Top3 + リスト）
-                            </Text>
-                        </Group>
-                    </Accordion.Control>
-                    <Accordion.Panel>
-                        <RankingFull
-                            maxItems={20}
-                            onUserClick={handleUserClick}
-                            title="This is Ranking"
-                            users={mockUsers}
-                        />
-                    </Accordion.Panel>
-                </Accordion.Item>
+                <RankingFullSample />
             </Accordion>
         </Stack>
     );
