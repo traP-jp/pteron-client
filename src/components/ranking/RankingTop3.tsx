@@ -63,6 +63,8 @@ const RankingTop3Item = ({ rankedUser, onUserClick }: RankingTop3ItemProps) => {
                         color={crownStyle.color}
                         fill={crownStyle.color}
                         size={crownStyle.size}
+                        role="img"
+                        aria-label={`Rank ${rank} crown`}
                     />
                 </Stack>
 
