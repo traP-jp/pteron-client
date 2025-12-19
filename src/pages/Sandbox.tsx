@@ -2,8 +2,10 @@ import { Accordion, Button, Group, Stack, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 import { CreateProjectModal } from "/@/components/CreateProjectModal";
+import type { components } from "/@/api/schema/internal";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
+import { TransactionList } from "/@/components/TransactionList";
 import { TrendIndicator } from "/@/components/TrendIndicator";
 import type { RankedUser } from "/@/components/ranking";
 import { RankingFull } from "/@/components/ranking";
@@ -31,6 +33,47 @@ const mockUsers: RankedUser[] = [
     { rank: 18, rankDiff: 0, user: { id: "18", name: "rachel", balance: 600 } },
     { rank: 19, rankDiff: -1, user: { id: "19", name: "steve", balance: 400 } },
     { rank: 20, rankDiff: -1, user: { id: "20", name: "tina", balance: 200 } },
+];
+
+type Transaction = components["schemas"]["Transaction"];
+
+const mockTransactions: Transaction[] = [
+    {
+        id: "1a2b3c4d-5e6f-7890-abcd-ef1234567890",
+        type: "TRANSFER",
+        amount: 10000,
+        project_id: "aabbccdd-eeff-1122-3344-556677889900",
+        user_id: "11223344-5566-7788-99aa-bbccddeeff00",
+        description: "プロジェクトからの報酬",
+        created_at: "2025-12-18T10:00:00Z",
+    },
+    {
+        id: "2b3c4d5e-6f7a-8901-bcde-f12345678901",
+        type: "BILL_PAYMENT",
+        amount: 5000,
+        project_id: "bbccddee-ff11-2233-4455-667788990011",
+        user_id: "11223344-5566-7788-99aa-bbccddeeff00",
+        description: "サービス利用料",
+        created_at: "2025-12-17T15:30:00Z",
+    },
+    {
+        id: "3c4d5e6f-7a8b-9012-cdef-123456789012",
+        type: "TRANSFER",
+        amount: 25000,
+        project_id: "aabbccdd-eeff-1122-3344-556677889900",
+        user_id: "11223344-5566-7788-99aa-bbccddeeff00",
+        description: "ボーナス",
+        created_at: "2025-12-16T09:00:00Z",
+    },
+    {
+        id: "4d5e6f7a-8b9c-0123-def1-234567890123",
+        type: "BILL_PAYMENT",
+        amount: 3000,
+        project_id: "ccddeeff-1122-3344-5566-778899001122",
+        user_id: "11223344-5566-7788-99aa-bbccddeeff00",
+        description: "月額料金",
+        created_at: "2025-12-15T12:00:00Z",
+    },
 ];
 
 const TrendIndicatorSample = () => (
@@ -240,6 +283,53 @@ const CreateProjectModalSample = () => {
         </Accordion.Item>
     );
 };
+const TransactionListSample = () => (
+    <Accordion.Item value="transaction-list">
+        <Accordion.Control>
+            <Group>
+                <Text fw={500}>TransactionList</Text>
+                <Text
+                    c="dimmed"
+                    size="xs"
+                >
+                    取引履歴表示
+                </Text>
+            </Group>
+        </Accordion.Control>
+        <Accordion.Panel>
+            <Stack gap="md">
+                <div>
+                    <Text
+                        size="xs"
+                        c="dimmed"
+                        mb={4}
+                    >
+                        {'currentType="user" direction="auto"'}
+                    </Text>
+                    <TransactionList
+                        transactions={mockTransactions}
+                        currentType="user"
+                        direction="auto"
+                    />
+                </div>
+                <div>
+                    <Text
+                        size="xs"
+                        c="dimmed"
+                        mb={4}
+                    >
+                        {'currentType="project" direction="auto"'}
+                    </Text>
+                    <TransactionList
+                        transactions={mockTransactions}
+                        currentType="project"
+                        direction="auto"
+                    />
+                </div>
+            </Stack>
+        </Accordion.Panel>
+    </Accordion.Item>
+);
 
 export const Sandbox = () => {
     return (
@@ -290,6 +380,7 @@ export const Sandbox = () => {
                 <RankingFullSample />
 
                 <CreateProjectModalSample />
+                <TransactionListSample />
             </Accordion>
         </Stack>
     );
