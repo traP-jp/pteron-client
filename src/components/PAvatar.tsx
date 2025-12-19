@@ -1,39 +1,32 @@
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Avatar, type AvatarProps, type MantineSize } from "@mantine/core";
 
 import { buildFallbackIconUrl, buildTraqIconUrl } from "/@/api";
-import { type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
+import { type Url, toBranded } from "/@/types/entity";
 
-type AvatarType = "user" | "project";
+import { type UserOrProject, type UserOrProjectType, isUser } from "../types/userOrProject";
 
-export type PAvatarProps<Type extends AvatarType> = AvatarProps & {
+export type PAvatarProps<Type extends UserOrProjectType> = AvatarProps & {
     size?: MantineSize | "checkout";
-    type: Type;
-    name: Type extends "user" ? UserName : ProjectName;
-};
+} & UserOrProject<Type>;
 
-export const PAvatar = <Type extends AvatarType>({ type, name, ...props }: PAvatarProps<Type>) => {
+export const PAvatar = <Type extends UserOrProjectType>(_props: PAvatarProps<Type>) => {
+    const { name, ...props } = _props;
     const [src, setSrc] = useState<Url>(toBranded<Url>(""));
 
     useEffect(() => {
         const buildUrl = async () =>
-            type === "user"
-                ? buildTraqIconUrl(toBranded<UserName>(name))
-                : buildFallbackIconUrl(name);
+            isUser(_props) ? buildTraqIconUrl(_props.name) : buildFallbackIconUrl(_props.name);
 
         buildUrl().then(url => setSrc(url));
     });
 
     return (
-        <Suspense>
-            {
-                <Avatar
-                    alt={name}
-                    src={src}
-                    {...props}
-                />
-            }
-        </Suspense>
+        <Avatar
+            alt={name}
+            src={src}
+            {...props}
+        />
     );
 };
