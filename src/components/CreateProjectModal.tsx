@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { Button, Modal, type ModalProps, TextInput } from "@mantine/core";
 
-import { api } from "../api/api";
+import apis from "/@/api";
 
 export type CreateProjectModalProps = Omit<ModalProps, "title">;
 
@@ -15,11 +15,9 @@ function projectNameValidator(name: string): string {
 
 async function createProject(name: string, url: string) {
     if (name.length === 0) return;
-    return api.internal.client.POST("/projects", {
-        body: {
-            name,
-            url: url || undefined,
-        },
+    return apis.internal.projects.createProject({
+        name,
+        url: url || undefined,
     });
 }
 

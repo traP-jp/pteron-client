@@ -18,7 +18,7 @@
         "@mantine/hooks": "8.3.10",
         "@mantine/modals": "^8.3.10",
         "@tabler/icons-react": "^3.36.0",
-        "openapi-fetch": "^0.15.0",
+        "axios": "^1.13.2",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
         "react-router-dom": "^7.10.1",
@@ -29,7 +29,6 @@
         "@eslint/js": "^9.39.2",
         "@eslint/json": "^0.14.0",
         "@eslint/markdown": "^7.5.1",
-        "@openapitools/openapi-generator-cli": "^2.25.2",
         "@tailwindcss/postcss": "^4.1.18",
         "@trivago/prettier-plugin-sort-imports": "^6.0.0",
         "@types/node": "^25.0.2",
@@ -44,13 +43,14 @@
         "eslint-plugin-react-refresh": "^0.4.25",
         "globals": "^16.5.0",
         "lint-staged": "^16.2.7",
-        "openapi-typescript-helpers": "^0.0.15",
+        "msw": "^2.12.4",
         "postcss": "^8.5.6",
         "postcss-preset-mantine": "1.18.0",
         "postcss-simple-vars": "^7.0.1",
         "prettier": "^3.7.4",
         "sass": "^1.97.0",
         "sass-embedded": "^1.97.0",
+        "swagger-typescript-api": "^13.2.16",
         "tailwindcss": "^4.1.18",
         "type-fest": "^5.3.1",
         "typescript": "^5.9.2",
@@ -58,5 +58,10 @@
         "vite": "^7.2.7",
         "vite-plugin-svgr": "^4.5.0"
     },
-    "packageManager": "pnpm@10.25.0"
+    "packageManager": "pnpm@10.25.0",
+    "msw": {
+        "workerDirectory": [
+            "public"
+        ]
+    }
 }

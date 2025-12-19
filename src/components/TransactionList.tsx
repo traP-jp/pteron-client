@@ -1,10 +1,8 @@
 import { Accordion, Stack } from "@mantine/core";
 
-import type { components } from "/@/api/schema/internal";
+import type { Transaction } from "/@/api/schema/internal";
 
 import { TransactionItem } from "./TransactionItem";
-
-type Transaction = components["schemas"]["Transaction"];
 
 export type TransactionListProps =
     | {

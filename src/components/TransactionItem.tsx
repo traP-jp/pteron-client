@@ -1,14 +1,12 @@
 import { Accordion, Group, Stack, Text } from "@mantine/core";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 
-import type { components } from "/@/api/schema/internal";
+import type { Transaction } from "/@/api/schema/internal";
 import { toBranded } from "/@/types/entity";
 import type { Copia, ProjectName, UserName } from "/@/types/entity";
 
 import { PAmount } from "./PAmount";
 import { PAvatar } from "./PAvatar";
-
-type Transaction = components["schemas"]["Transaction"];
 
 export interface TransactionItemProps {
     transaction: Transaction;
@@ -32,13 +30,12 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
         });
     };
 
-    // Project名を取得 (仮)
     const getProjectName = () => {
-        return toBranded<ProjectName>(`project_${transaction.project_id}`);
+        return toBranded<ProjectName>(transaction.project.name);
     };
 
     const getUserName = () => {
-        return toBranded<UserName>(`user_${transaction.user_id}`);
+        return toBranded<UserName>(transaction.user.name);
     };
 
     const fromAvatar = (
