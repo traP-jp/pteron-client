@@ -1,8 +1,8 @@
 import { Accordion, Button, Group, Stack, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
-import { CreateProjectModal } from "/@/components/CreateProjectModal";
 import type { components } from "/@/api/schema/internal";
+import { CreateProjectModal } from "/@/components/CreateProjectModal";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
