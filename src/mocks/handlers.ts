@@ -381,7 +381,7 @@ const internalHandlers = [
             rank,
             value: project.balance ?? 0,
             difference: 0,
-            user: project, // Note: API spec says "user" but should be "project"
+            project, // Updated: spec now correctly uses "project" instead of "user"
         };
 
         return HttpResponse.json({
