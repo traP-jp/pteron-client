@@ -1,14 +1,7 @@
-import type { components } from "/@/api/schema/internal";
+import type { Project, User } from "/@/api/schema/internal";
 
-/**
- * API から取得したユーザー情報
- */
-export type User = components["schemas"]["User"];
-
-/**
- * API から取得したプロジェクト情報
- */
-export type Project = components["schemas"]["Project"];
+// User と Project を再エクスポート
+export type { Project, User };
 
 /**
  * ランキングアイテムのエンティティ型 (User または Project)

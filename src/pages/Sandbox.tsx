@@ -1,7 +1,7 @@
 import { Accordion, Button, Group, Stack, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
-import type { components } from "/@/api/schema/internal";
+import type { Transaction } from "/@/api/schema/public";
 import { CreateProjectModal } from "/@/components/CreateProjectModal";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
@@ -53,8 +53,6 @@ const mockProjectItems: RankedItem<Project>[] = [
         entity: { id: "p6", name: "Jomon", balance: 15000, url: "https://jomon.trap.jp" },
     },
 ];
-
-type Transaction = components["schemas"]["Transaction"];
 
 const mockTransactions: Transaction[] = [
     {
