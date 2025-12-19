@@ -1,7 +1,7 @@
 import { Accordion, Button, Group, Stack, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
-import type { Transaction } from "/@/api/schema/public";
+import type { Transaction } from "/@/api/schema/internal";
 import { CreateProjectModal } from "/@/components/CreateProjectModal";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
@@ -25,32 +25,81 @@ const mockUserItems: RankedItem<User>[] = [
     { rank: 10, rankDiff: -2, entity: { id: "10", name: "jack", balance: 3000 } },
 ];
 
+// ダミーの owner と admins
+const dummyOwner: User = { id: "owner-1", name: "owner_user", balance: 100000 };
+const dummyAdmins: User[] = [];
+
 const mockProjectItems: RankedItem<Project>[] = [
     {
         rank: 1,
         rankDiff: 2,
-        entity: { id: "p1", name: "traQ", balance: 50000, url: "https://q.trap.jp" },
+        entity: {
+            id: "p1",
+            name: "traQ",
+            balance: 50000,
+            url: "https://q.trap.jp",
+            owner: dummyOwner,
+            admins: dummyAdmins,
+        },
     },
     {
         rank: 2,
         rankDiff: -1,
-        entity: { id: "p2", name: "knoQ", balance: 35000, url: "https://knoq.trap.jp" },
+        entity: {
+            id: "p2",
+            name: "knoQ",
+            balance: 35000,
+            url: "https://knoq.trap.jp",
+            owner: dummyOwner,
+            admins: dummyAdmins,
+        },
     },
     {
         rank: 3,
         rankDiff: 0,
-        entity: { id: "p3", name: "anke-to", balance: 28000, url: "https://anke-to.trap.jp" },
+        entity: {
+            id: "p3",
+            name: "anke-to",
+            balance: 28000,
+            url: "https://anke-to.trap.jp",
+            owner: dummyOwner,
+            admins: dummyAdmins,
+        },
     },
     {
         rank: 4,
         rankDiff: 1,
-        entity: { id: "p4", name: "booQ", balance: 22000, url: "https://booq.trap.jp" },
+        entity: {
+            id: "p4",
+            name: "booQ",
+            balance: 22000,
+            url: "https://booq.trap.jp",
+            owner: dummyOwner,
+            admins: dummyAdmins,
+        },
     },
-    { rank: 5, rankDiff: -2, entity: { id: "p5", name: "NeoShowcase", balance: 18000 } },
+    {
+        rank: 5,
+        rankDiff: -2,
+        entity: {
+            id: "p5",
+            name: "NeoShowcase",
+            balance: 18000,
+            owner: dummyOwner,
+            admins: dummyAdmins,
+        },
+    },
     {
         rank: 6,
         rankDiff: 0,
-        entity: { id: "p6", name: "Jomon", balance: 15000, url: "https://jomon.trap.jp" },
+        entity: {
+            id: "p6",
+            name: "Jomon",
+            balance: 15000,
+            url: "https://jomon.trap.jp",
+            owner: dummyOwner,
+            admins: dummyAdmins,
+        },
     },
 ];
 
