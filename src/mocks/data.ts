@@ -13,28 +13,33 @@ import type {
 export const mockUsers: User[] = [
     {
         id: "550e8400-e29b-41d4-a716-446655440001",
-        name: "alice",
-        balance: 15000,
+        name: "uni_kakurenbo",
+        balance: 0,
     },
     {
         id: "550e8400-e29b-41d4-a716-446655440002",
-        name: "bob",
-        balance: 8500,
+        name: "howard127",
+        balance: 85000000000000,
     },
     {
         id: "550e8400-e29b-41d4-a716-446655440003",
-        name: "charlie",
+        name: "mikannkann",
         balance: 23000,
     },
     {
         id: "550e8400-e29b-41d4-a716-446655440004",
-        name: "diana",
+        name: "quarantineeeeeeeeee",
         balance: 12000,
     },
     {
         id: "550e8400-e29b-41d4-a716-446655440005",
-        name: "eve",
+        name: "mamo",
         balance: 5000,
+    },
+    {
+        id: "019623b2-9ccc-7ba8-b7c6-14664b78f093",
+        name: "o_o",
+        balance: -100000000,
     },
 ];
 
@@ -192,4 +197,22 @@ export function getBillById(id: string): Bill | undefined {
 
 export function getProjectById(id: string): Project | undefined {
     return mockProjects.find(p => p.id === id);
+}
+
+export function getProjectByName(name: string): Project | undefined {
+    return mockProjects.find(p => p.name === name);
+}
+
+export function getUserByIdOrName(userIdOrName: string) {
+    const user = getUserById(userIdOrName);
+    if (user) return user;
+
+    return getUserByName(userIdOrName);
+}
+
+export function getProjectByIdOrName(userIdOrName: string) {
+    const user = getProjectById(userIdOrName);
+    if (user) return user;
+
+    return getProjectByName(userIdOrName);
 }

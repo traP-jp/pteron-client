@@ -7,8 +7,8 @@ import { HttpResponse, http } from "msw";
 import {
     generateUUID,
     getBillById,
-    getProjectById,
-    getUserById,
+    getProjectByIdOrName,
+    getUserByIdOrName,
     getUserByName,
     mockAPIClients,
     mockCurrentUser,
@@ -234,7 +234,7 @@ const internalHandlers = [
 
     // GET /api/internal/users/:user_id - ユーザー詳細
     http.get("/api/internal/users/:user_id", ({ params }) => {
-        const user = getUserById(params.user_id as string);
+        const user = getUserByIdOrName(params.user_id as string);
         if (!user) {
             return new HttpResponse(null, { status: 404 });
         }
@@ -243,7 +243,7 @@ const internalHandlers = [
 
     // GET /api/internal/users/:user_id/balance - ユーザー残高
     http.get("/api/internal/users/:user_id/balance", ({ params }) => {
-        const user = getUserById(params.user_id as string);
+        const user = getUserByIdOrName(params.user_id as string);
         if (!user) {
             return new HttpResponse(null, { status: 404 });
         }
@@ -254,7 +254,7 @@ const internalHandlers = [
 
     // GET /api/internal/users/:user_id/stats - ユーザーのランキング順位一覧
     http.get("/api/internal/users/:user_id/stats", ({ params }) => {
-        const user = getUserById(params.user_id as string);
+        const user = getUserByIdOrName(params.user_id as string);
         if (!user) {
             return new HttpResponse(null, { status: 404 });
         }
@@ -331,7 +331,7 @@ const internalHandlers = [
 
     // GET /api/internal/projects/:project_id - プロジェクト詳細
     http.get("/api/internal/projects/:project_id", ({ params }) => {
-        const project = getProjectById(params.project_id as string);
+        const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
             return new HttpResponse(null, { status: 404 });
         }
@@ -340,7 +340,7 @@ const internalHandlers = [
 
     // PUT /api/internal/projects/:project_id - プロジェクト更新
     http.put("/api/internal/projects/:project_id", async ({ params, request }) => {
-        const project = getProjectById(params.project_id as string);
+        const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
             return new HttpResponse(null, { status: 404 });
         }
@@ -356,7 +356,7 @@ const internalHandlers = [
 
     // GET /api/internal/projects/:project_id/balance - プロジェクト残高
     http.get("/api/internal/projects/:project_id/balance", ({ params }) => {
-        const project = getProjectById(params.project_id as string);
+        const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
             return new HttpResponse(null, { status: 404 });
         }
@@ -367,7 +367,7 @@ const internalHandlers = [
 
     // GET /api/internal/projects/:project_id/stats - プロジェクトのランキング順位一覧
     http.get("/api/internal/projects/:project_id/stats", ({ params }) => {
-        const project = getProjectById(params.project_id as string);
+        const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
             return new HttpResponse(null, { status: 404 });
         }
@@ -397,7 +397,7 @@ const internalHandlers = [
 
     // GET /api/internal/projects/:project_id/admins - 管理者一覧
     http.get("/api/internal/projects/:project_id/admins", ({ params }) => {
-        const project = getProjectById(params.project_id as string);
+        const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
             return new HttpResponse(null, { status: 404 });
         }
@@ -406,7 +406,7 @@ const internalHandlers = [
 
     // POST /api/internal/projects/:project_id/admins - 管理者追加
     http.post("/api/internal/projects/:project_id/admins", ({ params }) => {
-        const project = getProjectById(params.project_id as string);
+        const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
             return new HttpResponse(null, { status: 404 });
         }
@@ -415,7 +415,7 @@ const internalHandlers = [
 
     // DELETE /api/internal/projects/:project_id/admins - 管理者削除
     http.delete("/api/internal/projects/:project_id/admins", ({ params }) => {
-        const project = getProjectById(params.project_id as string);
+        const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
             return new HttpResponse(null, { status: 404 });
         }
@@ -424,7 +424,7 @@ const internalHandlers = [
 
     // GET /api/internal/projects/:project_id/clients - APIクライアント一覧
     http.get("/api/internal/projects/:project_id/clients", ({ params }) => {
-        const project = getProjectById(params.project_id as string);
+        const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
             return new HttpResponse(null, { status: 404 });
         }
@@ -433,7 +433,7 @@ const internalHandlers = [
 
     // POST /api/internal/projects/:project_id/clients - APIクライアント発行
     http.post("/api/internal/projects/:project_id/clients", ({ params }) => {
-        const project = getProjectById(params.project_id as string);
+        const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
             return new HttpResponse(null, { status: 404 });
         }
@@ -447,7 +447,7 @@ const internalHandlers = [
 
     // DELETE /api/internal/projects/:project_id/clients/:client_id - APIクライアント削除
     http.delete("/api/internal/projects/:project_id/clients/:client_id", ({ params }) => {
-        const project = getProjectById(params.project_id as string);
+        const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
             return new HttpResponse(null, { status: 404 });
         }
