@@ -1,31 +1,49 @@
-import { Group, Paper, Text } from "@mantine/core";
+import { ActionIcon, Group, Paper, Text } from "@mantine/core";
+import { IconExternalLink } from "@tabler/icons-react";
 
 import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
 import { toBranded } from "/@/types/entity";
-import type { UserName } from "/@/types/entity";
+import type { ProjectName, UserName } from "/@/types/entity";
 
-import type { RankedUser, RankingBaseProps } from "./RankingTypes";
+import type { RankedItem, RankingBaseProps, RankingEntity } from "./RankingTypes";
+import { isProject } from "./RankingTypes";
 
-export interface RankingListProps extends RankingBaseProps {
+export interface RankingListProps<
+    T extends RankingEntity = RankingEntity,
+> extends RankingBaseProps<T> {
     title?: string;
 }
 
-interface RankingListItemProps {
-    rankedUser: RankedUser;
-    onUserClick?: (user: RankedUser) => void;
+interface RankingListItemProps<T extends RankingEntity = RankingEntity> {
+    type: "user" | "project";
+    rankedItem: RankedItem<T>;
+    onItemClick?: (item: RankedItem<T>) => void;
 }
 
 /**
  * リストの個別アイテム
  */
-const RankingListItem = ({ rankedUser, onUserClick }: RankingListItemProps) => {
-    const { rank, rankDiff, user } = rankedUser;
+const RankingListItem = <T extends RankingEntity>({
+    type,
+    rankedItem,
+    onItemClick,
+}: RankingListItemProps<T>) => {
+    const { rank, rankDiff, entity } = rankedItem;
+    const entityIsProject = isProject(entity);
+    const projectUrl = entityIsProject ? entity.url : undefined;
+
+    const handleExternalLinkClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (projectUrl) {
+            window.open(projectUrl, "_blank", "noopener,noreferrer");
+        }
+    };
 
     return (
         <Paper
             className="cursor-pointer transition-colors hover:bg-gray-50"
-            onClick={() => onUserClick?.(rankedUser)}
+            onClick={() => onItemClick?.(rankedItem)}
             p="sm"
             radius="sm"
             withBorder
@@ -53,20 +71,37 @@ const RankingListItem = ({ rankedUser, onUserClick }: RankingListItemProps) => {
 
                 {/* アバター */}
                 <PAvatar
-                    name={toBranded<UserName>(user.name ?? "")}
+                    name={
+                        type === "user"
+                            ? toBranded<UserName>(entity.name ?? "")
+                            : toBranded<ProjectName>(entity.name ?? "")
+                    }
                     size="sm"
-                    type="user"
+                    type={type}
                 />
 
-                {/* ユーザー名 */}
+                {/* 名前 */}
                 <Text
                     className="flex-1"
                     fw={500}
                     lineClamp={1}
                     size="sm"
                 >
-                    {user.name}
+                    {entity.name}
                 </Text>
+
+                {/* プロジェクトの場合のみ外部リンクアイコン */}
+                {type === "project" && projectUrl && (
+                    <ActionIcon
+                        aria-label="サイトを開く"
+                        color="gray"
+                        onClick={handleExternalLinkClick}
+                        size="sm"
+                        variant="subtle"
+                    >
+                        <IconExternalLink size={16} />
+                    </ActionIcon>
+                )}
 
                 {/* ポイント */}
                 <Text
@@ -74,7 +109,7 @@ const RankingListItem = ({ rankedUser, onUserClick }: RankingListItemProps) => {
                     fw={600}
                     size="sm"
                 >
-                    {user.balance?.toLocaleString() ?? 0} pt
+                    {entity.balance?.toLocaleString() ?? 0} pt
                 </Text>
             </Group>
         </Paper>
@@ -84,8 +119,13 @@ const RankingListItem = ({ rankedUser, onUserClick }: RankingListItemProps) => {
 /**
  * 4位以降を縦リストで表示するコンポーネント
  */
-export const RankingList = ({ users, title, onUserClick }: RankingListProps) => {
-    if (users.length === 0) {
+export const RankingList = <T extends RankingEntity>({
+    type,
+    items,
+    title,
+    onItemClick,
+}: RankingListProps<T>) => {
+    if (items.length === 0) {
         return (
             <Text
                 c="dimmed"
@@ -107,11 +147,12 @@ export const RankingList = ({ users, title, onUserClick }: RankingListProps) => 
                     {title}
                 </Text>
             )}
-            {users.map(rankedUser => (
+            {items.map(rankedItem => (
                 <RankingListItem
-                    key={rankedUser.user.id}
-                    onUserClick={onUserClick}
-                    rankedUser={rankedUser}
+                    key={rankedItem.entity.id}
+                    onItemClick={onItemClick}
+                    rankedItem={rankedItem}
+                    type={type}
                 />
             ))}
         </div>
