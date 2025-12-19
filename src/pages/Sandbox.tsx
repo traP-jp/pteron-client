@@ -1,6 +1,8 @@
-import { Accordion, Group, Stack, Text, Title } from "@mantine/core";
+import { Accordion, Button, Group, Stack, Text, Title } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 
 import type { components } from "/@/api/schema/internal";
+import { CreateProjectModal } from "/@/components/CreateProjectModal";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
@@ -249,6 +251,38 @@ const RankingFullSample = () => {
     );
 };
 
+const CreateProjectModalSample = () => {
+    const [opened, { open, close }] = useDisclosure(false);
+    return (
+        <Accordion.Item value="create-project-modal">
+            <Accordion.Control>
+                <Group>
+                    <Text fw={500}>CreateProjectModal</Text>
+                    <Text
+                        c="dimmed"
+                        size="xs"
+                    >
+                        プロジェクト作成モーダル
+                    </Text>
+                </Group>
+            </Accordion.Control>
+            <Accordion.Panel>
+                <Stack gap="sm">
+                    <CreateProjectModal
+                        opened={opened}
+                        onClose={close}
+                    />
+                    <Button
+                        variant="default"
+                        onClick={open}
+                    >
+                        新規プロジェクトを作成
+                    </Button>
+                </Stack>
+            </Accordion.Panel>
+        </Accordion.Item>
+    );
+};
 const TransactionListSample = () => (
     <Accordion.Item value="transaction-list">
         <Accordion.Control>
@@ -345,6 +379,7 @@ export const Sandbox = () => {
 
                 <RankingFullSample />
 
+                <CreateProjectModalSample />
                 <TransactionListSample />
             </Accordion>
         </Stack>
