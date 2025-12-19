@@ -2,9 +2,11 @@ import { Divider, Paper, Stack, Text } from "@mantine/core";
 
 import { RankingList } from "./RankingList";
 import { RankingTop3 } from "./RankingTop3";
-import type { RankedUser, RankingBaseProps } from "./RankingTypes";
+import type { RankedItem, RankingBaseProps, RankingEntity } from "./RankingTypes";
 
-export interface RankingFullProps extends RankingBaseProps {
+export interface RankingFullProps<
+    T extends RankingEntity = RankingEntity,
+> extends RankingBaseProps<T> {
     title?: string;
     showTop3?: boolean;
     maxItems?: number;
@@ -14,21 +16,24 @@ export interface RankingFullProps extends RankingBaseProps {
  * 全体ランキング表示コンポーネント
  * 3位まで（横並び）+ 4位以降（縦リスト）を組み合わせて表示
  */
-export const RankingFull = ({
-    users,
+export const RankingFull = <T extends RankingEntity>({
+    type,
+    items,
     title,
     showTop3 = true,
     maxItems = 20,
-    onUserClick,
-}: RankingFullProps) => {
+    onItemClick,
+}: RankingFullProps<T>) => {
     // 最大件数でフィルタ
-    const limitedUsers = users.slice(0, maxItems);
+    const limitedItems = items.slice(0, maxItems);
 
     // 3位までとそれ以降を分割
-    const top3Users: RankedUser[] = showTop3 ? limitedUsers.filter(u => u.rank <= 3) : [];
-    const restUsers: RankedUser[] = showTop3 ? limitedUsers.filter(u => u.rank > 3) : limitedUsers;
+    const top3Items: RankedItem<T>[] = showTop3 ? limitedItems.filter(u => u.rank <= 3) : [];
+    const restItems: RankedItem<T>[] = showTop3
+        ? limitedItems.filter(u => u.rank > 3)
+        : limitedItems;
 
-    if (limitedUsers.length === 0) {
+    if (limitedItems.length === 0) {
         return (
             <Paper
                 p="lg"
@@ -62,21 +67,23 @@ export const RankingFull = ({
                 )}
 
                 {/* 3位まで */}
-                {showTop3 && top3Users.length > 0 && (
+                {showTop3 && top3Items.length > 0 && (
                     <>
                         <RankingTop3
-                            onUserClick={onUserClick}
-                            users={top3Users}
+                            items={top3Items}
+                            onItemClick={onItemClick}
+                            type={type}
                         />
-                        {restUsers.length > 0 && <Divider my="sm" />}
+                        {restItems.length > 0 && <Divider my="sm" />}
                     </>
                 )}
 
                 {/* 4位以降 */}
-                {restUsers.length > 0 && (
+                {restItems.length > 0 && (
                     <RankingList
-                        onUserClick={onUserClick}
-                        users={restUsers}
+                        items={restItems}
+                        onItemClick={onItemClick}
+                        type={type}
                     />
                 )}
             </Stack>
