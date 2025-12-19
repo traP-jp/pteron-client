@@ -34,11 +34,11 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
 
     // Project名を取得 (仮)
     const getProjectName = () => {
-        return toBranded<ProjectName>(`project_${transaction.project_id}`);
+        return toBranded<ProjectName>(`project_${transaction.project?.id}`);
     };
 
     const getUserName = () => {
-        return toBranded<UserName>(`user_${transaction.user_id}`);
+        return toBranded<UserName>(`user_${transaction.user?.id}`);
     };
 
     const fromAvatar = (
