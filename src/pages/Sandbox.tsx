@@ -1,7 +1,7 @@
 import { Accordion, Button, Group, Stack, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
-import type { Transaction } from "/@/api/schema/public";
+import type { Transaction } from "/@/api/schema/internal";
 import { CreateProjectModal } from "/@/components/CreateProjectModal";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
@@ -29,28 +29,73 @@ const mockProjectItems: RankedItem<Project>[] = [
     {
         rank: 1,
         rankDiff: 2,
-        entity: { id: "p1", name: "traQ", balance: 50000, url: "https://q.trap.jp" },
+        entity: {
+            id: "p1",
+            name: "traQ",
+            balance: 50000,
+            url: "https://q.trap.jp",
+            owner: { id: "u1", name: "alice", balance: 15000 },
+            admins: [],
+        },
     },
     {
         rank: 2,
         rankDiff: -1,
-        entity: { id: "p2", name: "knoQ", balance: 35000, url: "https://knoq.trap.jp" },
+        entity: {
+            id: "p2",
+            name: "knoQ",
+            balance: 35000,
+            url: "https://knoq.trap.jp",
+            owner: { id: "u2", name: "bob", balance: 12500 },
+            admins: [],
+        },
     },
     {
         rank: 3,
         rankDiff: 0,
-        entity: { id: "p3", name: "anke-to", balance: 28000, url: "https://anke-to.trap.jp" },
+        entity: {
+            id: "p3",
+            name: "anke-to",
+            balance: 28000,
+            url: "https://anke-to.trap.jp",
+            owner: { id: "u3", name: "charlie", balance: 10000 },
+            admins: [],
+        },
     },
     {
         rank: 4,
         rankDiff: 1,
-        entity: { id: "p4", name: "booQ", balance: 22000, url: "https://booq.trap.jp" },
+        entity: {
+            id: "p4",
+            name: "booQ",
+            balance: 22000,
+            url: "https://booq.trap.jp",
+            owner: { id: "u4", name: "david", balance: 8500 },
+            admins: [],
+        },
     },
-    { rank: 5, rankDiff: -2, entity: { id: "p5", name: "NeoShowcase", balance: 18000 } },
+    {
+        rank: 5,
+        rankDiff: -2,
+        entity: {
+            id: "p5",
+            name: "NeoShowcase",
+            balance: 18000,
+            owner: { id: "u5", name: "eve", balance: 7200 },
+            admins: [],
+        },
+    },
     {
         rank: 6,
         rankDiff: 0,
-        entity: { id: "p6", name: "Jomon", balance: 15000, url: "https://jomon.trap.jp" },
+        entity: {
+            id: "p6",
+            name: "Jomon",
+            balance: 15000,
+            url: "https://jomon.trap.jp",
+            owner: { id: "u6", name: "frank", balance: 6800 },
+            admins: [],
+        },
     },
 ];
 
@@ -59,8 +104,14 @@ const mockTransactions: Transaction[] = [
         id: "1a2b3c4d-5e6f-7890-abcd-ef1234567890",
         type: "TRANSFER",
         amount: 10000,
-        project_id: "aabbccdd-eeff-1122-3344-556677889900",
-        user_id: "11223344-5566-7788-99aa-bbccddeeff00",
+        project: {
+            id: "aabbccdd-eeff-1122-3344-556677889900",
+            name: "traQ",
+            balance: 50000,
+            owner: { id: "u1", name: "alice", balance: 15000 },
+            admins: [],
+        },
+        user: { id: "11223344-5566-7788-99aa-bbccddeeff00", name: "alice", balance: 15000 },
         description: "プロジェクトからの報酬",
         created_at: "2025-12-18T10:00:00Z",
     },
@@ -68,8 +119,14 @@ const mockTransactions: Transaction[] = [
         id: "2b3c4d5e-6f7a-8901-bcde-f12345678901",
         type: "BILL_PAYMENT",
         amount: 5000,
-        project_id: "bbccddee-ff11-2233-4455-667788990011",
-        user_id: "11223344-5566-7788-99aa-bbccddeeff00",
+        project: {
+            id: "bbccddee-ff11-2233-4455-667788990011",
+            name: "knoQ",
+            balance: 35000,
+            owner: { id: "u2", name: "bob", balance: 12500 },
+            admins: [],
+        },
+        user: { id: "11223344-5566-7788-99aa-bbccddeeff00", name: "alice", balance: 15000 },
         description: "サービス利用料",
         created_at: "2025-12-17T15:30:00Z",
     },
@@ -77,8 +134,14 @@ const mockTransactions: Transaction[] = [
         id: "3c4d5e6f-7a8b-9012-cdef-123456789012",
         type: "TRANSFER",
         amount: 25000,
-        project_id: "aabbccdd-eeff-1122-3344-556677889900",
-        user_id: "11223344-5566-7788-99aa-bbccddeeff00",
+        project: {
+            id: "aabbccdd-eeff-1122-3344-556677889900",
+            name: "traQ",
+            balance: 50000,
+            owner: { id: "u1", name: "alice", balance: 15000 },
+            admins: [],
+        },
+        user: { id: "11223344-5566-7788-99aa-bbccddeeff00", name: "alice", balance: 15000 },
         description: "ボーナス",
         created_at: "2025-12-16T09:00:00Z",
     },
@@ -86,8 +149,14 @@ const mockTransactions: Transaction[] = [
         id: "4d5e6f7a-8b9c-0123-def1-234567890123",
         type: "BILL_PAYMENT",
         amount: 3000,
-        project_id: "ccddeeff-1122-3344-5566-778899001122",
-        user_id: "11223344-5566-7788-99aa-bbccddeeff00",
+        project: {
+            id: "ccddeeff-1122-3344-5566-778899001122",
+            name: "Jomon",
+            balance: 15000,
+            owner: { id: "u6", name: "frank", balance: 6800 },
+            admins: [],
+        },
+        user: { id: "11223344-5566-7788-99aa-bbccddeeff00", name: "alice", balance: 15000 },
         description: "月額料金",
         created_at: "2025-12-15T12:00:00Z",
     },

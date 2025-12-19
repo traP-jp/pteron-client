@@ -102,7 +102,7 @@ const projectFormSchema = z.object({
 type ProjectFormValues = z.infer<typeof projectFormSchema>;
 
 async function createProject(values: ProjectFormValues) {
-    return apis.internal.projects.projectsCreate({
+    return apis.internal.projects.createProject({
         name: values.name,
         url: values.url || undefined,
     });
