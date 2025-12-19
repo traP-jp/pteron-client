@@ -18,7 +18,7 @@ pnpm dev
 ```typescript
 import apis from "/@/api";
 
-const { data } = await apis.internal.me.getMe();
+const { data } = await apis.internal.me.getCurrentUser();
 console.log(data.name); // "alice"
 console.log(data.balance); // 15000
 ```
@@ -26,7 +26,7 @@ console.log(data.balance); // 15000
 ### 2. ユーザー一覧を取得
 
 ```typescript
-const { data } = await apis.internal.users.usersList({ limit: 10 });
+const { data } = await apis.internal.users.getUsers({ limit: 10 });
 data.items.forEach(user => {
     console.log(`${user.name}: ${user.balance}円`);
 });
@@ -35,7 +35,7 @@ data.items.forEach(user => {
 ### 3. ユーザーランキングを取得
 
 ```typescript
-const { data } = await apis.internal.stats.usersDetail("balance", {
+const { data } = await apis.internal.stats.getUserRankings("balance", {
     term: "7days",
     limit: 10,
 });
@@ -47,7 +47,7 @@ data.items?.forEach(item => {
 ### 4. プロジェクト一覧を取得
 
 ```typescript
-const { data } = await apis.internal.projects.projectsList();
+const { data } = await apis.internal.projects.getProjects();
 data.items.forEach(project => {
     console.log(`${project.name}: ${project.balance}円`);
 });
