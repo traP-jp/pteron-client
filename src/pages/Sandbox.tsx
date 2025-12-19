@@ -182,6 +182,10 @@ const EntityCardSample = () => (
                         {'type="user"'}
                     </Text>
                     <EntityCard
+                        padding="xs"
+                        p="lg"
+                        withBorder
+                        radius="md"
                         amount={toBranded<Copia>(1000000n)}
                         name={toBranded<UserName>("uni_kakurenbo")}
                         type="user"
@@ -196,6 +200,10 @@ const EntityCardSample = () => (
                         {'type="project"'}
                     </Text>
                     <EntityCard
+                        padding="xs"
+                        p="lg"
+                        withBorder
+                        radius="md"
                         amount={toBranded<Copia>(10000000000n)}
                         name={toBranded<ProjectName>("awesome_project")}
                         type="project"

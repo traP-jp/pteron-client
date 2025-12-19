@@ -1,53 +1,62 @@
-import { Group, Text, UnstyledButton, type UnstyledButtonProps } from "@mantine/core";
-import { IconChevronRight } from "@tabler/icons-react";
+import { Card, type CardProps, Flex, Group, Text } from "@mantine/core";
 
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
-import classes from "/@/styles/entity-card.module.scss";
 import type { Amount } from "/@/types/amount";
 import type { UserOrProject, UserOrProjectType } from "/@/types/userOrProject";
 
-export type EntityCardProps<Type extends UserOrProjectType> = UnstyledButtonProps &
+import { MaybeLink } from "./MaybeLink";
+
+import { type Url, toBranded } from "../types/entity";
+import type { Href } from "../types/href";
+
+export type EntityCardProps<Type extends UserOrProjectType> = CardProps &
     Amount &
-    UserOrProject<Type>;
+    UserOrProject<Type> &
+    Partial<Href>;
 
 export const EntityCard = <Type extends UserOrProjectType>({
     type,
     name,
     amount,
+    href = toBranded<Url>(""),
     ...props
 }: EntityCardProps<Type>) => {
     return (
-        <UnstyledButton
-            className={classes.root}
-            {...props}
-        >
-            <Group>
-                <PAvatar
-                    type={type}
-                    name={name}
-                />
-
-                <div style={{ flex: 1 }}>
-                    <Text
-                        size="sm"
-                        fw={500}
+        <Card {...props}>
+            <Card.Section>
+                <Group>
+                    <MaybeLink
+                        to={href}
+                        className={`${href ? "" : "pointer-events-none"}`}
                     >
-                        {name}
-                    </Text>
+                        <PAvatar
+                            size="md"
+                            type={type}
+                            name={name}
+                        />
+                    </MaybeLink>
 
-                    <PAmount
-                        value={amount}
-                        leadingIcon
-                        coloring
-                    />
-                </div>
+                    <Flex direction="column">
+                        <MaybeLink to={href}>
+                            <Text
+                                size="md"
+                                fw={500}
+                            >
+                                {name}
+                            </Text>
+                        </MaybeLink>
 
-                <IconChevronRight
-                    size={14}
-                    stroke={1.5}
-                />
-            </Group>
-        </UnstyledButton>
+                        <PAmount
+                            size="custom"
+                            customSize={0.8}
+                            value={amount}
+                            leadingIcon
+                            coloring
+                        />
+                    </Flex>
+                </Group>
+            </Card.Section>
+        </Card>
     );
 };
