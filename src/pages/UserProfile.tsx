@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Card, Flex, Text } from "@mantine/core";
+import { Card, Flex, Grid, Text } from "@mantine/core";
 
 import apis from "/@/api";
 import type { Project, User } from "/@/api/schema/internal";
@@ -64,50 +64,77 @@ function UserProfileTop({ name, balance }: { name: UserName; balance: Copia }) {
 function UserProfileMiddle({ transactions }: { transactions: Transaction[] }) {
     // TODO: グラフ
     return (
-        <>
-            <Card
-                withBorder
-                radius="md"
-                p="lg"
-            >
-                <Text
-                    size="xl"
-                    mb="md"
+        <Grid>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+                <Card
+                    withBorder
+                    radius="md"
+                    p="lg"
+                    h="100%"
                 >
-                    取引履歴
-                </Text>
-                {transactions.length === 0 && <Text color="dimmed">取引履歴がありません</Text>}
-                <TransactionList
-                    transactions={transactions}
-                    currentType="user"
-                />
-            </Card>
-        </>
+                    <Text
+                        size="xl"
+                        mb="md"
+                    >
+                        概要
+                    </Text>
+                    <Text>グラフとか入る予定</Text>
+                </Card>
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+                <Card
+                    withBorder
+                    radius="md"
+                    p="lg"
+                    h="100%"
+                    style={{ display: "flex", flexDirection: "column" }}
+                >
+                    <Text
+                        size="xl"
+                        mb="md"
+                    >
+                        取引履歴
+                    </Text>
+                    {transactions.length === 0 && <Text c="dimmed">取引履歴がありません</Text>}
+                    <div style={{ overflow: "auto", height: "20rem" }}>
+                        <TransactionList
+                            transactions={transactions.concat(transactions)}
+                            currentType="user"
+                        />
+                    </div>
+                </Card>
+            </Grid.Col>
+        </Grid>
     );
 }
 
 function UserProfileBottom({ projects }: { projects: Project[] }) {
     return (
         <>
-            <Text size="xl">所属しているプロジェクト</Text>
-            <Flex
-                direction="row"
-                wrap="wrap"
-                gap="md"
+            <Text
+                size="xl"
+                // mb="md"
             >
+                所属しているプロジェクト
+            </Text>
+            <Grid>
                 {projects.map(project => (
-                    <EntityCard
-                        p="xl"
-                        withBorder
-                        radius="md"
+                    <Grid.Col
+                        span={{ base: 12, sm: 6, md: 4, lg: 3 }}
                         key={project.id}
-                        type="project"
-                        amount={toBranded<Copia>(BigInt(project.balance))}
-                        name={toBranded<ProjectName>(project.name)}
-                        extraLink={project.url ? toBranded<Url>(project.url) : undefined}
-                    />
+                    >
+                        <EntityCard
+                            p="xl"
+                            withBorder
+                            radius="md"
+                            type="project"
+                            amount={toBranded<Copia>(BigInt(project.balance))}
+                            name={toBranded<ProjectName>(project.name)}
+                            extraLink={project.url ? toBranded<Url>(project.url) : undefined}
+                        />
+                    </Grid.Col>
                 ))}
-            </Flex>
+            </Grid>
         </>
     );
 }
