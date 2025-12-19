@@ -3,11 +3,13 @@ import { IconCrown, IconExternalLink } from "@tabler/icons-react";
 
 import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
-import { toBranded } from "/@/types/entity";
+import { type Url, toBranded } from "/@/types/entity";
 import type { ProjectName, UserName } from "/@/types/entity";
 
 import type { RankedItem, RankingBaseProps, RankingEntity } from "./RankingTypes";
 import { isProject } from "./RankingTypes";
+
+import { createExternalLinkHander } from "../lib/link";
 
 /**
  * 王冠の色とサイズを取得
@@ -44,14 +46,9 @@ const RankingTop3Item = <T extends RankingEntity>({
     const crownStyle = getCrownStyle(rank);
     const isFirst = rank === 1;
     const entityIsProject = isProject(entity);
-    const projectUrl = entityIsProject ? entity.url : undefined;
+    const projectUrl = toBranded<Url>(entityIsProject ? (entity.url ?? "") : "");
 
-    const handleExternalLinkClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (projectUrl) {
-            window.open(projectUrl, "_blank", "noopener,noreferrer");
-        }
-    };
+    const handleExternalLinkClick = createExternalLinkHander(projectUrl);
 
     return (
         <Card

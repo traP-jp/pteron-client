@@ -3,15 +3,14 @@ import { useDisclosure } from "@mantine/hooks";
 
 import type { Transaction } from "/@/api/schema/internal";
 import { CreateProjectModal } from "/@/components/CreateProjectModal";
+import { EntityCard } from "/@/components/EntityCard";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
 import { TrendIndicator } from "/@/components/TrendIndicator";
 import type { Project, RankedItem, User } from "/@/components/ranking";
 import { RankingFull } from "/@/components/ranking";
-import { type Copia, type ProjectName, type UserName, toBranded } from "/@/types/entity";
-
-import { EntityCard } from "../components/EntityCard";
+import { type Copia, type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
 
 const TrendIndicatorSample = () => (
     <Accordion.Item value="trend-indicator">
@@ -206,6 +205,7 @@ const EntityCardSample = () => (
                         radius="md"
                         amount={toBranded<Copia>(10000000000n)}
                         name={toBranded<ProjectName>("awesome_project")}
+                        extraLink={toBranded<Url>("https://q.trap.jp")}
                         type="project"
                     />
                 </>

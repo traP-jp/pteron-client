@@ -15,7 +15,7 @@ export const MaybeLink = ({ to, children, ...props }: PLinkProps) => {
             to={to}
             {...props}
         >
-            children
+            {children}
         </Link>
     );
 };

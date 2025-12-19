@@ -4,10 +4,12 @@ import { IconExternalLink } from "@tabler/icons-react";
 import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
 import { toBranded } from "/@/types/entity";
-import type { ProjectName, UserName } from "/@/types/entity";
+import type { ProjectName, Url, UserName } from "/@/types/entity";
 
 import type { RankedItem, RankingBaseProps, RankingEntity } from "./RankingTypes";
 import { isProject } from "./RankingTypes";
+
+import { createExternalLinkHander } from "../lib/link";
 
 export interface RankingListProps<
     T extends RankingEntity = RankingEntity,
@@ -31,14 +33,9 @@ const RankingListItem = <T extends RankingEntity>({
 }: RankingListItemProps<T>) => {
     const { rank, rankDiff, entity } = rankedItem;
     const entityIsProject = isProject(entity);
-    const projectUrl = entityIsProject ? entity.url : undefined;
+    const projectUrl = toBranded<Url>(entityIsProject ? (entity.url ?? "") : "");
 
-    const handleExternalLinkClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (projectUrl) {
-            window.open(projectUrl, "_blank", "noopener,noreferrer");
-        }
-    };
+    const handleExternalLinkClick = createExternalLinkHander(projectUrl);
 
     return (
         <Paper
