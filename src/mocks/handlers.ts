@@ -8,6 +8,9 @@ import {
     generateUUID,
     getBillById,
     getProjectByIdOrName,
+    getProjectsByOwnerOrAdminIdOrName,
+    getTransactionsByProjectIdOrName,
+    getTransactionsByUserIdOrName,
     getUserByIdOrName,
     getUserByName,
     mockAPIClients,
@@ -95,7 +98,7 @@ const internalHandlers = [
         const limit = Number(url.searchParams.get("limit")) || 20;
         const userId = params.user_id as string;
 
-        const userTransactions = mockTransactions.filter(t => t.user?.id === userId);
+        const userTransactions = getTransactionsByUserIdOrName(userId);
         const items = userTransactions.slice(0, limit);
 
         return HttpResponse.json({
@@ -110,7 +113,7 @@ const internalHandlers = [
         const limit = Number(url.searchParams.get("limit")) || 20;
         const projectId = params.project_id as string;
 
-        const projectTransactions = mockTransactions.filter(t => t.project?.id === projectId);
+        const projectTransactions = getTransactionsByProjectIdOrName(projectId);
         const items = projectTransactions.slice(0, limit);
 
         return HttpResponse.json({
@@ -283,9 +286,7 @@ const internalHandlers = [
     // GET /api/internal/users/:user_id/projects - ユーザーのプロジェクト一覧
     http.get("/api/internal/users/:user_id/projects", ({ params }) => {
         const userId = params.user_id as string;
-        const userProjects = mockProjects.filter(
-            p => p.owner?.id === userId || p.admins?.some(a => a.id === userId)
-        );
+        const userProjects = getProjectsByOwnerOrAdminIdOrName(userId);
         return HttpResponse.json(userProjects);
     }),
 

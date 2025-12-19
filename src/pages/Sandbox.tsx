@@ -1,14 +1,14 @@
 import { Accordion, Button, Group, Stack, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
-import type { Transaction } from "/@/api/schema/internal";
+import type { Project, Transaction, User } from "/@/api/schema/internal";
 import { CreateProjectModal } from "/@/components/CreateProjectModal";
 import { EntityCard } from "/@/components/EntityCard";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
 import { TrendIndicator } from "/@/components/TrendIndicator";
-import type { Project, RankedItem, User } from "/@/components/ranking";
+import type { RankedItem } from "/@/components/ranking";
 import { RankingFull } from "/@/components/ranking";
 import { type Copia, type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
 

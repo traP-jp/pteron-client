@@ -216,3 +216,26 @@ export function getProjectByIdOrName(userIdOrName: string) {
 
     return getProjectByName(userIdOrName);
 }
+
+export function getProjectsByOwnerOrAdminIdOrName(userIdOrName: string) {
+    const user = getUserByIdOrName(userIdOrName);
+    if (!user) return [];
+
+    return mockProjects.filter(
+        ({ owner, admins }) => owner?.id === user.id || admins?.some(({ id }) => id === user.id)
+    );
+}
+
+export function getTransactionsByUserIdOrName(userIdOrName: string) {
+    const user = getUserByIdOrName(userIdOrName);
+    if (!user) return [];
+
+    return mockTransactions.filter(t => t.user?.id === user.id);
+}
+
+export function getTransactionsByProjectIdOrName(projectIdOrName: string) {
+    const project = getProjectByIdOrName(projectIdOrName);
+    if (!project) return [];
+
+    return mockTransactions.filter(t => t.project?.id === project.id);
+}
