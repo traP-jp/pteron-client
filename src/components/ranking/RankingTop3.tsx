@@ -1,12 +1,13 @@
-import { Card, Group, Stack, Text } from "@mantine/core";
-import { IconCrown } from "@tabler/icons-react";
+import { ActionIcon, Card, Group, Stack, Text } from "@mantine/core";
+import { IconCrown, IconExternalLink } from "@tabler/icons-react";
 
 import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
 import { toBranded } from "/@/types/entity";
-import type { UserName } from "/@/types/entity";
+import type { ProjectName, UserName } from "/@/types/entity";
 
-import type { RankedUser, RankingBaseProps } from "./RankingTypes";
+import type { RankedItem, RankingBaseProps, RankingEntity } from "./RankingTypes";
+import { isProject } from "./RankingTypes";
 
 /**
  * 王冠の色とサイズを取得
@@ -24,24 +25,38 @@ const getCrownStyle = (rank: number): { color: string; size: number } => {
     }
 };
 
-interface RankingTop3ItemProps {
-    rankedUser: RankedUser;
-    onUserClick?: (user: RankedUser) => void;
+interface RankingTop3ItemProps<T extends RankingEntity = RankingEntity> {
+    type: "user" | "project";
+    rankedItem: RankedItem<T>;
+    onItemClick?: (item: RankedItem<T>) => void;
 }
 
 /**
  * Top3の個別カード
- * レイアウト: 王冠 → ポイント → アバター+ユーザー名
+ * レイアウト: 王冠 → ポイント → アバター+名前
  */
-const RankingTop3Item = ({ rankedUser, onUserClick }: RankingTop3ItemProps) => {
-    const { rank, rankDiff, user } = rankedUser;
+const RankingTop3Item = <T extends RankingEntity>({
+    type,
+    rankedItem,
+    onItemClick,
+}: RankingTop3ItemProps<T>) => {
+    const { rank, rankDiff, entity } = rankedItem;
     const crownStyle = getCrownStyle(rank);
     const isFirst = rank === 1;
+    const entityIsProject = isProject(entity);
+    const projectUrl = entityIsProject ? entity.url : undefined;
+
+    const handleExternalLinkClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (projectUrl) {
+            window.open(projectUrl, "_blank", "noopener,noreferrer");
+        }
+    };
 
     return (
         <Card
             className={`flex-1 cursor-pointer transition-transform hover:scale-105 ${isFirst ? "border-2 border-yellow-400" : ""}`}
-            onClick={() => onUserClick?.(rankedUser)}
+            onClick={() => onItemClick?.(rankedItem)}
             padding="md"
             radius="md"
             shadow="sm"
@@ -60,11 +75,11 @@ const RankingTop3Item = ({ rankedUser, onUserClick }: RankingTop3ItemProps) => {
 
                     {/* 王冠アイコン */}
                     <IconCrown
+                        aria-label={`Rank ${rank} crown`}
                         color={crownStyle.color}
                         fill={crownStyle.color}
-                        size={crownStyle.size}
                         role="img"
-                        aria-label={`Rank ${rank} crown`}
+                        size={crownStyle.size}
                     />
                 </Stack>
 
@@ -74,50 +89,70 @@ const RankingTop3Item = ({ rankedUser, onUserClick }: RankingTop3ItemProps) => {
                     fw={700}
                     size={isFirst ? "xl" : "lg"}
                 >
-                    {user.balance?.toLocaleString() ?? 0}
+                    {entity.balance?.toLocaleString() ?? 0}
                 </Text>
 
-                {/* アバター + ユーザー名 */}
+                {/* アバター + 名前 + 外部リンク */}
                 <Group
                     gap="xs"
                     wrap="nowrap"
                 >
                     <PAvatar
-                        name={toBranded<UserName>(user.name ?? "")}
+                        name={
+                            type === "user"
+                                ? toBranded<UserName>(entity.name ?? "")
+                                : toBranded<ProjectName>(entity.name ?? "")
+                        }
                         size="sm"
-                        type="user"
+                        type={type}
                     />
                     <Text
                         fw={500}
                         lineClamp={1}
                         size="sm"
                     >
-                        {user.name}
+                        {entity.name}
                     </Text>
+                    {/* プロジェクトの場合のみ外部リンクアイコン */}
+                    {type === "project" && projectUrl && (
+                        <ActionIcon
+                            aria-label="サイトを開く"
+                            color="gray"
+                            onClick={handleExternalLinkClick}
+                            size="sm"
+                            variant="subtle"
+                        >
+                            <IconExternalLink size={14} />
+                        </ActionIcon>
+                    )}
                 </Group>
             </Stack>
         </Card>
     );
 };
 
-export type RankingTop3Props = RankingBaseProps;
+export type RankingTop3Props<T extends RankingEntity = RankingEntity> = RankingBaseProps<T>;
 
 /**
  * 1位〜3位を横並びで表示するコンポーネント
  */
-export const RankingTop3 = ({ users, onUserClick }: RankingTop3Props) => {
+export const RankingTop3 = <T extends RankingEntity>({
+    type,
+    items,
+    onItemClick,
+}: RankingTop3Props<T>) => {
     // 1位〜3位のみ取得
-    const top3Users = users.filter(u => u.rank >= 1 && u.rank <= 3);
+    const top3Items = items.filter(u => u.rank >= 1 && u.rank <= 3);
 
     // 表彰台形式の並び順にする (2位, 1位, 3位)
     // データが足りない場合も考慮して、rankで検索して配置
-    const podiumUsers = [
-        top3Users.find(u => u.rank === 2),
-        top3Users.find(u => u.rank === 1),
-        top3Users.find(u => u.rank === 3),
-    ].filter(u => u !== undefined) as RankedUser[];
+    const podiumItems = [
+        top3Items.find(u => u.rank === 2),
+        top3Items.find(u => u.rank === 1),
+        top3Items.find(u => u.rank === 3),
+    ].filter(u => u !== undefined) as RankedItem<T>[];
 
-    if (podiumUsers.length === 0) {
+    if (podiumItems.length === 0) {
         return (
             <Text
                 c="dimmed"
@@ -134,11 +169,12 @@ export const RankingTop3 = ({ users, onUserClick }: RankingTop3Props) => {
             gap="md"
             grow
         >
-            {podiumUsers.map(rankedUser => (
+            {podiumItems.map(rankedItem => (
                 <RankingTop3Item
-                    key={rankedUser.user.id}
-                    onUserClick={onUserClick}
-                    rankedUser={rankedUser}
+                    key={rankedItem.entity.id}
+                    onItemClick={onItemClick}
+                    rankedItem={rankedItem}
+                    type={type}
                 />
             ))}
         </Group>
