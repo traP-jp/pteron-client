@@ -1,0 +1,9 @@
+p {
+    &[data-size="custom"] {
+        font-size: attr(data-custom-size rem);
+        svg {
+            height: attr(data-custom-size rem);
+            width: auto;
+        }
+    }
+}

@@ -1,13 +1,36 @@
 #! /bin/bash -ue
 
-npx openapi-typescript \
-    https://raw.githubusercontent.com/traP-jp/plutus/refs/heads/main/specs/openapi/internal.yaml \
-    -o ./src/api/schema/internal.ts
+mkdir -p ./src/api/schema/
+cd ./src/api/schema/
 
-npx openapi-typescript \
-    https://raw.githubusercontent.com/traP-jp/plutus/refs/heads/main/specs/openapi/pteron.yaml \
-    -o ./src/api/schema/public.ts
+SOURCES=(
+    "https://raw.githubusercontent.com/traP-jp/plutus/refs/heads/main/specs/openapi/internal.yaml"
+    "https://raw.githubusercontent.com/traP-jp/plutus/refs/heads/main/specs/openapi/pteron.yaml"
+    "https://raw.githubusercontent.com/traPtitech/traQ/refs/heads/master/docs/v3-api.yaml"
+)
 
-npx openapi-typescript \
-    https://raw.githubusercontent.com/traPtitech/traQ/refs/heads/master/docs/v3-api.yaml \
-    -o ./src/api/schema/traq.ts
+OUTPUTS=(
+    internal.ts
+    public.ts
+    traq.ts
+)
+
+for ((i = 0; i < ${#SOURCES[@]}; i++)); do
+    {
+        npx -y swagger-typescript-api generate \
+            --add-readonly \
+            --route-types \
+            --axios \
+            --sort-routes --sort-types \
+            --generate-union-enums \
+            --path="${SOURCES[i]}" \
+            --name="${OUTPUTS[i]}" >"${OUTPUTS[i]}.log" 2>&1
+    } &
+done
+
+wait
+
+for ((i = 0; i < ${#OUTPUTS[@]}; i++)); do
+    cat "${OUTPUTS[i]}.log"
+    rm -f "${OUTPUTS[i]}.log"
+done
