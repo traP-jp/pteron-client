@@ -32,6 +32,15 @@ export const router = createBrowserRouter([
                 path: "stats",
                 Component: lazy(() => import("./pages/Stats")),
             },
+            // 開発環境のみsandboxを追加
+            ...(import.meta.env.DEV
+                ? [
+                      {
+                          path: "sandbox",
+                          Component: lazy(() => import("./pages/Sandbox")),
+                      },
+                  ]
+                : []),
         ],
     },
     {

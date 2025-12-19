@@ -2,7 +2,13 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import { AppShell, Group, Stack, Tooltip, UnstyledButton, rem } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import { IconChartBar, IconFolders, IconHome, IconUsersGroup } from "@tabler/icons-react";
+import {
+    IconChartBar,
+    IconFolders,
+    IconHome,
+    IconTestPipe,
+    IconUsersGroup,
+} from "@tabler/icons-react";
 
 import CopiaLogoSrc from "/@/assets/icons/copiaLogo.svg";
 import { toBranded } from "/@/types/entity";
@@ -15,6 +21,8 @@ const navItems = [
     { icon: IconFolders, label: "Projects", to: "/projects" },
     { icon: IconUsersGroup, label: "Users", to: "/users" },
     { icon: IconChartBar, label: "Stats", to: "/stats" },
+    // 開発環境のみ
+    ...(import.meta.env.DEV ? [{ icon: IconTestPipe, label: "Sandbox", to: "/sandbox" }] : []),
 ];
 
 interface NavbarLinkProps {
