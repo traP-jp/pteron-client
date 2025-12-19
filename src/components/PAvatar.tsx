@@ -1,7 +1,9 @@
+import { Suspense, useEffect, useState } from "react";
+
 import { Avatar, type AvatarProps, type MantineSize } from "@mantine/core";
 
-import { buildFallbackIconUrl, buildTraqIconUrl } from "/@/api/api";
-import { type ProjectName, type UserName, toBranded } from "/@/types/entity";
+import { buildFallbackIconUrl, buildTraqIconUrl } from "/@/api";
+import { type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
 
 type AvatarType = "user" | "project";
 
@@ -12,14 +14,26 @@ export type PAvatarProps<Type extends AvatarType> = AvatarProps & {
 };
 
 export const PAvatar = <Type extends AvatarType>({ type, name, ...props }: PAvatarProps<Type>) => {
-    const src =
-        type === "user" ? buildTraqIconUrl(toBranded<UserName>(name)) : buildFallbackIconUrl(name);
+    const [src, setSrc] = useState<Url>(toBranded<Url>(""));
+
+    useEffect(() => {
+        const buildUrl = async () =>
+            type === "user"
+                ? buildTraqIconUrl(toBranded<UserName>(name))
+                : buildFallbackIconUrl(name);
+
+        buildUrl().then(url => setSrc(url));
+    });
 
     return (
-        <Avatar
-            alt={name}
-            src={src}
-            {...props}
-        />
+        <Suspense>
+            {
+                <Avatar
+                    alt={name}
+                    src={src}
+                    {...props}
+                />
+            }
+        </Suspense>
     );
 };
