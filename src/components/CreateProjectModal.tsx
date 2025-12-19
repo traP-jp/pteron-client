@@ -15,7 +15,7 @@ function projectNameValidator(name: string): string {
 
 async function createProject(name: string, url: string) {
     if (name.length === 0) return;
-    return apis.internal.projects.projectsCreate({
+    return apis.internal.projects.createProject({
         name,
         url: url || undefined,
     });
