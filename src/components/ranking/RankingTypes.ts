@@ -1,9 +1,4 @@
-import type { components } from "/@/api/schema/internal";
-
-/**
- * API から取得したユーザー情報
- */
-export type User = components["schemas"]["User"];
+import type { User } from "/@/api/schema/internal";
 
 /**
  * 順位付きユーザー情報

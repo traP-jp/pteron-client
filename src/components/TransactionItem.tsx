@@ -1,14 +1,12 @@
 import { Accordion, Group, Stack, Text } from "@mantine/core";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 
-import type { components } from "/@/api/schema/internal";
+import type { Transaction } from "/@/api/schema/public";
 import { toBranded } from "/@/types/entity";
 import type { Copia, ProjectName, UserName } from "/@/types/entity";
 
 import { PAmount } from "./PAmount";
 import { PAvatar } from "./PAvatar";
-
-type Transaction = components["schemas"]["Transaction"];
 
 export interface TransactionItemProps {
     transaction: Transaction;

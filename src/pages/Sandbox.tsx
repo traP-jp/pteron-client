@@ -1,7 +1,7 @@
 import { Accordion, Button, Group, Stack, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
-import type { components } from "/@/api/schema/internal";
+import type { Transaction } from "/@/api/schema/public";
 import { CreateProjectModal } from "/@/components/CreateProjectModal";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
@@ -34,8 +34,6 @@ const mockUsers: RankedUser[] = [
     { rank: 19, rankDiff: -1, user: { id: "19", name: "steve", balance: 400 } },
     { rank: 20, rankDiff: -1, user: { id: "20", name: "tina", balance: 200 } },
 ];
-
-type Transaction = components["schemas"]["Transaction"];
 
 const mockTransactions: Transaction[] = [
     {
