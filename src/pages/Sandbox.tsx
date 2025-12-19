@@ -12,6 +12,8 @@ import type { RankedItem } from "/@/components/ranking";
 import { RankingFull } from "/@/components/ranking";
 import { type Copia, type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
 
+import { EditProjectModal } from "../components/EditProjectModal";
+
 const TrendIndicatorSample = () => (
     <Accordion.Item value="trend-indicator">
         <Accordion.Control>
@@ -350,6 +352,42 @@ const TransactionListSample = () => (
     </Accordion.Item>
 );
 
+const mockProjectName = toBranded<ProjectName>("traP Portal");
+
+const EditProjectModalSample = ({ projectName }: { projectName: ProjectName }) => {
+    const [opened, { open, close }] = useDisclosure(false);
+    return (
+        <Accordion.Item value="edit-project-modal">
+            <Accordion.Control>
+                <Group>
+                    <Text fw={500}>EditProjectModal</Text>
+                    <Text
+                        c="dimmed"
+                        size="xs"
+                    >
+                        プロジェクト編集モーダル
+                    </Text>
+                </Group>
+            </Accordion.Control>
+            <Accordion.Panel>
+                <Stack gap="sm">
+                    <EditProjectModal
+                        projectName={projectName}
+                        opened={opened}
+                        onClose={close}
+                    />
+                    <Button
+                        variant="default"
+                        onClick={open}
+                    >
+                        プロジェクトを編集
+                    </Button>
+                </Stack>
+            </Accordion.Panel>
+        </Accordion.Item>
+    );
+};
+
 export const Sandbox = () => {
     return (
         <Stack
@@ -402,6 +440,7 @@ export const Sandbox = () => {
 
                 <CreateProjectModalSample />
                 <TransactionListSample />
+                <EditProjectModalSample projectName={mockProjectName} />
             </Accordion>
         </Stack>
     );
