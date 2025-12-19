@@ -1,6 +1,6 @@
 import { Button, Container, Flex, Grid } from "@mantine/core";
 
-export function Checkout() {
+export default function Checkout() {
     return (
         <Container>
             <Flex
