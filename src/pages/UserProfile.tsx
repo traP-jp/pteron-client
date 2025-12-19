@@ -5,13 +5,13 @@ import { Card, Flex, Grid, Text } from "@mantine/core";
 
 import apis from "/@/api";
 import type { Project, User } from "/@/api/schema/internal";
+import type { Transaction } from "/@/api/schema/internal";
+import { EntityCard } from "/@/components/EntityCard";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
+import { TransactionList } from "/@/components/TransactionList";
+import BalanceChart from "/@/components/ranking/BalanceChart";
 import { type Copia, type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
-
-import type { Transaction } from "../api/schema/internal";
-import { EntityCard } from "../components/EntityCard";
-import { TransactionList } from "../components/TransactionList";
 
 function UserProfileTop({ name, balance }: { name: UserName; balance: Copia }) {
     return (
@@ -62,49 +62,54 @@ function UserProfileTop({ name, balance }: { name: UserName; balance: Copia }) {
 }
 
 function UserProfileMiddle({ transactions }: { transactions: Transaction[] }) {
-    // TODO: グラフ
     return (
-        <Grid>
-            <Grid.Col span={{ base: 12, sm: 6 }}>
-                <Card
-                    withBorder
-                    radius="md"
-                    p="lg"
-                    h="100%"
+        <Flex
+            wrap="wrap"
+            direction="row"
+            gap="md"
+        >
+            <Card
+                className="flex-auto"
+                withBorder
+                radius="md"
+                p="lg"
+                h="100%"
+            >
+                <Text
+                    size="xl"
+                    mb="md"
                 >
-                    <Text
-                        size="xl"
-                        mb="md"
-                    >
-                        概要
-                    </Text>
-                    <Text>グラフとか入る予定</Text>
-                </Card>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, sm: 6 }}>
-                <Card
-                    withBorder
-                    radius="md"
-                    p="lg"
-                    h="100%"
-                    style={{ display: "flex", flexDirection: "column" }}
+                    概要
+                </Text>
+                <BalanceChart
+                    h={320}
+                    transactions={transactions}
+                />
+            </Card>
+
+            <Card
+                withBorder
+                className="min-w-100"
+                radius="md"
+                p="lg"
+                h="100%"
+                style={{ display: "flex", flexDirection: "column" }}
+            >
+                <Text
+                    size="xl"
+                    mb="md"
                 >
-                    <Text
-                        size="xl"
-                        mb="md"
-                    >
-                        取引履歴
-                    </Text>
-                    {transactions.length === 0 && <Text c="dimmed">取引履歴がありません</Text>}
-                    <div style={{ overflow: "auto", height: "20rem" }}>
-                        <TransactionList
-                            transactions={transactions.concat(transactions)}
-                            currentType="user"
-                        />
-                    </div>
-                </Card>
-            </Grid.Col>
-        </Grid>
+                    取引履歴
+                </Text>
+                {!transactions && <Text c="dimmed">取引履歴がありません</Text>}
+                <div className="h-80 overflow-auto">
+                    <TransactionList
+                        transactions={transactions}
+                        currentType="user"
+                    />
+                </div>
+            </Card>
+        </Flex>
     );
 }
 
@@ -152,19 +157,16 @@ const UserProfile = () => {
     }, [_userName]);
 
     useEffect(() => {
-        if (!user) return;
-        apis.internal.transactions.getUserTransactions(user.name).then(({ data }) => {
+        apis.internal.transactions.getUserTransactions(_userName!).then(({ data }) => {
             setTransactions(data.items);
         });
-    }, [user]);
+    }, [_userName]);
 
     useEffect(() => {
-        if (!user) return;
-
-        apis.internal.users.getUserProjects(user.name).then(({ data }) => {
+        apis.internal.users.getUserProjects(_userName!).then(({ data }) => {
             setUserProjects(data);
         });
-    }, [user]);
+    }, [_userName]);
 
     if (!user) return <></>;
 

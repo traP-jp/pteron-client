@@ -3,13 +3,12 @@ import { IconCrown, IconExternalLink } from "@tabler/icons-react";
 
 import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
+import { createExternalLinkHander } from "/@/lib/link";
 import { type Url, toBranded } from "/@/types/entity";
 import type { ProjectName, UserName } from "/@/types/entity";
 
 import type { RankedItem, RankingBaseProps, RankingEntity } from "./RankingTypes";
 import { isProject } from "./RankingTypes";
-
-import { createExternalLinkHander } from "../lib/link";
 
 /**
  * 王冠の色とサイズを取得
