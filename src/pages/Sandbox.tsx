@@ -1,39 +1,58 @@
-import { Accordion, Group, Stack, Text, Title } from "@mantine/core";
+import { Accordion, Button, Group, Stack, Text, Title } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 
-import type { components } from "/@/api/schema/internal";
+import type { Transaction } from "/@/api/schema/public";
+import { CreateProjectModal } from "/@/components/CreateProjectModal";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
 import { TrendIndicator } from "/@/components/TrendIndicator";
-import type { RankedUser } from "/@/components/ranking";
+import type { Project, RankedItem, User } from "/@/components/ranking";
 import { RankingFull } from "/@/components/ranking";
 import { type Copia, type ProjectName, type UserName, toBranded } from "/@/types/entity";
 
 // モックデータ（デバッグ用）
-const mockUsers: RankedUser[] = [
-    { rank: 1, rankDiff: 1, user: { id: "1", name: "alice", balance: 15000 } },
-    { rank: 2, rankDiff: -1, user: { id: "2", name: "bob", balance: 12500 } },
-    { rank: 3, rankDiff: -1, user: { id: "3", name: "charlie", balance: 10000 } },
-    { rank: 4, rankDiff: 2, user: { id: "4", name: "david", balance: 8500 } },
-    { rank: 5, rankDiff: 0, user: { id: "5", name: "eve", balance: 7200 } },
-    { rank: 6, rankDiff: -3, user: { id: "6", name: "frank", balance: 6800 } },
-    { rank: 7, rankDiff: 0, user: { id: "7", name: "grace", balance: 5500 } },
-    { rank: 8, rankDiff: 5, user: { id: "8", name: "henry", balance: 4200 } },
-    { rank: 9, rankDiff: -1, user: { id: "9", name: "ivy", balance: 3800 } },
-    { rank: 10, rankDiff: -2, user: { id: "10", name: "jack", balance: 3000 } },
-    { rank: 11, rankDiff: -1, user: { id: "11", name: "karen", balance: 2500 } },
-    { rank: 12, rankDiff: -1, user: { id: "12", name: "leo", balance: 2000 } },
-    { rank: 13, rankDiff: -1, user: { id: "13", name: "mia", balance: 1800 } },
-    { rank: 14, rankDiff: -1, user: { id: "14", name: "nick", balance: 1500 } },
-    { rank: 15, rankDiff: -1, user: { id: "15", name: "olivia", balance: 1200 } },
-    { rank: 16, rankDiff: -1, user: { id: "16", name: "paul", balance: 1000 } },
-    { rank: 17, rankDiff: -1, user: { id: "17", name: "quinn", balance: 800 } },
-    { rank: 18, rankDiff: 0, user: { id: "18", name: "rachel", balance: 600 } },
-    { rank: 19, rankDiff: -1, user: { id: "19", name: "steve", balance: 400 } },
-    { rank: 20, rankDiff: -1, user: { id: "20", name: "tina", balance: 200 } },
+const mockUserItems: RankedItem<User>[] = [
+    { rank: 1, rankDiff: 1, entity: { id: "1", name: "alice", balance: 15000 } },
+    { rank: 2, rankDiff: -1, entity: { id: "2", name: "bob", balance: 12500 } },
+    { rank: 3, rankDiff: -1, entity: { id: "3", name: "charlie", balance: 10000 } },
+    { rank: 4, rankDiff: 2, entity: { id: "4", name: "david", balance: 8500 } },
+    { rank: 5, rankDiff: 0, entity: { id: "5", name: "eve", balance: 7200 } },
+    { rank: 6, rankDiff: -3, entity: { id: "6", name: "frank", balance: 6800 } },
+    { rank: 7, rankDiff: 0, entity: { id: "7", name: "grace", balance: 5500 } },
+    { rank: 8, rankDiff: 5, entity: { id: "8", name: "henry", balance: 4200 } },
+    { rank: 9, rankDiff: -1, entity: { id: "9", name: "ivy", balance: 3800 } },
+    { rank: 10, rankDiff: -2, entity: { id: "10", name: "jack", balance: 3000 } },
 ];
 
-type Transaction = components["schemas"]["Transaction"];
+const mockProjectItems: RankedItem<Project>[] = [
+    {
+        rank: 1,
+        rankDiff: 2,
+        entity: { id: "p1", name: "traQ", balance: 50000, url: "https://q.trap.jp" },
+    },
+    {
+        rank: 2,
+        rankDiff: -1,
+        entity: { id: "p2", name: "knoQ", balance: 35000, url: "https://knoq.trap.jp" },
+    },
+    {
+        rank: 3,
+        rankDiff: 0,
+        entity: { id: "p3", name: "anke-to", balance: 28000, url: "https://anke-to.trap.jp" },
+    },
+    {
+        rank: 4,
+        rankDiff: 1,
+        entity: { id: "p4", name: "booQ", balance: 22000, url: "https://booq.trap.jp" },
+    },
+    { rank: 5, rankDiff: -2, entity: { id: "p5", name: "NeoShowcase", balance: 18000 } },
+    {
+        rank: 6,
+        rankDiff: 0,
+        entity: { id: "p6", name: "Jomon", balance: 15000, url: "https://jomon.trap.jp" },
+    },
+];
 
 const mockTransactions: Transaction[] = [
     {
@@ -244,8 +263,12 @@ export const PAvatarSample = () => (
 );
 
 const RankingFullSample = () => {
-    const handleUserClick = (rankedUser: RankedUser) => {
-        console.log("Clicked user:", rankedUser);
+    const handleUserClick = (item: RankedItem<User>) => {
+        console.log("Clicked user:", item);
+    };
+
+    const handleProjectClick = (item: RankedItem<Project>) => {
+        console.log("Clicked project:", item);
     };
 
     return (
@@ -262,17 +285,71 @@ const RankingFullSample = () => {
                 </Group>
             </Accordion.Control>
             <Accordion.Panel>
-                <RankingFull
-                    maxItems={20}
-                    onUserClick={handleUserClick}
-                    title="This is Ranking"
-                    users={mockUsers}
-                />
+                <Stack gap="md">
+                    <Text
+                        fw={500}
+                        size="sm"
+                    >
+                        ユーザーランキング
+                    </Text>
+                    <RankingFull
+                        type="user"
+                        items={mockUserItems}
+                        maxItems={10}
+                        onItemClick={handleUserClick}
+                        title="User Ranking"
+                    />
+                    <Text
+                        fw={500}
+                        size="sm"
+                    >
+                        プロジェクトランキング（外部リンクアイコン付き）
+                    </Text>
+                    <RankingFull
+                        type="project"
+                        items={mockProjectItems}
+                        maxItems={6}
+                        onItemClick={handleProjectClick}
+                        title="Project Ranking"
+                    />
+                </Stack>
             </Accordion.Panel>
         </Accordion.Item>
     );
 };
 
+const CreateProjectModalSample = () => {
+    const [opened, { open, close }] = useDisclosure(false);
+    return (
+        <Accordion.Item value="create-project-modal">
+            <Accordion.Control>
+                <Group>
+                    <Text fw={500}>CreateProjectModal</Text>
+                    <Text
+                        c="dimmed"
+                        size="xs"
+                    >
+                        プロジェクト作成モーダル
+                    </Text>
+                </Group>
+            </Accordion.Control>
+            <Accordion.Panel>
+                <Stack gap="sm">
+                    <CreateProjectModal
+                        opened={opened}
+                        onClose={close}
+                    />
+                    <Button
+                        variant="default"
+                        onClick={open}
+                    >
+                        新規プロジェクトを作成
+                    </Button>
+                </Stack>
+            </Accordion.Panel>
+        </Accordion.Item>
+    );
+};
 const TransactionListSample = () => (
     <Accordion.Item value="transaction-list">
         <Accordion.Control>
@@ -369,6 +446,7 @@ export const Sandbox = () => {
 
                 <RankingFullSample />
 
+                <CreateProjectModalSample />
                 <TransactionListSample />
             </Accordion>
         </Stack>
