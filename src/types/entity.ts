@@ -14,3 +14,6 @@ export type ProjectId = BrandedType<string, "ProjectId">;
 
 export type Url = BrandedType<string, "Url">;
 export type Copia = BrandedType<bigint, "Copia">;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Invocable = (...args: any[]) => any;
