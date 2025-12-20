@@ -95,6 +95,7 @@ const RankingListItem = <T extends RankingEntity>({
                     {valueDisplay === "copia" ? (
                         <PAmount
                             coloring
+                            compact
                             leadingIcon
                             size="sm"
                             value={toBranded<Copia>(BigInt(entity.balance ?? 0))}
@@ -172,6 +173,7 @@ const RankingListItem = <T extends RankingEntity>({
                     {valueDisplay === "copia" ? (
                         <PAmount
                             coloring
+                            compact
                             leadingIcon
                             size="md"
                             value={toBranded<Copia>(BigInt(entity.balance ?? 0))}
