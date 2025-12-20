@@ -1,148 +1,111 @@
+import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
-import { SimpleGrid } from "@mantine/core";
+import { Center, Loader, SimpleGrid, Text } from "@mantine/core";
 
+import apis from "/@/api";
+import type { Project } from "/@/api/schema/internal";
 import { RankingFull } from "/@/components/ranking/RankingFull";
 import type { RankedItem } from "/@/components/ranking/RankingTypes";
-import type { Project, User } from "/@/components/ranking/RankingTypes";
 
 interface StatsContext {
-    period: string;
+    period: "24hours" | "7days" | "30days" | "365days";
 }
 
-const mockUser1: User = { id: "u1", name: "alice", balance: 15000 };
-const mockUser2: User = { id: "u2", name: "bob", balance: 12500 };
+type RankingName = "balance" | "difference" | "in" | "out" | "count" | "total" | "ratio";
 
-const mockProjectItems: RankedItem<Project>[] = [
-    {
-        rank: 1,
-        rankDiff: 2,
-        entity: {
-            id: "p1",
-            name: "traQ",
-            balance: 50000,
-            url: "https://q.trap.jp",
-            admins: [mockUser2],
-            owner: mockUser1,
-        },
-    },
-    {
-        rank: 2,
-        rankDiff: -1,
-        entity: {
-            id: "p2",
-            name: "knoQ",
-            balance: 35000,
-            url: "https://knoq.trap.jp",
-            admins: [],
-            owner: mockUser1,
-        },
-    },
-    {
-        rank: 3,
-        rankDiff: 0,
-        entity: {
-            id: "p3",
-            name: "anke-to",
-            balance: 28000,
-            url: "https://anke-to.trap.jp",
-            admins: [],
-            owner: mockUser2,
-        },
-    },
-    {
-        rank: 4,
-        rankDiff: 1,
-        entity: {
-            id: "p4",
-            name: "booQ",
-            balance: 22000,
-            url: "https://booq.trap.jp",
-            admins: [],
-            owner: mockUser1,
-        },
-    },
-    {
-        rank: 5,
-        rankDiff: -2,
-        entity: { id: "p5", name: "NeoShowcase", balance: 18000, admins: [], owner: mockUser2 },
-    },
-    {
-        rank: 6,
-        rankDiff: 0,
-        entity: {
-            id: "p6",
-            name: "Jomon",
-            balance: 15000,
-            url: "https://jomon.trap.jp",
-            admins: [],
-            owner: mockUser1,
-        },
-    },
-    {
-        rank: 7,
-        rankDiff: 3,
-        entity: { id: "p7", name: "traPortal", balance: 12000, admins: [], owner: mockUser2 },
-    },
-    {
-        rank: 8,
-        rankDiff: -1,
-        entity: {
-            id: "p8",
-            name: "Showcase",
-            balance: 9000,
-            url: "https://sc.trap.jp",
-            admins: [],
-            owner: mockUser1,
-        },
-    },
+interface RankingData {
+    title: string;
+    rankingName: RankingName;
+    items: RankedItem<Project>[];
+    loading: boolean;
+}
+
+const rankingConfigs: { title: string; rankingName: RankingName }[] = [
+    { title: "残高ランキング", rankingName: "balance" },
+    { title: "取引数ランキング", rankingName: "count" },
+    { title: "収入ランキング", rankingName: "in" },
+    { title: "支出ランキング", rankingName: "out" },
+    { title: "差額ランキング", rankingName: "difference" },
+    { title: "総額ランキング", rankingName: "total" },
 ];
 
 const StatsProjects = () => {
     const { period } = useOutletContext<StatsContext>();
-    console.log("Current period:", period); // デバッグ用
+    const [rankings, setRankings] = useState<RankingData[]>(
+        rankingConfigs.map(config => ({
+            ...config,
+            items: [],
+            loading: true,
+        }))
+    );
+
+    useEffect(() => {
+        const fetchRankings = async () => {
+            // 全てのランキングをロード中に設定
+            setRankings(prev => prev.map(r => ({ ...r, loading: true })));
+
+            const results = await Promise.all(
+                rankingConfigs.map(async config => {
+                    try {
+                        const response = await apis.internal.stats.getProjectRankings(
+                            config.rankingName,
+                            { term: period, limit: 8 }
+                        );
+                        const items: RankedItem<Project>[] =
+                            response.data.items?.map(item => ({
+                                rank: item.rank,
+                                rankDiff: item.difference,
+                                entity: item.project,
+                            })) ?? [];
+                        return { ...config, items, loading: false };
+                    } catch (error) {
+                        console.error(`Failed to fetch ${config.rankingName} ranking:`, error);
+                        return { ...config, items: [], loading: false };
+                    }
+                })
+            );
+
+            setRankings(results);
+        };
+
+        fetchRankings();
+    }, [period]);
+
+    const isLoading = rankings.some(r => r.loading);
+
+    if (isLoading) {
+        return (
+            <Center py="xl">
+                <Loader size="lg" />
+            </Center>
+        );
+    }
+
+    const hasAnyData = rankings.some(r => r.items.length > 0);
+
+    if (!hasAnyData) {
+        return (
+            <Center py="xl">
+                <Text c="dimmed">データの取得に失敗しました</Text>
+            </Center>
+        );
+    }
 
     return (
         <SimpleGrid
             cols={{ base: 1, sm: 2, lg: 3 }}
             spacing="md"
         >
-            <RankingFull
-                items={mockProjectItems}
-                maxItems={5}
-                title="残高ランキング"
-                type="project"
-            />
-            <RankingFull
-                items={mockProjectItems}
-                maxItems={5}
-                title="取引数ランキング"
-                type="project"
-            />
-            <RankingFull
-                items={mockProjectItems}
-                maxItems={5}
-                title="収入ランキング"
-                type="project"
-            />
-            <RankingFull
-                items={mockProjectItems}
-                maxItems={5}
-                title="支出ランキング"
-                type="project"
-            />
-            <RankingFull
-                items={mockProjectItems}
-                maxItems={5}
-                title="差額ランキング"
-                type="project"
-            />
-            <RankingFull
-                items={mockProjectItems}
-                maxItems={5}
-                title="総額ランキング"
-                type="project"
-            />
+            {rankings.map(ranking => (
+                <RankingFull
+                    key={ranking.rankingName}
+                    items={ranking.items}
+                    maxItems={5}
+                    title={ranking.title}
+                    type="project"
+                />
+            ))}
         </SimpleGrid>
     );
 };

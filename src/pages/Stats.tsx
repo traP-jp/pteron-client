@@ -3,13 +3,13 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import { Group, SegmentedControl, Select, Stack, Text, Title } from "@mantine/core";
 
-type Period = "7days" | "30days" | "90days" | "all";
+type Period = "24hours" | "7days" | "30days" | "365days";
 
 const periodOptions = [
+    { value: "24hours", label: "24時間" },
     { value: "7days", label: "7日間" },
     { value: "30days", label: "30日間" },
-    { value: "90days", label: "90日間" },
-    { value: "all", label: "全期間" },
+    { value: "365days", label: "365日間" },
 ];
 
 const Stats = () => {
