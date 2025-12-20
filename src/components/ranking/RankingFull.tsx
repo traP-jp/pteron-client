@@ -1,4 +1,4 @@
-import { Divider, Paper, Stack, Text } from "@mantine/core";
+import { Paper, Stack, Text } from "@mantine/core";
 
 import { RankingList } from "./RankingList";
 import { RankingTop3 } from "./RankingTop3";
@@ -23,6 +23,7 @@ export const RankingFull = <T extends RankingEntity>({
     showTop3 = true,
     maxItems = 20,
     onItemClick,
+    valueDisplay = "copia",
 }: RankingFullProps<T>) => {
     // 最大件数でフィルタ
     const limitedItems = items.slice(0, maxItems);
@@ -68,14 +69,12 @@ export const RankingFull = <T extends RankingEntity>({
 
                 {/* 3位まで */}
                 {showTop3 && top3Items.length > 0 && (
-                    <>
-                        <RankingTop3
-                            items={top3Items}
-                            onItemClick={onItemClick}
-                            type={type}
-                        />
-                        {restItems.length > 0 && <Divider my="sm" />}
-                    </>
+                    <RankingTop3
+                        items={top3Items}
+                        onItemClick={onItemClick}
+                        type={type}
+                        valueDisplay={valueDisplay}
+                    />
                 )}
 
                 {/* 4位以降 */}
@@ -84,6 +83,7 @@ export const RankingFull = <T extends RankingEntity>({
                         items={restItems}
                         onItemClick={onItemClick}
                         type={type}
+                        valueDisplay={valueDisplay}
                     />
                 )}
             </Stack>
