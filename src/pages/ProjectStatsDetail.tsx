@@ -1,4 +1,4 @@
-import { Suspense, use, useState } from "react";
+import { Suspense, use, useMemo, useState } from "react";
 import { Link, useOutletContext, useParams } from "react-router-dom";
 
 import { ActionIcon, Center, Group, Loader, Pagination, Stack, Text, Title } from "@mantine/core";
@@ -103,22 +103,23 @@ const ProjectStatsDetail = () => {
     const validRankingName = (rankingName as RankingName) || "balance";
     const title = rankingTitles[validRankingName] || "ランキング";
 
-    const fetch = async () => {
-        const {
-            data: { items },
-        } = await apis.internal.stats.getProjectRankings(validRankingName, {
-            term: period,
-            limit: 100,
-        });
-
-        return (
-            items?.map(item => ({
-                rank: item.rank,
-                rankDiff: item.difference,
-                entity: item.project,
-            })) ?? []
-        );
-    };
+    const fetcher = useMemo(
+        () =>
+            apis.internal.stats
+                .getProjectRankings(validRankingName, {
+                    term: period,
+                    limit: 100,
+                })
+                .then(
+                    ({ data: { items } }) =>
+                        items?.map(item => ({
+                            rank: item.rank,
+                            rankDiff: item.difference,
+                            entity: item.project,
+                        })) ?? []
+                ),
+        [validRankingName, period]
+    );
 
     return (
         <ErrorBoundary>
@@ -131,7 +132,7 @@ const ProjectStatsDetail = () => {
             >
                 <TheProjectStatsDetail
                     title={title}
-                    fetcher={fetch()}
+                    fetcher={fetcher}
                 />
             </Suspense>
         </ErrorBoundary>

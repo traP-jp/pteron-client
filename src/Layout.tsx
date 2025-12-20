@@ -1,3 +1,4 @@
+import { Suspense, memo, use, useCallback, useMemo } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import { AppShell, Group, Stack, Tooltip, UnstyledButton, rem } from "@mantine/core";
@@ -10,6 +11,8 @@ import {
     IconUsersGroup,
 } from "@tabler/icons-react";
 
+import apis from "/@/api";
+import type { User } from "/@/api/schema/internal";
 import CopiaLogoSrc from "/@/assets/icons/copiaLogo.svg";
 import { toBranded } from "/@/types/entity";
 import type { UserName } from "/@/types/entity";
@@ -63,15 +66,17 @@ function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
     );
 }
 
-function UserLink() {
+function UserLink({ fetcher }: { fetcher: Promise<User> }) {
     const navigate = useNavigate();
+    const me = use(fetcher);
+
     return (
         <Tooltip
             label="User Profile"
             position="right"
         >
             <UnstyledButton
-                onClick={() => navigate("/users/uni_kakurenbo")}
+                onClick={() => navigate(`/users/${me.name}`)}
                 style={{
                     width: rem(50),
                     height: rem(50),
@@ -83,36 +88,49 @@ function UserLink() {
             >
                 <PAvatar
                     type="user"
-                    name={toBranded<UserName>("uni_kakurenbo")}
+                    name={toBranded<UserName>(me.name)}
                 />
             </UnstyledButton>
         </Tooltip>
     );
 }
 
-export function DashboardLayout() {
+function DashboardLayout() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const isActive = (path: string) => location.pathname === path;
+    const isActive = useCallback((path: string) => location.pathname === path, [location.pathname]);
 
-    const links = navItems.map(link => (
-        <NavbarLink
-            {...link}
-            key={link.label}
-            active={isActive(link.to)}
-            onClick={() => navigate(link.to)}
-        />
-    ));
+    const userFetcher = useMemo(
+        () => apis.internal.me.getCurrentUser().then(({ data }) => data),
+        []
+    );
 
-    const footerLinks = navItems.slice(1).map(link => (
-        <NavbarLink
-            {...link}
-            key={link.label}
-            active={isActive(link.to)}
-            onClick={() => navigate(link.to)}
-        />
-    ));
+    const links = useMemo(
+        () =>
+            navItems.map(link => (
+                <NavbarLink
+                    {...link}
+                    key={link.label}
+                    active={isActive(link.to)}
+                    onClick={() => navigate(link.to)}
+                />
+            )),
+        [isActive, navigate]
+    );
+
+    const footerLinks = useMemo(
+        () =>
+            navItems.slice(1).map(link => (
+                <NavbarLink
+                    {...link}
+                    key={link.label}
+                    active={isActive(link.to)}
+                    onClick={() => navigate(link.to)}
+                />
+            )),
+        [isActive, navigate]
+    );
 
     const isMobile = useMediaQuery("(max-width: 48em)");
 
@@ -157,7 +175,9 @@ export function DashboardLayout() {
                         align="center"
                         gap="xs"
                     >
-                        <UserLink />
+                        <Suspense>
+                            <UserLink fetcher={userFetcher} />
+                        </Suspense>
                     </Stack>
                 </Stack>
             </AppShell.Navbar>
@@ -190,13 +210,19 @@ export function DashboardLayout() {
                         />
                     </UnstyledButton>
                     {footerLinks.slice(2)}
-                    <UserLink />
+                    <Suspense>
+                        <UserLink fetcher={userFetcher} />
+                    </Suspense>
                 </Group>
             </AppShell.Footer>
 
             <AppShell.Main>
-                <Outlet />
+                <Suspense>
+                    <Outlet />
+                </Suspense>
             </AppShell.Main>
         </AppShell>
     );
 }
+
+export default memo(DashboardLayout);
