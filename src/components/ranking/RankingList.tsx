@@ -9,7 +9,7 @@ import type { ProjectName, Url, UserName } from "/@/types/entity";
 import type { RankedItem, RankingBaseProps, RankingEntity } from "./RankingTypes";
 import { isProject } from "./RankingTypes";
 
-import { createExternalLinkHander } from "../lib/link";
+import { createExternalLinkHander } from "../../lib/link";
 
 export interface RankingListProps<
     T extends RankingEntity = RankingEntity,
