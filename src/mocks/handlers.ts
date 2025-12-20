@@ -25,12 +25,12 @@ import {
 
 // ========== Internal API ハンドラー ==========
 const internalHandlers = [
-    // GET /api/internal/me - 自分の情報を取得
+    // GET /internal/me - 自分の情報を取得
     http.get("/api/internal/me", () => {
         return HttpResponse.json(mockCurrentUser);
     }),
 
-    // GET /api/internal/me/bills/:bill_id - 請求の詳細を取得
+    // GET /internal/me/bills/:bill_id - 請求の詳細を取得
     http.get("/api/internal/me/bills/:bill_id", ({ params }) => {
         const bill = getBillById(params.bill_id as string);
         if (!bill) {
@@ -39,7 +39,7 @@ const internalHandlers = [
         return HttpResponse.json(bill);
     }),
 
-    // POST /api/internal/me/bills/:bill_id/approve - 請求を承認
+    // POST /internal/me/bills/:bill_id/approve - 請求を承認
     http.post("/api/internal/me/bills/:bill_id/approve", ({ params }) => {
         const bill = getBillById(params.bill_id as string);
         if (!bill) {
@@ -54,7 +54,7 @@ const internalHandlers = [
         });
     }),
 
-    // POST /api/internal/me/bills/:bill_id/decline - 請求を拒否
+    // POST /internal/me/bills/:bill_id/decline - 請求を拒否
     http.post("/api/internal/me/bills/:bill_id/decline", ({ params }) => {
         const bill = getBillById(params.bill_id as string);
         if (!bill) {
@@ -66,7 +66,7 @@ const internalHandlers = [
         return new HttpResponse(null, { status: 204 });
     }),
 
-    // GET /api/internal/transactions - 経済圏全体の取引履歴
+    // GET /internal/transactions - 経済圏全体の取引履歴
     http.get("/api/internal/transactions", ({ request }) => {
         const url = new URL(request.url);
         const limit = Number(url.searchParams.get("limit")) || 20;
@@ -92,7 +92,7 @@ const internalHandlers = [
         });
     }),
 
-    // GET /api/internal/transactions/users/:user_id - ユーザーの取引履歴
+    // GET /internal/transactions/users/:user_id - ユーザーの取引履歴
     http.get("/api/internal/transactions/users/:user_id", ({ request, params }) => {
         const url = new URL(request.url);
         const limit = Number(url.searchParams.get("limit")) || 20;
@@ -107,7 +107,7 @@ const internalHandlers = [
         });
     }),
 
-    // GET /api/internal/transactions/projects/:project_id - プロジェクトの取引履歴
+    // GET /internal/transactions/projects/:project_id - プロジェクトの取引履歴
     http.get("/api/internal/transactions/projects/:project_id", ({ request, params }) => {
         const url = new URL(request.url);
         const limit = Number(url.searchParams.get("limit")) || 20;
@@ -122,7 +122,7 @@ const internalHandlers = [
         });
     }),
 
-    // GET /api/internal/stats - 経済圏全体の統計情報
+    // GET /internal/stats - 経済圏全体の統計情報
     http.get("/api/internal/stats", () => {
         const totalBalance =
             mockUsers.reduce((sum, u) => sum + (u.balance ?? 0), 0) +
@@ -136,7 +136,7 @@ const internalHandlers = [
         });
     }),
 
-    // GET /api/internal/stats/users - ユーザー関連統計
+    // GET /internal/stats/users - ユーザー関連統計
     http.get("/api/internal/stats/users", () => {
         const userBalance = mockUsers.reduce((sum, u) => sum + (u.balance ?? 0), 0);
         const userTransactions = mockTransactions.filter(t => t.type === "TRANSFER");
@@ -150,7 +150,7 @@ const internalHandlers = [
         });
     }),
 
-    // GET /api/internal/stats/projects - プロジェクト関連統計
+    // GET /internal/stats/projects - プロジェクト関連統計
     http.get("/api/internal/stats/projects", () => {
         const projectBalance = mockProjects.reduce((sum, p) => sum + (p.balance ?? 0), 0);
         return HttpResponse.json({
@@ -163,7 +163,7 @@ const internalHandlers = [
         });
     }),
 
-    // GET /api/internal/stats/users/:ranking_name - ユーザーランキング
+    // GET /internal/stats/users/:ranking_name - ユーザーランキング
     http.get("/api/internal/stats/users/:ranking_name", ({ request }) => {
         const url = new URL(request.url);
         const limit = Number(url.searchParams.get("limit")) || 20;
@@ -187,7 +187,7 @@ const internalHandlers = [
         });
     }),
 
-    // GET /api/internal/stats/projects/:project_name - プロジェクトランキング
+    // GET /internal/stats/projects/:project_name - プロジェクトランキング
     http.get("/api/internal/stats/projects/:project_name", ({ request }) => {
         const url = new URL(request.url);
         const limit = Number(url.searchParams.get("limit")) || 20;
@@ -211,7 +211,7 @@ const internalHandlers = [
         });
     }),
 
-    // GET /api/internal/users - 全ユーザー一覧
+    // GET /internal/users - 全ユーザー一覧
     http.get("/api/internal/users", ({ request }) => {
         const url = new URL(request.url);
         const limit = Number(url.searchParams.get("limit")) || 20;
@@ -235,7 +235,7 @@ const internalHandlers = [
         });
     }),
 
-    // GET /api/internal/users/:user_id - ユーザー詳細
+    // GET /internal/users/:user_id - ユーザー詳細
     http.get("/api/internal/users/:user_id", ({ params }) => {
         const user = getUserByIdOrName(params.user_id as string);
         if (!user) {
@@ -244,7 +244,7 @@ const internalHandlers = [
         return HttpResponse.json(user);
     }),
 
-    // GET /api/internal/users/:user_id/balance - ユーザー残高
+    // GET /internal/users/:user_id/balance - ユーザー残高
     http.get("/api/internal/users/:user_id/balance", ({ params }) => {
         const user = getUserByIdOrName(params.user_id as string);
         if (!user) {
@@ -255,7 +255,7 @@ const internalHandlers = [
         });
     }),
 
-    // GET /api/internal/users/:user_id/stats - ユーザーのランキング順位一覧
+    // GET /internal/users/:user_id/stats - ユーザーのランキング順位一覧
     http.get("/api/internal/users/:user_id/stats", ({ params }) => {
         const user = getUserByIdOrName(params.user_id as string);
         if (!user) {
@@ -283,14 +283,14 @@ const internalHandlers = [
         });
     }),
 
-    // GET /api/internal/users/:user_id/projects - ユーザーのプロジェクト一覧
+    // GET /internal/users/:user_id/projects - ユーザーのプロジェクト一覧
     http.get("/api/internal/users/:user_id/projects", ({ params }) => {
         const userId = params.user_id as string;
         const userProjects = getProjectsByOwnerOrAdminIdOrName(userId);
         return HttpResponse.json(userProjects);
     }),
 
-    // GET /api/internal/projects - 全プロジェクト一覧
+    // GET /internal/projects - 全プロジェクト一覧
     http.get("/api/internal/projects", ({ request }) => {
         const url = new URL(request.url);
         const limit = Number(url.searchParams.get("limit")) || 20;
@@ -316,7 +316,7 @@ const internalHandlers = [
         });
     }),
 
-    // POST /api/internal/projects - プロジェクト新規作成
+    // POST /internal/projects - プロジェクト新規作成
     http.post("/api/internal/projects", async ({ request }) => {
         const body = (await request.json()) as { name?: string; url?: string };
         const newProject = {
@@ -330,7 +330,7 @@ const internalHandlers = [
         return HttpResponse.json(newProject, { status: 201 });
     }),
 
-    // GET /api/internal/projects/:project_id - プロジェクト詳細
+    // GET /internal/projects/:project_id - プロジェクト詳細
     http.get("/api/internal/projects/:project_id", ({ params }) => {
         const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
@@ -339,7 +339,7 @@ const internalHandlers = [
         return HttpResponse.json(project);
     }),
 
-    // PUT /api/internal/projects/:project_id - プロジェクト更新
+    // PUT /internal/projects/:project_id - プロジェクト更新
     http.put("/api/internal/projects/:project_id", async ({ params, request }) => {
         const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
@@ -355,7 +355,7 @@ const internalHandlers = [
         );
     }),
 
-    // GET /api/internal/projects/:project_id/balance - プロジェクト残高
+    // GET /internal/projects/:project_id/balance - プロジェクト残高
     http.get("/api/internal/projects/:project_id/balance", ({ params }) => {
         const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
@@ -366,7 +366,7 @@ const internalHandlers = [
         });
     }),
 
-    // GET /api/internal/projects/:project_id/stats - プロジェクトのランキング順位一覧
+    // GET /internal/projects/:project_id/stats - プロジェクトのランキング順位一覧
     http.get("/api/internal/projects/:project_id/stats", ({ params }) => {
         const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
@@ -396,7 +396,7 @@ const internalHandlers = [
         });
     }),
 
-    // GET /api/internal/projects/:project_id/admins - 管理者一覧
+    // GET /internal/projects/:project_id/admins - 管理者一覧
     http.get("/api/internal/projects/:project_id/admins", ({ params }) => {
         const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
@@ -405,7 +405,7 @@ const internalHandlers = [
         return HttpResponse.json(project.admins ?? []);
     }),
 
-    // POST /api/internal/projects/:project_id/admins - 管理者追加
+    // POST /internal/projects/:project_id/admins - 管理者追加
     http.post("/api/internal/projects/:project_id/admins", ({ params }) => {
         const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
@@ -414,7 +414,7 @@ const internalHandlers = [
         return new HttpResponse(null, { status: 204 });
     }),
 
-    // DELETE /api/internal/projects/:project_id/admins - 管理者削除
+    // DELETE /internal/projects/:project_id/admins - 管理者削除
     http.delete("/api/internal/projects/:project_id/admins", ({ params }) => {
         const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
@@ -423,7 +423,7 @@ const internalHandlers = [
         return new HttpResponse(null, { status: 204 });
     }),
 
-    // GET /api/internal/projects/:project_id/clients - APIクライアント一覧
+    // GET /internal/projects/:project_id/clients - APIクライアント一覧
     http.get("/api/internal/projects/:project_id/clients", ({ params }) => {
         const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
@@ -432,7 +432,7 @@ const internalHandlers = [
         return HttpResponse.json(mockAPIClients);
     }),
 
-    // POST /api/internal/projects/:project_id/clients - APIクライアント発行
+    // POST /internal/projects/:project_id/clients - APIクライアント発行
     http.post("/api/internal/projects/:project_id/clients", ({ params }) => {
         const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
@@ -446,7 +446,7 @@ const internalHandlers = [
         return HttpResponse.json(newClient, { status: 201 });
     }),
 
-    // DELETE /api/internal/projects/:project_id/clients/:client_id - APIクライアント削除
+    // DELETE /internal/projects/:project_id/clients/:client_id - APIクライアント削除
     http.delete("/api/internal/projects/:project_id/clients/:client_id", ({ params }) => {
         const project = getProjectByIdOrName(params.project_id as string);
         if (!project) {
@@ -458,12 +458,12 @@ const internalHandlers = [
 
 // ========== Public API ハンドラー ==========
 const publicHandlers = [
-    // GET /api/v1/project - 自プロジェクト情報
+    // GET /v1/project - 自プロジェクト情報
     http.get("/api/v1/project", () => {
         return HttpResponse.json(mockPublicProject);
     }),
 
-    // GET /api/v1/project/transactions - 取引履歴
+    // GET /v1/project/transactions - 取引履歴
     http.get("/api/v1/project/transactions", ({ request }) => {
         const url = new URL(request.url);
         const limit = Number(url.searchParams.get("limit")) || 20;
@@ -475,7 +475,7 @@ const publicHandlers = [
         });
     }),
 
-    // POST /api/v1/transactions - ユーザーへ送金
+    // POST /v1/transactions - ユーザーへ送金
     http.post("/api/v1/transactions", async ({ request }) => {
         const body = (await request.json()) as {
             to_user: string;
@@ -503,7 +503,7 @@ const publicHandlers = [
         return HttpResponse.json(transaction);
     }),
 
-    // POST /api/v1/bills - 請求作成
+    // POST /v1/bills - 請求作成
     http.post("/api/v1/bills", async ({ request }) => {
         const body = (await request.json()) as {
             target_user: string;
@@ -529,7 +529,7 @@ const publicHandlers = [
         );
     }),
 
-    // GET /api/v1/bills/:bill_id - 請求ステータス
+    // GET /v1/bills/:bill_id - 請求ステータス
     http.get("/api/v1/bills/:bill_id", ({ params }) => {
         const bill = mockPublicBills.find(b => b.id === params.bill_id);
         if (!bill) {

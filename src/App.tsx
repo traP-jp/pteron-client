@@ -14,7 +14,7 @@ export default function App() {
     return (
         <MantineProvider theme={theme}>
             <ModalsProvider>
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense>
                     <RouterProvider router={router}></RouterProvider>
                 </Suspense>
             </ModalsProvider>

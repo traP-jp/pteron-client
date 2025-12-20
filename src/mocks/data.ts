@@ -41,6 +41,102 @@ export const mockUsers: User[] = [
         name: "o_o",
         balance: -100000000,
     },
+    // 追加ユーザー（ページネーション検証用）
+    {
+        id: "550e8400-e29b-41d4-a716-446655440007",
+        name: "takumi_dev",
+        balance: 45000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440008",
+        name: "sakura_chan",
+        balance: 32000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440009",
+        name: "yuki_snow",
+        balance: 28000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440010",
+        name: "haru_spring",
+        balance: 21000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440011",
+        name: "natsu_summer",
+        balance: 19000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440012",
+        name: "aki_autumn",
+        balance: 17000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440013",
+        name: "fuyu_winter",
+        balance: 15000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440014",
+        name: "kaze_wind",
+        balance: 14000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440015",
+        name: "umi_sea",
+        balance: 13000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440016",
+        name: "yama_mountain",
+        balance: 11000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440017",
+        name: "sora_sky",
+        balance: 10000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440018",
+        name: "tsuki_moon",
+        balance: 9000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440019",
+        name: "hoshi_star",
+        balance: 8000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440020",
+        name: "kumo_cloud",
+        balance: 7000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440021",
+        name: "ame_rain",
+        balance: 6000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440022",
+        name: "kaminari_thunder",
+        balance: 4500,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440023",
+        name: "niji_rainbow",
+        balance: 4000,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440024",
+        name: "hikari_light",
+        balance: 3500,
+    },
+    {
+        id: "550e8400-e29b-41d4-a716-446655440025",
+        name: "kage_shadow",
+        balance: 3000,
+    },
 ];
 
 // 現在のユーザー（ログインユーザー）
