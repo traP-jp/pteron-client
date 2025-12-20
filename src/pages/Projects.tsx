@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import { Button, Flex, SimpleGrid, Text } from "@mantine/core";
+import { Button, Flex, Select, SimpleGrid, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 
@@ -10,14 +10,21 @@ import { CreateProjectModal } from "../components/CreateProjectModal";
 import { EntityCard } from "../components/EntityCard";
 import { type Copia, type ProjectName, type Url, type UserId, toBranded } from "../types/entity";
 
-const CreateNewProject = () => {
+type SortOption = "balance-desc" | "balance-asc" | "name-asc" | "name-desc";
+
+const CreateNewProject = ({ onProjectCreated }: { onProjectCreated: () => void }) => {
     const [opened, { open, close }] = useDisclosure(false);
+
+    const handleSuccess = () => {
+        close();
+        onProjectCreated();
+    };
 
     return (
         <>
             <CreateProjectModal
                 opened={opened}
-                onClose={close}
+                onClose={handleSuccess}
             />
             <Button
                 color="green"
@@ -42,6 +49,43 @@ const Projects = () => {
     const [myId, setMyId] = useState<UserId>();
     const [projects, setProjects] = useState<Project[]>([]);
     const [haveProjects, setHaveProjects] = useState<Project[]>([]);
+    const [sortByAll, setSortByAll] = useState<SortOption>("balance-desc");
+
+    const loadAllProjects = useCallback(() => {
+        apis.internal.projects.getProjects().then(({ data }) => {
+            setProjects(data.items);
+        });
+    }, []);
+
+    const loadMyProjects = useCallback(() => {
+        if (!myId) return;
+        apis.internal.users.getUserProjects(myId).then(({ data }) => {
+            setHaveProjects(data);
+        });
+    }, [myId]);
+
+    const reloadProjects = useCallback(() => {
+        loadAllProjects();
+        loadMyProjects();
+    }, [loadAllProjects, loadMyProjects]);
+
+    const sortProjects = (projects: Project[], sortBy: SortOption) => {
+        return [...projects].sort((a, b) => {
+            switch (sortBy) {
+                case "balance-desc":
+                    return b.balance - a.balance;
+                case "balance-asc":
+                    return a.balance - b.balance;
+                case "name-asc":
+                    return a.name.localeCompare(b.name);
+                case "name-desc":
+                    return b.name.localeCompare(a.name);
+                    return 0;
+            }
+        });
+    };
+
+    const sortedAllProjects = sortProjects(projects, sortByAll);
 
     useEffect(() => {
         apis.internal.me.getCurrentUser().then(({ data }) => {
@@ -50,17 +94,12 @@ const Projects = () => {
     }, []);
 
     useEffect(() => {
-        apis.internal.projects.getProjects().then(({ data }) => {
-            setProjects(data.items);
-        });
-    }, []);
+        loadAllProjects();
+    }, [loadAllProjects]);
 
     useEffect(() => {
-        if (!myId) return;
-        apis.internal.users.getUserProjects(myId).then(({ data }) => {
-            setHaveProjects(data);
-        });
-    }, [myId]);
+        loadMyProjects();
+    }, [loadMyProjects]);
 
     return (
         <>
@@ -75,10 +114,19 @@ const Projects = () => {
                     <Flex
                         direction="row"
                         align="center"
-                        gap="xl"
+                        mr="lg"
+                        gap="md"
+                        wrap="wrap"
                     >
-                        <Text size="xl">所有しているプロジェクト</Text>
-                        <CreateNewProject />
+                        <Flex
+                            direction="row"
+                            align="center"
+                            wrap="wrap"
+                            gap="md"
+                        >
+                            <Text size="xl">所有しているプロジェクト</Text>
+                        </Flex>
+                        <CreateNewProject onProjectCreated={reloadProjects} />
                     </Flex>
                     <SimpleGrid
                         cols={{ base: 1, md: 2, xl: 3 }}
@@ -104,12 +152,31 @@ const Projects = () => {
                     direction="column"
                     gap="md"
                 >
-                    <Text size="xl">全プロジェクト一覧</Text>
+                    <Flex
+                        direction="row"
+                        justify="space-between"
+                        align="center"
+                        wrap="wrap"
+                        gap="md"
+                    >
+                        <Text size="xl">全プロジェクト一覧</Text>
+                        <Select
+                            data={[
+                                { value: "balance-desc", label: "総資産降順" },
+                                { value: "balance-asc", label: "総資産昇順" },
+                                { value: "name-asc", label: "名前昇順" },
+                                { value: "name-desc", label: "名前降順" },
+                            ]}
+                            value={sortByAll}
+                            onChange={value => setSortByAll(value as SortOption)}
+                            allowDeselect={false}
+                        />
+                    </Flex>
                     <SimpleGrid
                         cols={{ base: 1, md: 2, xl: 3 }}
                         spacing="md"
                     >
-                        {projects.map(project => {
+                        {sortedAllProjects.map(project => {
                             return (
                                 <EntityCard
                                     key={project.id}

@@ -42,6 +42,7 @@ const Users = () => {
                 direction="row"
                 justify="space-between"
                 align="center"
+                wrap="wrap"
                 mb="md"
             >
                 <Text
