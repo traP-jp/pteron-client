@@ -89,6 +89,7 @@ const Projects = () => {
                         {haveProjects.map(project => {
                             return (
                                 <EntityCard
+                                    className="w-1/6"
                                     key={project.id}
                                     type="project"
                                     name={toBranded<ProjectName>(project.name)}
@@ -116,6 +117,7 @@ const Projects = () => {
                         {projects.map(project => {
                             return (
                                 <EntityCard
+                                    className="w-1/6"
                                     key={project.id}
                                     type="project"
                                     name={toBranded<ProjectName>(project.name)}
