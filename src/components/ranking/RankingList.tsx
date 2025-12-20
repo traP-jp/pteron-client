@@ -1,16 +1,12 @@
-import { ActionIcon, Group, Paper, Text } from "@mantine/core";
-import { IconExternalLink } from "@tabler/icons-react";
+import { Group, Paper, Text } from "@mantine/core";
 
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
 import { toBranded } from "/@/types/entity";
-import type { Copia, ProjectName, Url, UserName } from "/@/types/entity";
+import type { Copia, ProjectName, UserName } from "/@/types/entity";
 
 import type { RankedItem, RankingBaseProps, RankingEntity, ValueDisplayType } from "./RankingTypes";
-import { isProject } from "./RankingTypes";
-
-import { createExternalLinkHander } from "../../lib/link";
 
 export interface RankingListProps<
     T extends RankingEntity = RankingEntity,
@@ -35,10 +31,6 @@ const RankingListItem = <T extends RankingEntity>({
     valueDisplay = "copia",
 }: RankingListItemProps<T>) => {
     const { rank, rankDiff, entity } = rankedItem;
-    const entityIsProject = isProject(entity);
-    const projectUrl = toBranded<Url>(entityIsProject ? (entity.url ?? "") : "");
-
-    const handleExternalLinkClick = createExternalLinkHander(projectUrl);
 
     return (
         <Paper
@@ -91,17 +83,6 @@ const RankingListItem = <T extends RankingEntity>({
                 </Text>
 
                 {/* プロジェクトの場合のみ外部リンクアイコン */}
-                {type === "project" && projectUrl && (
-                    <ActionIcon
-                        aria-label="サイトを開く"
-                        color="gray"
-                        onClick={handleExternalLinkClick}
-                        size="sm"
-                        variant="subtle"
-                    >
-                        <IconExternalLink size={16} />
-                    </ActionIcon>
-                )}
 
                 {/* ポイント */}
                 {valueDisplay === "copia" ? (

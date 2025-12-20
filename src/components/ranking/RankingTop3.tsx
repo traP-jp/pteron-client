@@ -1,15 +1,13 @@
-import { ActionIcon, Card, Group, Stack, Text } from "@mantine/core";
-import { IconCrown, IconExternalLink } from "@tabler/icons-react";
+import { Card, Group, Stack, Text } from "@mantine/core";
+import { IconCrown } from "@tabler/icons-react";
 
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
-import { createExternalLinkHander } from "/@/lib/link";
-import { type Copia, type Url, toBranded } from "/@/types/entity";
+import { type Copia, toBranded } from "/@/types/entity";
 import type { ProjectName, UserName } from "/@/types/entity";
 
 import type { RankedItem, RankingBaseProps, RankingEntity, ValueDisplayType } from "./RankingTypes";
-import { isProject } from "./RankingTypes";
 
 /**
  * 王冠の色とサイズを取得
@@ -47,10 +45,6 @@ const RankingTop3Item = <T extends RankingEntity>({
     const { rank, rankDiff, entity } = rankedItem;
     const crownStyle = getCrownStyle(rank);
     const isFirst = rank === 1;
-    const entityIsProject = isProject(entity);
-    const projectUrl = toBranded<Url>(entityIsProject ? (entity.url ?? "") : "");
-
-    const handleExternalLinkClick = createExternalLinkHander(projectUrl);
 
     return (
         <Card
@@ -130,18 +124,6 @@ const RankingTop3Item = <T extends RankingEntity>({
                     >
                         {entity.name}
                     </Text>
-                    {/* プロジェクトの場合のみ外部リンクアイコン */}
-                    {type === "project" && projectUrl && (
-                        <ActionIcon
-                            aria-label="サイトを開く"
-                            color="gray"
-                            onClick={handleExternalLinkClick}
-                            size="sm"
-                            variant="subtle"
-                        >
-                            <IconExternalLink size={14} />
-                        </ActionIcon>
-                    )}
                 </Group>
             </Stack>
         </Card>
