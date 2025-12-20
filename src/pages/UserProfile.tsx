@@ -7,6 +7,7 @@ import apis from "/@/api";
 import type { Project, User } from "/@/api/schema/internal";
 import type { Transaction } from "/@/api/schema/internal";
 import { EntityCard } from "/@/components/EntityCard";
+import ErrorBoundary from "/@/components/ErrorBoundary";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
@@ -15,7 +16,7 @@ import { type Copia, type ProjectName, type Url, type UserName, toBranded } from
 
 const UserProfileHeder = ({ name, balance }: { name: UserName; balance: Copia }) => {
     return (
-        <>
+        <ErrorBoundary>
             <Flex
                 direction="column"
                 mt="lg"
@@ -54,65 +55,67 @@ const UserProfileHeder = ({ name, balance }: { name: UserName; balance: Copia })
                     />
                 </Flex>
             </Flex>
-        </>
+        </ErrorBoundary>
     );
 };
 
 const UserProfileDetail = ({ transactions }: { transactions: Transaction[] }) => {
     return (
-        <Flex
-            wrap="wrap"
-            direction="row"
-            gap="md"
-        >
-            <Card
-                className="flex-auto"
-                p="lg"
-                h="100%"
+        <ErrorBoundary>
+            <Flex
+                wrap="wrap"
+                direction="row"
+                gap="md"
             >
-                <Title
-                    order={2}
-                    fw={400}
-                    mb="md"
+                <Card
+                    className="flex-auto"
+                    p="lg"
+                    h="100%"
                 >
-                    推移
-                </Title>
-                <BalanceChart
-                    h={320}
-                    transactions={transactions}
-                />
-            </Card>
-
-            <Divider orientation="vertical" />
-
-            <Card
-                className="min-w-md"
-                p="lg"
-                h="100%"
-                style={{ display: "flex", flexDirection: "column" }}
-            >
-                <Title
-                    order={2}
-                    fw={400}
-                    mb="md"
-                >
-                    取引履歴
-                </Title>
-                {!transactions && <Text c="dimmed">取引履歴がありません</Text>}
-                <div className="h-80 overflow-auto">
-                    <TransactionList
+                    <Title
+                        order={2}
+                        fw={400}
+                        mb="md"
+                    >
+                        推移
+                    </Title>
+                    <BalanceChart
+                        h={320}
                         transactions={transactions}
-                        currentType="user"
                     />
-                </div>
-            </Card>
-        </Flex>
+                </Card>
+
+                <Divider orientation="vertical" />
+
+                <Card
+                    className="min-w-md"
+                    p="lg"
+                    h="100%"
+                    style={{ display: "flex", flexDirection: "column" }}
+                >
+                    <Title
+                        order={2}
+                        fw={400}
+                        mb="md"
+                    >
+                        取引履歴
+                    </Title>
+                    {!transactions && <Text c="dimmed">取引履歴がありません</Text>}
+                    <div className="h-80 overflow-auto">
+                        <TransactionList
+                            transactions={transactions}
+                            currentType="user"
+                        />
+                    </div>
+                </Card>
+            </Flex>
+        </ErrorBoundary>
     );
 };
 
 const UserProfileProjectList = ({ projects }: { projects: Project[] }) => {
     return (
-        <>
+        <ErrorBoundary>
             <Title
                 order={2}
                 fw={400}
@@ -137,7 +140,7 @@ const UserProfileProjectList = ({ projects }: { projects: Project[] }) => {
                     />
                 ))}
             </SimpleGrid>
-        </>
+        </ErrorBoundary>
     );
 };
 
@@ -184,15 +187,17 @@ const UserProfile = () => {
     };
 
     return (
-        <Suspense
-            fallback={
-                <Center h="50vh">
-                    <Loader size="lg" />
-                </Center>
-            }
-        >
-            <TheUserProfile fetcher={fetch()} />
-        </Suspense>
+        <ErrorBoundary>
+            <Suspense
+                fallback={
+                    <Center h="50vh">
+                        <Loader size="lg" />
+                    </Center>
+                }
+            >
+                <TheUserProfile fetcher={fetch()} />
+            </Suspense>
+        </ErrorBoundary>
     );
 };
 export default UserProfile;

@@ -4,6 +4,7 @@ import { useDisclosure } from "@mantine/hooks";
 import type { Project, Transaction, User } from "/@/api/schema/internal";
 import { CreateProjectModal } from "/@/components/CreateProjectModal";
 import { EntityCard } from "/@/components/EntityCard";
+import ErrorBoundary from "/@/components/ErrorBoundary";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
@@ -29,35 +30,37 @@ const TrendIndicatorSample = () => (
             </Group>
         </Accordion.Control>
         <Accordion.Panel>
-            <Stack gap="xs">
-                <Group>
-                    <Text
-                        size="sm"
-                        w={80}
-                    >
-                        diff=0:
-                    </Text>
-                    <TrendIndicator diff={0} />
-                </Group>
-                <Group>
-                    <Text
-                        size="sm"
-                        w={80}
-                    >
-                        diff=100:
-                    </Text>
-                    <TrendIndicator diff={100} />
-                </Group>
-                <Group>
-                    <Text
-                        size="sm"
-                        w={80}
-                    >
-                        diff=-100:
-                    </Text>
-                    <TrendIndicator diff={-100} />
-                </Group>
-            </Stack>
+            <ErrorBoundary>
+                <Stack gap="xs">
+                    <Group>
+                        <Text
+                            size="sm"
+                            w={80}
+                        >
+                            diff=0:
+                        </Text>
+                        <TrendIndicator diff={0} />
+                    </Group>
+                    <Group>
+                        <Text
+                            size="sm"
+                            w={80}
+                        >
+                            diff=100:
+                        </Text>
+                        <TrendIndicator diff={100} />
+                    </Group>
+                    <Group>
+                        <Text
+                            size="sm"
+                            w={80}
+                        >
+                            diff=-100:
+                        </Text>
+                        <TrendIndicator diff={-100} />
+                    </Group>
+                </Stack>
+            </ErrorBoundary>
         </Accordion.Panel>
     </Accordion.Item>
 );
@@ -76,40 +79,42 @@ const PAmountSample = () => (
             </Group>
         </Accordion.Control>
         <Accordion.Panel>
-            <Stack gap="sm">
-                <>
-                    <Text
-                        size="xs"
-                        c="dimmed"
-                        mb={4}
-                    >
-                        正の値（カスタムサイズ・アイコン付き・ダッシュ付き）
-                    </Text>
-                    <PAmount
-                        value={toBranded<Copia>(100000000n)}
-                        coloring
-                        size="custom"
-                        customSize={5}
-                        leadingIcon
-                        trailingDash
-                    />
-                </>
-                <>
-                    <Text
-                        size="xs"
-                        c="dimmed"
-                        mb={4}
-                    >
-                        負の値（グループなし）
-                    </Text>
-                    <PAmount
-                        value={toBranded<Copia>(-100000000n)}
-                        coloring
-                        size="xl"
-                        formatOptions={{ useGrouping: false }}
-                    />
-                </>
-            </Stack>
+            <ErrorBoundary>
+                <Stack gap="sm">
+                    <>
+                        <Text
+                            size="xs"
+                            c="dimmed"
+                            mb={4}
+                        >
+                            正の値（カスタムサイズ・アイコン付き・ダッシュ付き）
+                        </Text>
+                        <PAmount
+                            value={toBranded<Copia>(100000000n)}
+                            coloring
+                            size="custom"
+                            customSize={5}
+                            leadingIcon
+                            trailingDash
+                        />
+                    </>
+                    <>
+                        <Text
+                            size="xs"
+                            c="dimmed"
+                            mb={4}
+                        >
+                            負の値（グループなし）
+                        </Text>
+                        <PAmount
+                            value={toBranded<Copia>(-100000000n)}
+                            coloring
+                            size="xl"
+                            formatOptions={{ useGrouping: false }}
+                        />
+                    </>
+                </Stack>
+            </ErrorBoundary>
         </Accordion.Panel>
     </Accordion.Item>
 );
@@ -128,47 +133,49 @@ const PAvatarSample = () => (
             </Group>
         </Accordion.Control>
         <Accordion.Panel>
-            <Stack gap="sm">
-                <>
-                    <Text
-                        size="xs"
-                        c="dimmed"
-                        mb={4}
-                    >
-                        {'type="user"'}
-                    </Text>
-                    <PAvatar
-                        name={toBranded<UserName>("uni_kakurenbo")}
-                        type="user"
-                    />
-                </>
-                <>
-                    <Text
-                        size="xs"
-                        c="dimmed"
-                        mb={4}
-                    >
-                        {'type="project"'}
-                    </Text>
-                    <PAvatar
-                        name={toBranded<ProjectName>("awesome_project")}
-                        type="project"
-                    />
-                </>
-                <>
-                    <Text
-                        size="xs"
-                        c="dimmed"
-                        mb={4}
-                    >
-                        {'type="system"'}
-                    </Text>
-                    <PAvatar
-                        type="system"
-                        name={SYSTEM_NAME}
-                    />
-                </>
-            </Stack>
+            <ErrorBoundary>
+                <Stack gap="sm">
+                    <>
+                        <Text
+                            size="xs"
+                            c="dimmed"
+                            mb={4}
+                        >
+                            {'type="user"'}
+                        </Text>
+                        <PAvatar
+                            name={toBranded<UserName>("uni_kakurenbo")}
+                            type="user"
+                        />
+                    </>
+                    <>
+                        <Text
+                            size="xs"
+                            c="dimmed"
+                            mb={4}
+                        >
+                            {'type="project"'}
+                        </Text>
+                        <PAvatar
+                            name={toBranded<ProjectName>("awesome_project")}
+                            type="project"
+                        />
+                    </>
+                    <>
+                        <Text
+                            size="xs"
+                            c="dimmed"
+                            mb={4}
+                        >
+                            {'type="system"'}
+                        </Text>
+                        <PAvatar
+                            type="system"
+                            name={SYSTEM_NAME}
+                        />
+                    </>
+                </Stack>
+            </ErrorBoundary>
         </Accordion.Panel>
     </Accordion.Item>
 );
@@ -187,45 +194,47 @@ const EntityCardSample = () => (
             </Group>
         </Accordion.Control>
         <Accordion.Panel>
-            <Stack gap="sm">
-                <>
-                    <Text
-                        size="xs"
-                        c="dimmed"
-                        mb={4}
-                    >
-                        {'type="user"'}
-                    </Text>
-                    <EntityCard
-                        padding="xs"
-                        p="lg"
-                        withBorder
-                        radius="md"
-                        amount={toBranded<Copia>(1000000n)}
-                        name={toBranded<UserName>("uni_kakurenbo")}
-                        type="user"
-                    />
-                </>
-                <>
-                    <Text
-                        size="xs"
-                        c="dimmed"
-                        mb={4}
-                    >
-                        {'type="project"'}
-                    </Text>
-                    <EntityCard
-                        padding="xs"
-                        p="lg"
-                        withBorder
-                        radius="md"
-                        amount={toBranded<Copia>(10000000000n)}
-                        name={toBranded<ProjectName>("awesome_project")}
-                        extraLink={toBranded<Url>("https://q.trap.jp")}
-                        type="project"
-                    />
-                </>
-            </Stack>
+            <ErrorBoundary>
+                <Stack gap="sm">
+                    <>
+                        <Text
+                            size="xs"
+                            c="dimmed"
+                            mb={4}
+                        >
+                            {'type="user"'}
+                        </Text>
+                        <EntityCard
+                            padding="xs"
+                            p="lg"
+                            withBorder
+                            radius="md"
+                            amount={toBranded<Copia>(1000000n)}
+                            name={toBranded<UserName>("uni_kakurenbo")}
+                            type="user"
+                        />
+                    </>
+                    <>
+                        <Text
+                            size="xs"
+                            c="dimmed"
+                            mb={4}
+                        >
+                            {'type="project"'}
+                        </Text>
+                        <EntityCard
+                            padding="xs"
+                            p="lg"
+                            withBorder
+                            radius="md"
+                            amount={toBranded<Copia>(10000000000n)}
+                            name={toBranded<ProjectName>("awesome_project")}
+                            extraLink={toBranded<Url>("https://q.trap.jp")}
+                            type="project"
+                        />
+                    </>
+                </Stack>
+            </ErrorBoundary>
         </Accordion.Panel>
     </Accordion.Item>
 );
@@ -253,34 +262,36 @@ const RankingFullSample = () => {
                 </Group>
             </Accordion.Control>
             <Accordion.Panel>
-                <Stack gap="md">
-                    <Text
-                        fw={500}
-                        size="sm"
-                    >
-                        ユーザーランキング
-                    </Text>
-                    <RankingFull
-                        type="user"
-                        items={mockUserItems}
-                        maxItems={10}
-                        onItemClick={handleUserClick}
-                        title="User Ranking"
-                    />
-                    <Text
-                        fw={500}
-                        size="sm"
-                    >
-                        プロジェクトランキング（外部リンクアイコン付き）
-                    </Text>
-                    <RankingFull
-                        type="project"
-                        items={mockProjectItems}
-                        maxItems={6}
-                        onItemClick={handleProjectClick}
-                        title="Project Ranking"
-                    />
-                </Stack>
+                <ErrorBoundary>
+                    <Stack gap="md">
+                        <Text
+                            fw={500}
+                            size="sm"
+                        >
+                            ユーザーランキング
+                        </Text>
+                        <RankingFull
+                            type="user"
+                            items={mockUserItems}
+                            maxItems={10}
+                            onItemClick={handleUserClick}
+                            title="User Ranking"
+                        />
+                        <Text
+                            fw={500}
+                            size="sm"
+                        >
+                            プロジェクトランキング（外部リンクアイコン付き）
+                        </Text>
+                        <RankingFull
+                            type="project"
+                            items={mockProjectItems}
+                            maxItems={6}
+                            onItemClick={handleProjectClick}
+                            title="Project Ranking"
+                        />
+                    </Stack>
+                </ErrorBoundary>
             </Accordion.Panel>
         </Accordion.Item>
     );
@@ -302,18 +313,20 @@ const CreateProjectModalSample = () => {
                 </Group>
             </Accordion.Control>
             <Accordion.Panel>
-                <Stack gap="sm">
-                    <CreateProjectModal
-                        opened={opened}
-                        onClose={close}
-                    />
-                    <Button
-                        variant="default"
-                        onClick={open}
-                    >
-                        新規プロジェクトを作成
-                    </Button>
-                </Stack>
+                <ErrorBoundary>
+                    <Stack gap="sm">
+                        <CreateProjectModal
+                            opened={opened}
+                            onClose={close}
+                        />
+                        <Button
+                            variant="default"
+                            onClick={open}
+                        >
+                            新規プロジェクトを作成
+                        </Button>
+                    </Stack>
+                </ErrorBoundary>
             </Accordion.Panel>
         </Accordion.Item>
     );
@@ -332,36 +345,38 @@ const TransactionListSample = () => (
             </Group>
         </Accordion.Control>
         <Accordion.Panel>
-            <Stack gap="md">
-                <div>
-                    <Text
-                        size="xs"
-                        c="dimmed"
-                        mb={4}
-                    >
-                        {'currentType="user" direction="auto"'}
-                    </Text>
-                    <TransactionList
-                        transactions={mockTransactions}
-                        currentType="user"
-                        direction="auto"
-                    />
-                </div>
-                <div>
-                    <Text
-                        size="xs"
-                        c="dimmed"
-                        mb={4}
-                    >
-                        {'currentType="project" direction="auto"'}
-                    </Text>
-                    <TransactionList
-                        transactions={mockTransactions}
-                        currentType="project"
-                        direction="auto"
-                    />
-                </div>
-            </Stack>
+            <ErrorBoundary>
+                <Stack gap="md">
+                    <div>
+                        <Text
+                            size="xs"
+                            c="dimmed"
+                            mb={4}
+                        >
+                            {'currentType="user" direction="auto"'}
+                        </Text>
+                        <TransactionList
+                            transactions={mockTransactions}
+                            currentType="user"
+                            direction="auto"
+                        />
+                    </div>
+                    <div>
+                        <Text
+                            size="xs"
+                            c="dimmed"
+                            mb={4}
+                        >
+                            {'currentType="project" direction="auto"'}
+                        </Text>
+                        <TransactionList
+                            transactions={mockTransactions}
+                            currentType="project"
+                            direction="auto"
+                        />
+                    </div>
+                </Stack>
+            </ErrorBoundary>
         </Accordion.Panel>
     </Accordion.Item>
 );
@@ -380,10 +395,12 @@ const BalanceChartSample = () => (
             </Group>
         </Accordion.Control>
         <Accordion.Panel>
-            <BalanceChart
-                h={300}
-                transactions={mockTransactions}
-            />
+            <ErrorBoundary>
+                <BalanceChart
+                    h={300}
+                    transactions={mockTransactions}
+                />
+            </ErrorBoundary>
         </Accordion.Panel>
     </Accordion.Item>
 );

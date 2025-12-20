@@ -5,6 +5,7 @@ import { Center, Loader, SimpleGrid, Text } from "@mantine/core";
 
 import apis from "/@/api";
 import type { Project } from "/@/api/schema/internal";
+import ErrorBoundary from "/@/components/ErrorBoundary";
 import { RankingFull } from "/@/components/ranking/RankingFull";
 import type { RankedItem } from "/@/components/ranking/RankingTypes";
 
@@ -84,15 +85,17 @@ const ProjectStats = () => {
     );
 
     return (
-        <Suspense
-            fallback={
-                <Center py="xl">
-                    <Loader size="lg" />
-                </Center>
-            }
-        >
-            <TheProjectStats fetcher={fetcher} />
-        </Suspense>
+        <ErrorBoundary>
+            <Suspense
+                fallback={
+                    <Center py="xl">
+                        <Loader size="lg" />
+                    </Center>
+                }
+            >
+                <TheProjectStats fetcher={fetcher} />
+            </Suspense>
+        </ErrorBoundary>
     );
 };
 

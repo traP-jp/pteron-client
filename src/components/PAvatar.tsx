@@ -2,7 +2,7 @@ import { Suspense, use } from "react";
 
 import { Avatar, type AvatarProps, type MantineSize } from "@mantine/core";
 
-import { buildFallbackIconUrl, buildTraqIconUrl } from "/@/api";
+import { buildFallbackIconUrl, buildTraqIconUrl } from "/@/api/paths";
 import copiaIcon from "/@/assets/icons/copia.svg";
 import { type Entity, type EntityType, isProject, isUser } from "/@/types/composed";
 import { type Url, toBranded } from "/@/types/entity";

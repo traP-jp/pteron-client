@@ -8,6 +8,7 @@ import apis from "/@/api";
 import type { Project } from "/@/api/schema/internal";
 import { CreateProjectModal } from "/@/components/CreateProjectModal";
 import { EntityCard } from "/@/components/EntityCard";
+import ErrorBoundary from "/@/components/ErrorBoundary";
 import { type Copia, type ProjectName, type Url, toBranded } from "/@/types/entity";
 
 type SortOption = "balance-desc" | "balance-asc" | "name-asc" | "name-desc";
@@ -21,7 +22,7 @@ const CreateNewProject = ({ onProjectCreated }: { onProjectCreated: () => void }
     };
 
     return (
-        <>
+        <ErrorBoundary>
             <CreateProjectModal
                 opened={opened}
                 onClose={handleSuccess}
@@ -41,7 +42,7 @@ const CreateNewProject = ({ onProjectCreated }: { onProjectCreated: () => void }
                     プロジェクトを作成
                 </Text>
             </Button>
-        </>
+        </ErrorBoundary>
     );
 };
 
@@ -66,25 +67,27 @@ export const AllProjects = ({ sortBy, fetcher }: { sortBy: SortOption; fetcher: 
     const sortedProjects = sortProjects(projects, sortBy);
 
     return (
-        <SimpleGrid
-            cols={{ base: 1, md: 2, xl: 3 }}
-            spacing="md"
-        >
-            {sortedProjects.map(project => {
-                return (
-                    <EntityCard
-                        key={project.id}
-                        type="project"
-                        name={toBranded<ProjectName>(project.name)}
-                        amount={toBranded<Copia>(BigInt(project.balance))}
-                        withBorder
-                        p="xl"
-                        radius="md"
-                        extraLink={toBranded<Url>(project.url ?? "")}
-                    />
-                );
-            })}
-        </SimpleGrid>
+        <ErrorBoundary>
+            <SimpleGrid
+                cols={{ base: 1, md: 2, xl: 3 }}
+                spacing="md"
+            >
+                {sortedProjects.map(project => {
+                    return (
+                        <EntityCard
+                            key={project.id}
+                            type="project"
+                            name={toBranded<ProjectName>(project.name)}
+                            amount={toBranded<Copia>(BigInt(project.balance))}
+                            withBorder
+                            p="xl"
+                            radius="md"
+                            extraLink={toBranded<Url>(project.url ?? "")}
+                        />
+                    );
+                })}
+            </SimpleGrid>
+        </ErrorBoundary>
     );
 };
 
@@ -92,25 +95,27 @@ export const OwnProjects = ({ sortBy, fetcher }: { sortBy: SortOption; fetcher: 
     const { ownProjects } = use(fetcher);
 
     return (
-        <SimpleGrid
-            cols={{ base: 1, md: 2, xl: 3 }}
-            spacing="md"
-        >
-            {sortProjects(ownProjects, sortBy).map(project => {
-                return (
-                    <EntityCard
-                        key={project.id}
-                        type="project"
-                        name={toBranded<ProjectName>(project.name)}
-                        amount={toBranded<Copia>(BigInt(project.balance))}
-                        withBorder
-                        p="xl"
-                        radius="md"
-                        extraLink={toBranded<Url>(project.url ?? "")}
-                    />
-                );
-            })}
-        </SimpleGrid>
+        <ErrorBoundary>
+            <SimpleGrid
+                cols={{ base: 1, md: 2, xl: 3 }}
+                spacing="md"
+            >
+                {sortProjects(ownProjects, sortBy).map(project => {
+                    return (
+                        <EntityCard
+                            key={project.id}
+                            type="project"
+                            name={toBranded<ProjectName>(project.name)}
+                            amount={toBranded<Copia>(BigInt(project.balance))}
+                            withBorder
+                            p="xl"
+                            radius="md"
+                            extraLink={toBranded<Url>(project.url ?? "")}
+                        />
+                    );
+                })}
+            </SimpleGrid>
+        </ErrorBoundary>
     );
 };
 
@@ -147,74 +152,76 @@ const Projects = () => {
     const refresh = () => setFetcher(fetch());
 
     return (
-        <Flex
-            direction="column"
-            gap="xl"
-        >
+        <ErrorBoundary>
             <Flex
                 direction="column"
-                gap="md"
+                gap="xl"
             >
                 <Flex
-                    direction="row"
-                    align="center"
-                    mr="lg"
+                    direction="column"
                     gap="md"
-                    wrap="wrap"
                 >
                     <Flex
                         direction="row"
                         align="center"
+                        mr="lg"
+                        gap="md"
+                        wrap="wrap"
+                    >
+                        <Flex
+                            direction="row"
+                            align="center"
+                            wrap="wrap"
+                            gap="md"
+                        >
+                            <Text size="xl">所有しているプロジェクト</Text>
+                        </Flex>
+                        <CreateNewProject onProjectCreated={refresh} />
+                    </Flex>
+                    <Suspense>
+                        <OwnProjects
+                            sortBy={sortBy}
+                            fetcher={fetcher}
+                        />
+                    </Suspense>
+                </Flex>
+                <Flex
+                    direction="column"
+                    gap="md"
+                >
+                    <Flex
+                        direction="row"
+                        justify="space-between"
+                        align="center"
                         wrap="wrap"
                         gap="md"
                     >
-                        <Text size="xl">所有しているプロジェクト</Text>
+                        <Text size="xl">全プロジェクト一覧</Text>
+                        <Select
+                            data={
+                                [
+                                    { value: "balance-desc", label: "総資産降順" },
+                                    { value: "balance-asc", label: "総資産昇順" },
+                                    { value: "name-asc", label: "名前昇順" },
+                                    { value: "name-desc", label: "名前降順" },
+                                ] as const
+                            }
+                            value={sortBy}
+                            onChange={value => {
+                                setSortBy(value as SortOption);
+                            }}
+                            allowDeselect={false}
+                        />
                     </Flex>
-                    <CreateNewProject onProjectCreated={refresh} />
+                    <Suspense>
+                        <AllProjects
+                            sortBy={sortBy}
+                            fetcher={fetcher}
+                        />
+                    </Suspense>
                 </Flex>
-                <Suspense>
-                    <OwnProjects
-                        sortBy={sortBy}
-                        fetcher={fetcher}
-                    />
-                </Suspense>
             </Flex>
-            <Flex
-                direction="column"
-                gap="md"
-            >
-                <Flex
-                    direction="row"
-                    justify="space-between"
-                    align="center"
-                    wrap="wrap"
-                    gap="md"
-                >
-                    <Text size="xl">全プロジェクト一覧</Text>
-                    <Select
-                        data={
-                            [
-                                { value: "balance-desc", label: "総資産降順" },
-                                { value: "balance-asc", label: "総資産昇順" },
-                                { value: "name-asc", label: "名前昇順" },
-                                { value: "name-desc", label: "名前降順" },
-                            ] as const
-                        }
-                        value={sortBy}
-                        onChange={value => {
-                            setSortBy(value as SortOption);
-                        }}
-                        allowDeselect={false}
-                    />
-                </Flex>
-                <Suspense>
-                    <AllProjects
-                        sortBy={sortBy}
-                        fetcher={fetcher}
-                    />
-                </Suspense>
-            </Flex>
-        </Flex>
+        </ErrorBoundary>
     );
 };
 

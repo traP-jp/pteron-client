@@ -6,6 +6,7 @@ import { IconArrowLeft } from "@tabler/icons-react";
 
 import apis from "/@/api";
 import type { Project } from "/@/api/schema/internal";
+import ErrorBoundary from "/@/components/ErrorBoundary";
 import { RankingFull } from "/@/components/ranking/RankingFull";
 import type { RankedItem } from "/@/components/ranking/RankingTypes";
 
@@ -120,18 +121,20 @@ const ProjectStatsDetail = () => {
     };
 
     return (
-        <Suspense
-            fallback={
-                <Center py="xl">
-                    <Loader size="lg" />
-                </Center>
-            }
-        >
-            <TheProjectStatsDetail
-                title={title}
-                fetcher={fetch()}
-            />
-        </Suspense>
+        <ErrorBoundary>
+            <Suspense
+                fallback={
+                    <Center py="xl">
+                        <Loader size="lg" />
+                    </Center>
+                }
+            >
+                <TheProjectStatsDetail
+                    title={title}
+                    fetcher={fetch()}
+                />
+            </Suspense>
+        </ErrorBoundary>
     );
 };
 
