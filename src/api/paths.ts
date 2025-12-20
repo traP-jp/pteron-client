@@ -1,7 +1,7 @@
 import apis from ".";
 import type { InternalAxiosRequestConfig } from "axios";
 
-import { type Url, type UserName, toBranded } from "/@/types/entity";
+import { type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
 
 export const dummyAdapter = async (config: InternalAxiosRequestConfig) => ({
     data: {},
@@ -23,4 +23,12 @@ export const buildTraqIconUrl = async (userName: UserName): Promise<Url> => {
 
 export const buildFallbackIconUrl = (name: string): Url => {
     return toBranded<Url>(`https://api.dicebear.com/9.x/rings/svg?seed=${name}`);
+};
+
+export const buildUserPageUrl = (userName: UserName): Url => {
+    return toBranded<Url>(`/users/${userName}`);
+};
+
+export const buildProjectPageUrl = (projectName: ProjectName): Url => {
+    return toBranded<Url>(`/projects/${projectName}`);
 };

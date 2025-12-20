@@ -74,6 +74,7 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
         >
             <Accordion.Control>
                 <Group
+                    px="xs"
                     justify="space-between"
                     wrap="nowrap"
                 >
