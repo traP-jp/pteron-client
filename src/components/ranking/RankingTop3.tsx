@@ -1,4 +1,5 @@
 import { Card, Group, Stack, Text } from "@mantine/core";
+import { useElementSize } from "@mantine/hooks";
 import { IconCrown } from "@tabler/icons-react";
 
 import { PAmount } from "/@/components/PAmount";
@@ -30,6 +31,7 @@ interface RankingTop3ItemProps<T extends RankingEntity = RankingEntity> {
     rankedItem: RankedItem<T>;
     onItemClick?: (item: RankedItem<T>) => void;
     valueDisplay?: ValueDisplayType;
+    isNarrow?: boolean;
 }
 
 /**
@@ -41,6 +43,7 @@ const RankingTop3Item = <T extends RankingEntity>({
     rankedItem,
     onItemClick,
     valueDisplay = "copia",
+    isNarrow = false,
 }: RankingTop3ItemProps<T>) => {
     const { rank, rankDiff, entity } = rankedItem;
     const crownStyle = getCrownStyle(rank);
@@ -54,6 +57,7 @@ const RankingTop3Item = <T extends RankingEntity>({
             radius="md"
             shadow="sm"
             withBorder
+            style={{ minWidth: isNarrow ? undefined : 200, width: isNarrow ? "100%" : undefined }}
         >
             <Stack
                 align="center"
@@ -82,14 +86,14 @@ const RankingTop3Item = <T extends RankingEntity>({
                         coloring
                         fw={700}
                         leadingIcon
-                        size={isFirst ? "xl" : "lg"}
+                        size={isFirst ? "lg" : "md"}
                         value={toBranded<Copia>(BigInt(entity.balance ?? 0))}
                     />
                 ) : valueDisplay === "percent" ? (
                     <Text
                         c="blue"
                         fw={700}
-                        size={isFirst ? "xl" : "lg"}
+                        size={isFirst ? "lg" : "md"}
                     >
                         {entity.balance?.toLocaleString() ?? 0}%
                     </Text>
@@ -97,7 +101,7 @@ const RankingTop3Item = <T extends RankingEntity>({
                     <Text
                         c="blue"
                         fw={700}
-                        size={isFirst ? "xl" : "lg"}
+                        size={isFirst ? "lg" : "md"}
                     >
                         {entity.balance?.toLocaleString() ?? 0}
                     </Text>
@@ -141,18 +145,27 @@ export const RankingTop3 = <T extends RankingEntity>({
     onItemClick,
     valueDisplay = "copia",
 }: RankingTop3Props<T>) => {
+    const { ref, width } = useElementSize();
+    const isNarrow = width < 620; // コンテナ幅が600px未満の場合は縦並び
+
     // 1位〜3位のみ取得
     const top3Items = items.filter(u => u.rank >= 1 && u.rank <= 3);
 
-    // 表彰台形式の並び順にする (2位, 1位, 3位)
-    // データが足りない場合も考慮して、rankで検索して配置
-    const podiumItems = [
-        top3Items.find(u => u.rank === 2),
-        top3Items.find(u => u.rank === 1),
-        top3Items.find(u => u.rank === 3),
-    ].filter(u => u !== undefined) as RankedItem<T>[];
+    // 狭い場合は順位順 (1位, 2位, 3位)
+    // 広い場合は表彰台形式 (2位, 1位, 3位)
+    const orderedItems = isNarrow
+        ? ([
+              top3Items.find(u => u.rank === 1),
+              top3Items.find(u => u.rank === 2),
+              top3Items.find(u => u.rank === 3),
+          ].filter(u => u !== undefined) as RankedItem<T>[])
+        : ([
+              top3Items.find(u => u.rank === 2),
+              top3Items.find(u => u.rank === 1),
+              top3Items.find(u => u.rank === 3),
+          ].filter(u => u !== undefined) as RankedItem<T>[]);
 
-    if (podiumItems.length === 0) {
+    if (orderedItems.length === 0) {
         return (
             <Text
                 c="dimmed"
@@ -163,13 +176,36 @@ export const RankingTop3 = <T extends RankingEntity>({
         );
     }
 
+    if (isNarrow) {
+        return (
+            <Stack
+                ref={ref}
+                align="center"
+                gap="md"
+            >
+                {orderedItems.map(rankedItem => (
+                    <RankingTop3Item
+                        key={rankedItem.entity.id}
+                        isNarrow
+                        onItemClick={onItemClick}
+                        rankedItem={rankedItem}
+                        type={type}
+                        valueDisplay={valueDisplay}
+                    />
+                ))}
+            </Stack>
+        );
+    }
+
     return (
         <Group
+            ref={ref}
             align="end" // 下揃えにして表彰台の高低差を自然に見せる
             gap="md"
             grow
+            wrap="nowrap"
         >
-            {podiumItems.map(rankedItem => (
+            {orderedItems.map(rankedItem => (
                 <RankingTop3Item
                     key={rankedItem.entity.id}
                     onItemClick={onItemClick}
