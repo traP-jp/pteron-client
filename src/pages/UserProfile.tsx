@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { Suspense, use } from "react";
 import { useParams } from "react-router-dom";
 
-import { Card, Divider, Flex, SimpleGrid, Text, Title } from "@mantine/core";
+import { Card, Center, Divider, Flex, Loader, SimpleGrid, Text, Title } from "@mantine/core";
 
 import apis from "/@/api";
 import type { Project, User } from "/@/api/schema/internal";
@@ -141,53 +141,58 @@ const UserProfileProjectList = ({ projects }: { projects: Project[] }) => {
     );
 };
 
-const UserProfile = () => {
-    const { userId: _userName } = useParams();
-    const [user, setUser] = useState<User | null>(null);
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [userProjects, setUserProjects] = useState<Project[]>([]);
-
-    useEffect(() => {
-        apis.internal.users.getUser(_userName!).then(({ data }) => {
-            setUser(data);
-        });
-    }, [_userName]);
-
-    useEffect(() => {
-        apis.internal.transactions.getUserTransactions(_userName!).then(({ data }) => {
-            setTransactions(data.items);
-        });
-    }, [_userName]);
-
-    useEffect(() => {
-        apis.internal.users.getUserProjects(_userName!).then(({ data }) => {
-            setUserProjects(data);
-        });
-    }, [_userName]);
-
-    if (!user) return <></>;
+const TheUserProfile = ({
+    fetcher,
+}: {
+    fetcher: Promise<{ user: User; transactions: Transaction[]; projects: Project[] }>;
+}) => {
+    const { user, transactions, projects } = use(fetcher);
 
     const name = toBranded<UserName>(user.name);
     const balance = toBranded<Copia>(BigInt(user.balance));
-    const projects = toBranded<Project[]>(userProjects);
 
     return (
-        <>
-            <Flex
-                direction="column"
-                gap="md"
-            >
-                <UserProfileHeder
-                    name={name}
-                    balance={balance}
-                />
-                <Divider />
-                <UserProfileDetail transactions={transactions} />
-                <Divider />
-                <UserProfileProjectList projects={projects} />
-            </Flex>
-        </>
+        <Flex
+            direction="column"
+            gap="md"
+        >
+            <UserProfileHeder
+                name={name}
+                balance={balance}
+            />
+            <Divider />
+            <UserProfileDetail transactions={transactions} />
+            <Divider />
+            <UserProfileProjectList projects={projects} />
+        </Flex>
     );
 };
 
+const UserProfile = () => {
+    const { userId: _userName } = useParams();
+    const userName = toBranded<UserName>(_userName ?? "");
+
+    const fetch = async () => {
+        const { data: user } = await apis.internal.users.getUser(userName);
+        const {
+            data: { items: transactions },
+        } = await apis.internal.transactions.getUserTransactions(userName);
+
+        const { data: projects } = await apis.internal.users.getUserProjects(userName);
+
+        return { user, transactions, projects };
+    };
+
+    return (
+        <Suspense
+            fallback={
+                <Center h="50vh">
+                    <Loader size="lg" />
+                </Center>
+            }
+        >
+            <TheUserProfile fetcher={fetch()} />
+        </Suspense>
+    );
+};
 export default UserProfile;

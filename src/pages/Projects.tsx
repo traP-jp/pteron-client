@@ -1,23 +1,30 @@
-import { useEffect, useState } from "react";
+import { Suspense, use, useState } from "react";
 
-import { Button, Flex, Text } from "@mantine/core";
+import { Button, Center, Flex, Loader, Select, SimpleGrid, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 
-import apis from "../api";
-import type { Project } from "../api/schema/internal";
-import { CreateProjectModal } from "../components/CreateProjectModal";
-import { EntityCard } from "../components/EntityCard";
-import { type Copia, type ProjectName, type Url, type UserId, toBranded } from "../types/entity";
+import apis from "/@/api";
+import type { Project } from "/@/api/schema/internal";
+import { CreateProjectModal } from "/@/components/CreateProjectModal";
+import { EntityCard } from "/@/components/EntityCard";
+import { type Copia, type Invocable, type ProjectName, type Url, toBranded } from "/@/types/entity";
 
-const CreateNewProject = () => {
+type SortOption = "balance-desc" | "balance-asc" | "name-asc" | "name-desc";
+
+const CreateNewProject = ({ onProjectCreated }: { onProjectCreated: () => void }) => {
     const [opened, { open, close }] = useDisclosure(false);
+
+    const handleSuccess = () => {
+        close();
+        onProjectCreated();
+    };
 
     return (
         <>
             <CreateProjectModal
                 opened={opened}
-                onClose={close}
+                onClose={handleSuccess}
             />
             <Button
                 color="green"
@@ -38,101 +45,163 @@ const CreateNewProject = () => {
     );
 };
 
-const Projects = () => {
-    const [myId, setMyId] = useState<UserId>();
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [haveProjects, setHaveProjects] = useState<Project[]>([]);
+const sortProjects = (projects: Project[], sortBy: SortOption) => {
+    return [...projects].sort((a, b) => {
+        switch (sortBy) {
+            case "balance-desc":
+                return b.balance - a.balance;
+            case "balance-asc":
+                return a.balance - b.balance;
+            case "name-asc":
+                return a.name.localeCompare(b.name);
+            case "name-desc":
+                return b.name.localeCompare(a.name);
+                return 0;
+        }
+    });
+};
 
-    useEffect(() => {
-        apis.internal.me.getCurrentUser().then(({ data }) => {
-            setMyId(toBranded<UserId>(data.id));
-        });
-    }, []);
+type Fetcher = Promise<{
+    projects: Project[];
+    ownProjects: Project[];
+}>;
 
-    useEffect(() => {
-        apis.internal.projects.getProjects().then(({ data }) => {
-            setProjects(data.items);
-        });
-    }, []);
+const TheProjects = ({ refresh, fetcher }: { refresh: Invocable; fetcher: Fetcher }) => {
+    const [sortBy, setSortBy] = useState<SortOption>("balance-desc");
 
-    useEffect(() => {
-        if (!myId) return;
-        apis.internal.users.getUserProjects(myId).then(({ data }) => {
-            setHaveProjects(data);
-        });
-    }, [myId]);
+    const { projects, ownProjects } = use(fetcher);
+
+    const sortedProjects = sortProjects(projects, sortBy);
 
     return (
-        <>
+        <Flex
+            direction="column"
+            gap="xl"
+        >
             <Flex
                 direction="column"
-                gap="xl"
+                gap="md"
             >
                 <Flex
-                    direction="column"
+                    direction="row"
+                    align="center"
+                    mr="lg"
                     gap="md"
+                    wrap="wrap"
                 >
                     <Flex
                         direction="row"
                         align="center"
-                        gap="xl"
-                    >
-                        <Text size="xl">所有しているプロジェクト一覧</Text>
-                        <CreateNewProject />
-                    </Flex>
-                    <Flex
-                        direction="row"
-                        gap="md"
-                        mt="md"
                         wrap="wrap"
+                        gap="md"
                     >
-                        {haveProjects.map(project => {
-                            return (
-                                <EntityCard
-                                    className="w-1/6"
-                                    key={project.id}
-                                    type="project"
-                                    name={toBranded<ProjectName>(project.name)}
-                                    amount={toBranded<Copia>(BigInt(project.balance))}
-                                    withBorder
-                                    p="xl"
-                                    radius="md"
-                                    extraLink={toBranded<Url>(project.url ?? "")}
-                                />
-                            );
-                        })}
+                        <Text size="xl">所有しているプロジェクト</Text>
                     </Flex>
+                    <CreateNewProject onProjectCreated={refresh} />
                 </Flex>
+                <SimpleGrid
+                    cols={{ base: 1, md: 2, xl: 3 }}
+                    spacing="md"
+                >
+                    {ownProjects.map(project => {
+                        return (
+                            <EntityCard
+                                key={project.id}
+                                type="project"
+                                name={toBranded<ProjectName>(project.name)}
+                                amount={toBranded<Copia>(BigInt(project.balance))}
+                                withBorder
+                                p="xl"
+                                radius="md"
+                                extraLink={toBranded<Url>(project.url ?? "")}
+                            />
+                        );
+                    })}
+                </SimpleGrid>
+            </Flex>
+            <Flex
+                direction="column"
+                gap="md"
+            >
                 <Flex
-                    direction="column"
+                    direction="row"
+                    justify="space-between"
+                    align="center"
+                    wrap="wrap"
                     gap="md"
                 >
                     <Text size="xl">全プロジェクト一覧</Text>
-                    <Flex
-                        direction="row"
-                        gap="md"
-                        mt="md"
-                        wrap="wrap"
-                    >
-                        {projects.map(project => {
-                            return (
-                                <EntityCard
-                                    className="w-1/6"
-                                    key={project.id}
-                                    type="project"
-                                    name={toBranded<ProjectName>(project.name)}
-                                    amount={toBranded<Copia>(BigInt(project.balance))}
-                                    withBorder
-                                    p="xl"
-                                    radius="md"
-                                    extraLink={toBranded<Url>(project.url ?? "")}
-                                />
-                            );
-                        })}
-                    </Flex>
+                    <Select
+                        data={
+                            [
+                                { value: "balance-desc", label: "総資産降順" },
+                                { value: "balance-asc", label: "総資産昇順" },
+                                { value: "name-asc", label: "名前昇順" },
+                                { value: "name-desc", label: "名前降順" },
+                            ] as const
+                        }
+                        value={sortBy}
+                        onChange={value => {
+                            setSortBy(value as SortOption);
+                        }}
+                        allowDeselect={false}
+                    />
                 </Flex>
+                <SimpleGrid
+                    cols={{ base: 1, md: 2, xl: 3 }}
+                    spacing="md"
+                >
+                    {sortedProjects.map(project => {
+                        return (
+                            <EntityCard
+                                key={project.id}
+                                type="project"
+                                name={toBranded<ProjectName>(project.name)}
+                                amount={toBranded<Copia>(BigInt(project.balance))}
+                                withBorder
+                                p="xl"
+                                radius="md"
+                                extraLink={toBranded<Url>(project.url ?? "")}
+                            />
+                        );
+                    })}
+                </SimpleGrid>
             </Flex>
-        </>
+        </Flex>
+    );
+};
+
+const Projects = () => {
+    const fetch = async () => {
+        const {
+            data: { id },
+        } = await apis.internal.me.getCurrentUser();
+
+        const {
+            data: { items: projects },
+        } = await apis.internal.projects.getProjects();
+        const { data: ownProjects } = await apis.internal.users.getUserProjects(id);
+
+        return { projects, ownProjects };
+    };
+
+    const [fetcher, setFetcher] = useState<Fetcher>(fetch());
+
+    const refresh = () => setFetcher(fetch());
+
+    return (
+        <Suspense
+            fallback={
+                <Center h="50vh">
+                    <Loader size="lg" />
+                </Center>
+            }
+        >
+            <TheProjects
+                refresh={refresh}
+                fetcher={fetcher}
+            />
+        </Suspense>
     );
 };
 
