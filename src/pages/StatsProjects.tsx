@@ -103,6 +103,7 @@ const StatsProjects = () => {
                     items={ranking.items}
                     maxItems={5}
                     title={ranking.title}
+                    titleLink={`/stats/projects/${ranking.rankingName}`}
                     type="project"
                 />
             ))}

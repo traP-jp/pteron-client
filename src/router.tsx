@@ -46,8 +46,16 @@ export const router = createBrowserRouter([
                         Component: lazy(() => import("./pages/StatsUsers")),
                     },
                     {
+                        path: "users/:rankingName",
+                        Component: lazy(() => import("./pages/StatsUserDetails")),
+                    },
+                    {
                         path: "projects",
                         Component: lazy(() => import("./pages/StatsProjects")),
+                    },
+                    {
+                        path: "projects/:rankingName",
+                        Component: lazy(() => import("./pages/StatsProjectDetails")),
                     },
                 ],
             },
