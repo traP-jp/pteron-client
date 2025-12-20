@@ -1,7 +1,7 @@
 import { Suspense, use } from "react";
 import { useParams } from "react-router-dom";
 
-import { Card, Divider, Flex, SimpleGrid, Text, Title } from "@mantine/core";
+import { Button, Card, Divider, Flex, SimpleGrid, Text, Title } from "@mantine/core";
 
 import apis from "/@/api";
 import type { Project, User } from "/@/api/schema/internal";
@@ -13,7 +13,15 @@ import { TransactionList } from "/@/components/TransactionList";
 import BalanceChart from "/@/components/ranking/BalanceChart";
 import { type Copia, type ProjectName, type UserName, toBranded } from "/@/types/entity";
 
-const ProjectHeader = ({ name, balance }: { name: ProjectName; balance: Copia }) => {
+const ProjectHeader = ({
+    name,
+    balance,
+    isAdmin,
+}: {
+    name: ProjectName;
+    balance: Copia;
+    isAdmin: boolean;
+}) => {
     return (
         <Flex
             direction="column"
@@ -41,16 +49,29 @@ const ProjectHeader = ({ name, balance }: { name: ProjectName; balance: Copia })
                     >
                         {name}
                     </Text>
+                    {isAdmin && (
+                        <Button
+                            variant="light"
+                            size="sm"
+                        >
+                            プロジェクトを管理
+                        </Button>
+                    )}
                 </Flex>
-                <PAmount
+                <Flex
                     ml="auto"
                     mr="xl"
-                    value={balance}
-                    leadingIcon
-                    coloring
-                    size="custom"
-                    customSize={2}
-                />
+                    align="center"
+                    gap="md"
+                >
+                    <PAmount
+                        value={balance}
+                        leadingIcon
+                        coloring
+                        size="custom"
+                        customSize={2}
+                    />
+                </Flex>
             </Flex>
         </Flex>
     );
@@ -145,12 +166,17 @@ const ProjectMemberList = ({ owner, admins }: { owner?: User; admins?: User[] })
 const TheProjectDetails = ({
     fetcher,
 }: {
-    fetcher: Promise<{ project: Project; transactions: Transaction[] }>;
+    fetcher: Promise<{ project: Project; transactions: Transaction[]; currentUserId: string }>;
 }) => {
-    const { project, transactions } = use(fetcher);
+    const { project, transactions, currentUserId } = use(fetcher);
 
     const name = toBranded<ProjectName>(project.name);
     const balance = toBranded<Copia>(BigInt(project.balance));
+
+    // 管理者判定
+    const isAdmin =
+        project.owner?.id === currentUserId ||
+        (project.admins ?? []).some(admin => admin.id === currentUserId);
 
     return (
         <Flex
@@ -160,6 +186,7 @@ const TheProjectDetails = ({
             <ProjectHeader
                 name={name}
                 balance={balance}
+                isAdmin={isAdmin}
             />
             <Divider />
             <ProjectDetail transactions={transactions} />
@@ -181,9 +208,14 @@ const ProjectDetails = () => {
         const {
             data: { items: transactions },
         } = await apis.internal.transactions.getProjectTransactions(projectName);
+        const { data: currentUser } = await apis.internal.me.getCurrentUser();
 
         // transactions が undefined の場合は空配列を返す
-        return { project, transactions: transactions ?? [] };
+        return {
+            project,
+            transactions: transactions ?? [],
+            currentUserId: currentUser.id,
+        };
     };
 
     // Suspense に fallback を渡す（コメントは JSX の外へ）
