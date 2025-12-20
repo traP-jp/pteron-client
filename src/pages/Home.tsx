@@ -262,7 +262,9 @@ export const Home = () => {
                             size="lg"
                             fw={700}
                         >
-                            {systemStats && systemStats.count !== undefined ? systemStats.count.toLocaleString() : "-"}
+                            {systemStats && systemStats.count !== undefined
+                                ? systemStats.count.toLocaleString()
+                                : "-"}
                         </Text>
                         {systemStats && (
                             <Text
