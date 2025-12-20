@@ -1,4 +1,5 @@
 import { AreaChart, type AreaChartProps } from "@mantine/charts";
+import { Center, Text } from "@mantine/core";
 
 import { type Transaction } from "/@/api/schema/internal";
 
@@ -14,6 +15,10 @@ interface ChartRecord {
 type ChartData = ChartRecord[];
 
 const formatTransactionData = (start: number, transactions: Transaction[]): ChartData => {
+    if (transactions.length === 0) {
+        return [];
+    }
+
     let sum = start;
 
     const data: ChartData = [];
@@ -47,6 +52,14 @@ const BalanceChart = ({
     curveType = "linear",
     ...props
 }: BalanceChartProps) => {
+    if (!transactions || transactions.length === 0) {
+        return (
+            <Center h={props.h || 200}>
+                <Text c="dimmed">データがありません</Text>
+            </Center>
+        );
+    }
+
     return (
         <AreaChart
             data={formatTransactionData(0, transactions)}
