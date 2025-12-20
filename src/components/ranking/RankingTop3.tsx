@@ -90,7 +90,7 @@ const RankingTop3Item = <T extends RankingEntity>({
                         fw={700}
                         leadingIcon
                         size={isFirst ? "xl" : "lg"}
-                        value={toBranded<Copia>(entity.balance ?? 0)}
+                        value={toBranded<Copia>(BigInt(entity.balance ?? 0))}
                     />
                 ) : valueDisplay === "percent" ? (
                     <Text

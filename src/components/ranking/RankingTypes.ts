@@ -1,5 +1,7 @@
 import type { Project, User } from "/@/api/schema/internal";
 
+export type { Project, User };
+
 /**
  * ランキングアイテムのエンティティ型 (User または Project)
  */
