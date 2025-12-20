@@ -1,7 +1,19 @@
 import { Suspense, use } from "react";
 import { useParams } from "react-router-dom";
 
-import { Button, Card, Divider, Flex, SimpleGrid, Text, Title } from "@mantine/core";
+import {
+    ActionIcon,
+    Button,
+    Card,
+    Center,
+    Divider,
+    Flex,
+    Loader,
+    SimpleGrid,
+    Text,
+    Title,
+} from "@mantine/core";
+import { IconExternalLink } from "@tabler/icons-react";
 
 import apis from "/@/api";
 import type { Project, User } from "/@/api/schema/internal";
@@ -11,17 +23,23 @@ import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
 import BalanceChart from "/@/components/ranking/BalanceChart";
+import { createExternalLinkHander } from "/@/lib/link";
 import { type Copia, type ProjectName, type UserName, toBranded } from "/@/types/entity";
+import type { Url } from "/@/types/entity";
 
 const ProjectHeader = ({
     name,
     balance,
     isAdmin,
+    url,
 }: {
     name: ProjectName;
     balance: Copia;
     isAdmin: boolean;
+    url?: Url;
 }) => {
+    const handleExternalLinkClick = url ? createExternalLinkHander(url) : undefined;
+
     return (
         <Flex
             direction="column"
@@ -43,12 +61,29 @@ const ProjectHeader = ({
                         name={name}
                         type="project"
                     />
-                    <Text
-                        size="xl"
-                        fw={700}
+                    <Flex
+                        direction="row"
+                        align="center"
+                        gap="xs"
                     >
-                        {name}
-                    </Text>
+                        <Text
+                            size="xl"
+                            fw={700}
+                        >
+                            {name}
+                        </Text>
+                        {url && (
+                            <ActionIcon
+                                aria-label="サイトを開く"
+                                color="gray"
+                                onClick={handleExternalLinkClick}
+                                size="lg"
+                                variant="subtle"
+                            >
+                                <IconExternalLink size={20} />
+                            </ActionIcon>
+                        )}
+                    </Flex>
                     {isAdmin && (
                         <Button
                             variant="light"
@@ -58,20 +93,16 @@ const ProjectHeader = ({
                         </Button>
                     )}
                 </Flex>
-                <Flex
+
+                <PAmount
                     ml="auto"
                     mr="xl"
-                    align="center"
-                    gap="md"
-                >
-                    <PAmount
-                        value={balance}
-                        leadingIcon
-                        coloring
-                        size="custom"
-                        customSize={2}
-                    />
-                </Flex>
+                    value={balance}
+                    leadingIcon
+                    coloring
+                    size="custom"
+                    customSize={2}
+                />
             </Flex>
         </Flex>
     );
@@ -96,10 +127,9 @@ const ProjectDetail = ({ transactions }: { transactions: Transaction[] }) => {
                 >
                     推移
                 </Title>
-                {/* transactions が undefined の場合は空配列を渡してクラッシュを防ぐ */}
                 <BalanceChart
                     h={320}
-                    transactions={transactions ?? []}
+                    transactions={transactions}
                 />
             </Card>
 
@@ -120,9 +150,8 @@ const ProjectDetail = ({ transactions }: { transactions: Transaction[] }) => {
                 </Title>
                 {!transactions && <Text c="dimmed">取引履歴がありません</Text>}
                 <div className="h-80 overflow-auto">
-                    {/* 同様に安全な配列を渡す */}
                     <TransactionList
-                        transactions={transactions ?? []}
+                        transactions={transactions}
                         currentType="project"
                     />
                 </div>
@@ -172,6 +201,7 @@ const TheProjectDetails = ({
 
     const name = toBranded<ProjectName>(project.name);
     const balance = toBranded<Copia>(BigInt(project.balance));
+    const url = project.url ? toBranded<Url>(project.url) : undefined;
 
     // 管理者判定
     const isAdmin =
@@ -187,6 +217,7 @@ const TheProjectDetails = ({
                 name={name}
                 balance={balance}
                 isAdmin={isAdmin}
+                url={url}
             />
             <Divider />
             <ProjectDetail transactions={transactions} />
@@ -210,7 +241,6 @@ const ProjectDetails = () => {
         } = await apis.internal.transactions.getProjectTransactions(projectName);
         const { data: currentUser } = await apis.internal.me.getCurrentUser();
 
-        // transactions が undefined の場合は空配列を返す
         return {
             project,
             transactions: transactions ?? [],
@@ -218,9 +248,14 @@ const ProjectDetails = () => {
         };
     };
 
-    // Suspense に fallback を渡す（コメントは JSX の外へ）
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense
+            fallback={
+                <Center h="50vh">
+                    <Loader size="lg" />
+                </Center>
+            }
+        >
             <TheProjectDetails fetcher={fetch()} />
         </Suspense>
     );
