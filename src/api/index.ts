@@ -5,17 +5,13 @@ import { Api as TraqApiClient } from "./schema/traq";
 export * from "./paths";
 
 // 環境変数からAPIのbaseURLを取得
-// 設定されていれば使用、なければspecのデフォルト値を使用
+// 設定されていれば使用、なければ空文字列（specのデフォルト + ローカルproxy）
 // 例: VITE_API_BASE_URL=https://pteron-api.trap.show
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
-// 環境変数があれば上書き、なければ空オブジェクト（specのデフォルト値を使用）
-const internalConfig = apiBaseUrl ? { baseURL: `${apiBaseUrl}/internal` } : {};
-const publicConfig = apiBaseUrl ? { baseURL: `${apiBaseUrl}/v1` } : {};
+const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "";
 
 const apis = {
-    internal: new InternalApiClient(internalConfig),
-    public: new PublicApiClient(publicConfig),
+    internal: new InternalApiClient({ baseURL: `${baseUrl}/internal` }),
+    public: new PublicApiClient({ baseURL: `${baseUrl}/v1` }),
     traq: new TraqApiClient({}),
 };
 
