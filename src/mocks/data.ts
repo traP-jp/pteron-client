@@ -50,7 +50,7 @@ export const mockCurrentUser: User = mockUsers[0]!;
 export const mockProjects: Project[] = [
     {
         id: "660e8400-e29b-41d4-a716-446655440001",
-        name: "traP Portal",
+        name: "traP_Portal",
         url: "https://portal.trap.jp",
         owner: mockUsers[0]!,
         admins: [mockUsers[1]!, mockUsers[2]!],
