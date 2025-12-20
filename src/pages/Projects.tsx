@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Button, Flex, Text } from "@mantine/core";
+import { Button, Flex, SimpleGrid, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 
@@ -77,19 +77,16 @@ const Projects = () => {
                         align="center"
                         gap="xl"
                     >
-                        <Text size="xl">所有しているプロジェクト一覧</Text>
+                        <Text size="xl">所有しているプロジェクト</Text>
                         <CreateNewProject />
                     </Flex>
-                    <Flex
-                        direction="row"
-                        gap="md"
-                        mt="md"
-                        wrap="wrap"
+                    <SimpleGrid
+                        cols={{ base: 1, md: 2, xl: 3 }}
+                        spacing="md"
                     >
                         {haveProjects.map(project => {
                             return (
                                 <EntityCard
-                                    className="w-1/6"
                                     key={project.id}
                                     type="project"
                                     name={toBranded<ProjectName>(project.name)}
@@ -101,23 +98,20 @@ const Projects = () => {
                                 />
                             );
                         })}
-                    </Flex>
+                    </SimpleGrid>
                 </Flex>
                 <Flex
                     direction="column"
                     gap="md"
                 >
                     <Text size="xl">全プロジェクト一覧</Text>
-                    <Flex
-                        direction="row"
-                        gap="md"
-                        mt="md"
-                        wrap="wrap"
+                    <SimpleGrid
+                        cols={{ base: 1, md: 2, xl: 3 }}
+                        spacing="md"
                     >
                         {projects.map(project => {
                             return (
                                 <EntityCard
-                                    className="w-1/6"
                                     key={project.id}
                                     type="project"
                                     name={toBranded<ProjectName>(project.name)}
@@ -129,7 +123,7 @@ const Projects = () => {
                                 />
                             );
                         })}
-                    </Flex>
+                    </SimpleGrid>
                 </Flex>
             </Flex>
         </>
