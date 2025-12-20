@@ -105,8 +105,15 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
                         align="flex-end"
                     >
                         <PAmount
-                            value={toBranded<Copia>(BigInt(transaction.amount || 0))}
+                            value={toBranded<Copia>(
+                                BigInt(
+                                    direction === "to"
+                                        ? -1 * transaction.amount
+                                        : transaction.amount
+                                )
+                            )}
                             leadingIcon
+                            coloring
                             fw={600}
                             size="lg"
                         />
