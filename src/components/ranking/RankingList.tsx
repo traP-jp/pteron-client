@@ -1,15 +1,12 @@
-import { ActionIcon, Group, Paper, Text } from "@mantine/core";
-import { IconExternalLink } from "@tabler/icons-react";
+import { Group, Paper, Text } from "@mantine/core";
 
+import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
 import { toBranded } from "/@/types/entity";
-import type { ProjectName, Url, UserName } from "/@/types/entity";
+import type { Copia, ProjectName, UserName } from "/@/types/entity";
 
-import type { RankedItem, RankingBaseProps, RankingEntity } from "./RankingTypes";
-import { isProject } from "./RankingTypes";
-
-import { createExternalLinkHander } from "../lib/link";
+import type { RankedItem, RankingBaseProps, RankingEntity, ValueDisplayType } from "./RankingTypes";
 
 export interface RankingListProps<
     T extends RankingEntity = RankingEntity,
@@ -21,6 +18,7 @@ interface RankingListItemProps<T extends RankingEntity = RankingEntity> {
     type: "user" | "project";
     rankedItem: RankedItem<T>;
     onItemClick?: (item: RankedItem<T>) => void;
+    valueDisplay?: ValueDisplayType;
 }
 
 /**
@@ -30,12 +28,9 @@ const RankingListItem = <T extends RankingEntity>({
     type,
     rankedItem,
     onItemClick,
+    valueDisplay = "copia",
 }: RankingListItemProps<T>) => {
     const { rank, rankDiff, entity } = rankedItem;
-    const entityIsProject = isProject(entity);
-    const projectUrl = toBranded<Url>(entityIsProject ? (entity.url ?? "") : "");
-
-    const handleExternalLinkClick = createExternalLinkHander(projectUrl);
 
     return (
         <Paper
@@ -88,26 +83,32 @@ const RankingListItem = <T extends RankingEntity>({
                 </Text>
 
                 {/* プロジェクトの場合のみ外部リンクアイコン */}
-                {type === "project" && projectUrl && (
-                    <ActionIcon
-                        aria-label="サイトを開く"
-                        color="gray"
-                        onClick={handleExternalLinkClick}
-                        size="sm"
-                        variant="subtle"
-                    >
-                        <IconExternalLink size={16} />
-                    </ActionIcon>
-                )}
 
                 {/* ポイント */}
-                <Text
-                    c="blue"
-                    fw={600}
-                    size="sm"
-                >
-                    {entity.balance?.toLocaleString() ?? 0} pt
-                </Text>
+                {valueDisplay === "copia" ? (
+                    <PAmount
+                        coloring
+                        leadingIcon
+                        size="sm"
+                        value={toBranded<Copia>(BigInt(entity.balance ?? 0))}
+                    />
+                ) : valueDisplay === "percent" ? (
+                    <Text
+                        c="blue"
+                        fw={600}
+                        size="sm"
+                    >
+                        {entity.balance?.toLocaleString() ?? 0}%
+                    </Text>
+                ) : (
+                    <Text
+                        c="blue"
+                        fw={600}
+                        size="sm"
+                    >
+                        {entity.balance?.toLocaleString() ?? 0}
+                    </Text>
+                )}
             </Group>
         </Paper>
     );
@@ -121,6 +122,7 @@ export const RankingList = <T extends RankingEntity>({
     items,
     title,
     onItemClick,
+    valueDisplay = "copia",
 }: RankingListProps<T>) => {
     if (items.length === 0) {
         return (
@@ -150,6 +152,7 @@ export const RankingList = <T extends RankingEntity>({
                     onItemClick={onItemClick}
                     rankedItem={rankedItem}
                     type={type}
+                    valueDisplay={valueDisplay}
                 />
             ))}
         </div>

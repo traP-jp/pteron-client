@@ -10,6 +10,7 @@ import { TransactionList } from "/@/components/TransactionList";
 import { TrendIndicator } from "/@/components/TrendIndicator";
 import type { RankedItem } from "/@/components/ranking";
 import { RankingFull } from "/@/components/ranking";
+import BalanceChart from "/@/components/ranking/BalanceChart";
 import { type Copia, type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
 
 import { EditProjectModal } from "../components/EditProjectModal";
@@ -352,6 +353,28 @@ const TransactionListSample = () => (
     </Accordion.Item>
 );
 
+const BalanceChartSample = () => (
+    <Accordion.Item value="transaction-chart">
+        <Accordion.Control>
+            <Group>
+                <Text fw={500}>TransactionChart</Text>
+                <Text
+                    c="dimmed"
+                    size="xs"
+                >
+                    残高推移
+                </Text>
+            </Group>
+        </Accordion.Control>
+        <Accordion.Panel>
+            <BalanceChart
+                h={300}
+                transactions={mockTransactions}
+            />
+        </Accordion.Panel>
+    </Accordion.Item>
+);
+
 const mockProjectName = toBranded<ProjectName>("traP Portal");
 
 const EditProjectModalSample = ({ projectName }: { projectName: ProjectName }) => {
@@ -422,6 +445,8 @@ export const Sandbox = () => {
                 <PAvatarSample />
 
                 <EntityCardSample />
+
+                <BalanceChartSample />
             </Accordion>
 
             {/* 複合コンポーネント */}

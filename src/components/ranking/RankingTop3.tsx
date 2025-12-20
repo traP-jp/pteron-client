@@ -1,15 +1,13 @@
-import { ActionIcon, Card, Group, Stack, Text } from "@mantine/core";
-import { IconCrown, IconExternalLink } from "@tabler/icons-react";
+import { Card, Group, Stack, Text } from "@mantine/core";
+import { IconCrown } from "@tabler/icons-react";
 
+import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
-import { type Url, toBranded } from "/@/types/entity";
+import { type Copia, toBranded } from "/@/types/entity";
 import type { ProjectName, UserName } from "/@/types/entity";
 
-import type { RankedItem, RankingBaseProps, RankingEntity } from "./RankingTypes";
-import { isProject } from "./RankingTypes";
-
-import { createExternalLinkHander } from "../lib/link";
+import type { RankedItem, RankingBaseProps, RankingEntity, ValueDisplayType } from "./RankingTypes";
 
 /**
  * 王冠の色とサイズを取得
@@ -31,6 +29,7 @@ interface RankingTop3ItemProps<T extends RankingEntity = RankingEntity> {
     type: "user" | "project";
     rankedItem: RankedItem<T>;
     onItemClick?: (item: RankedItem<T>) => void;
+    valueDisplay?: ValueDisplayType;
 }
 
 /**
@@ -41,14 +40,11 @@ const RankingTop3Item = <T extends RankingEntity>({
     type,
     rankedItem,
     onItemClick,
+    valueDisplay = "copia",
 }: RankingTop3ItemProps<T>) => {
     const { rank, rankDiff, entity } = rankedItem;
     const crownStyle = getCrownStyle(rank);
     const isFirst = rank === 1;
-    const entityIsProject = isProject(entity);
-    const projectUrl = toBranded<Url>(entityIsProject ? (entity.url ?? "") : "");
-
-    const handleExternalLinkClick = createExternalLinkHander(projectUrl);
 
     return (
         <Card
@@ -81,13 +77,31 @@ const RankingTop3Item = <T extends RankingEntity>({
                 </Stack>
 
                 {/* ポイント */}
-                <Text
-                    c="blue"
-                    fw={700}
-                    size={isFirst ? "xl" : "lg"}
-                >
-                    {entity.balance?.toLocaleString() ?? 0}
-                </Text>
+                {valueDisplay === "copia" ? (
+                    <PAmount
+                        coloring
+                        fw={700}
+                        leadingIcon
+                        size={isFirst ? "xl" : "lg"}
+                        value={toBranded<Copia>(BigInt(entity.balance ?? 0))}
+                    />
+                ) : valueDisplay === "percent" ? (
+                    <Text
+                        c="blue"
+                        fw={700}
+                        size={isFirst ? "xl" : "lg"}
+                    >
+                        {entity.balance?.toLocaleString() ?? 0}%
+                    </Text>
+                ) : (
+                    <Text
+                        c="blue"
+                        fw={700}
+                        size={isFirst ? "xl" : "lg"}
+                    >
+                        {entity.balance?.toLocaleString() ?? 0}
+                    </Text>
+                )}
 
                 {/* アバター + 名前 + 外部リンク */}
                 <Group
@@ -110,18 +124,6 @@ const RankingTop3Item = <T extends RankingEntity>({
                     >
                         {entity.name}
                     </Text>
-                    {/* プロジェクトの場合のみ外部リンクアイコン */}
-                    {type === "project" && projectUrl && (
-                        <ActionIcon
-                            aria-label="サイトを開く"
-                            color="gray"
-                            onClick={handleExternalLinkClick}
-                            size="sm"
-                            variant="subtle"
-                        >
-                            <IconExternalLink size={14} />
-                        </ActionIcon>
-                    )}
                 </Group>
             </Stack>
         </Card>
@@ -137,6 +139,7 @@ export const RankingTop3 = <T extends RankingEntity>({
     type,
     items,
     onItemClick,
+    valueDisplay = "copia",
 }: RankingTop3Props<T>) => {
     // 1位〜3位のみ取得
     const top3Items = items.filter(u => u.rank >= 1 && u.rank <= 3);
@@ -172,6 +175,7 @@ export const RankingTop3 = <T extends RankingEntity>({
                     onItemClick={onItemClick}
                     rankedItem={rankedItem}
                     type={type}
+                    valueDisplay={valueDisplay}
                 />
             ))}
         </Group>
