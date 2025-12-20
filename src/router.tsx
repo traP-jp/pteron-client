@@ -18,7 +18,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: "users/:userId",
-                Component: lazy(() => import("./pages/UserProfile")),
+                Component: lazy(() => import("./pages/UserDetails")),
             },
             {
                 path: "projects",
