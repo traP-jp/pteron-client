@@ -1,15 +1,16 @@
 import { Accordion, Button, Group, Stack, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
-import type { Transaction } from "/@/api/schema/internal";
+import type { Project, Transaction, User } from "/@/api/schema/internal";
 import { CreateProjectModal } from "/@/components/CreateProjectModal";
 import { EntityCard } from "/@/components/EntityCard";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
 import { TrendIndicator } from "/@/components/TrendIndicator";
-import type { Project, RankedItem, User } from "/@/components/ranking";
+import type { RankedItem } from "/@/components/ranking";
 import { RankingFull } from "/@/components/ranking";
+import BalanceChart from "/@/components/ranking/BalanceChart";
 import { type Copia, type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
 
 const TrendIndicatorSample = () => (
@@ -350,6 +351,28 @@ const TransactionListSample = () => (
     </Accordion.Item>
 );
 
+const BalanceChartSample = () => (
+    <Accordion.Item value="transaction-chart">
+        <Accordion.Control>
+            <Group>
+                <Text fw={500}>TransactionChart</Text>
+                <Text
+                    c="dimmed"
+                    size="xs"
+                >
+                    残高推移
+                </Text>
+            </Group>
+        </Accordion.Control>
+        <Accordion.Panel>
+            <BalanceChart
+                h={300}
+                transactions={mockTransactions}
+            />
+        </Accordion.Panel>
+    </Accordion.Item>
+);
+
 export const Sandbox = () => {
     return (
         <Stack
@@ -384,6 +407,8 @@ export const Sandbox = () => {
                 <PAvatarSample />
 
                 <EntityCardSample />
+
+                <BalanceChartSample />
             </Accordion>
 
             {/* 複合コンポーネント */}

@@ -12,7 +12,5 @@ export type {
     RankingBaseProps,
     RankingEntity,
     RankingType,
-    Project,
-    User,
 } from "./RankingTypes";
 export { isProject } from "./RankingTypes";
