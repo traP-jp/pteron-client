@@ -6,26 +6,22 @@ import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { createExternalLinkHander } from "/@/lib/link";
 import type { Amount } from "/@/types/amount";
+import { type Entity, type EntityType, isProject, isUser } from "/@/types/composed";
 import { type Url, toBranded } from "/@/types/entity";
 import type { Href } from "/@/types/href";
-import {
-    type UserOrProject,
-    type UserOrProjectType,
-    isProject,
-    isUser,
-} from "/@/types/userOrProject";
 
 import { MaybeLink } from "./MaybeLink";
 
-export type EntityCardProps<Type extends UserOrProjectType> = CardProps &
+export type EntityCardProps<Type extends EntityType> = CardProps &
     Amount &
-    UserOrProject<Type> &
+    Entity<Type> &
     Partial<Href> & {
         extraLink?: Url;
     };
 
-export const EntityCard = <Type extends UserOrProjectType>(_props: EntityCardProps<Type>) => {
+export const EntityCard = <Type extends EntityType>(_props: EntityCardProps<Type>) => {
     const { type, name, amount, href: _href, extraLink = toBranded<Url>(""), ...props } = _props;
+
     const href =
         _href ??
         (isUser(_props)
@@ -33,6 +29,7 @@ export const EntityCard = <Type extends UserOrProjectType>(_props: EntityCardPro
             : isProject(_props)
               ? buildProjectPageUrl(_props.name)
               : undefined);
+
     const handleExternalLinkClick = createExternalLinkHander(extraLink);
 
     return (
