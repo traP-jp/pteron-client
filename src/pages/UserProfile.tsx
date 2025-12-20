@@ -1,7 +1,7 @@
 import { Suspense, use } from "react";
 import { useParams } from "react-router-dom";
 
-import { Card, Divider, Flex, SimpleGrid, Text, Title } from "@mantine/core";
+import { Card, Center, Divider, Flex, Loader, SimpleGrid, Text, Title } from "@mantine/core";
 
 import apis from "/@/api";
 import type { Project, User } from "/@/api/schema/internal";
@@ -184,7 +184,13 @@ const UserProfile = () => {
     };
 
     return (
-        <Suspense>
+        <Suspense
+            fallback={
+                <Center h="50vh">
+                    <Loader size="lg" />
+                </Center>
+            }
+        >
             <TheUserProfile fetcher={fetch()} />
         </Suspense>
     );
