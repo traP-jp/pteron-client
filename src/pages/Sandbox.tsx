@@ -98,6 +98,70 @@ const PAmountSample = () => (
                         c="dimmed"
                         mb={4}
                     >
+                        compact: 100M (100,000,000)
+                    </Text>
+                    <PAmount
+                        value={toBranded<Copia>(100000000n)}
+                        coloring
+                        size="xl"
+                        leadingIcon
+                        compact
+                    />
+                </>
+                <>
+                    <Text
+                        size="xs"
+                        c="dimmed"
+                        mb={4}
+                    >
+                        compact: 1.5M (1,500,000)
+                    </Text>
+                    <PAmount
+                        value={toBranded<Copia>(1500000n)}
+                        coloring
+                        size="xl"
+                        leadingIcon
+                        compact
+                    />
+                </>
+                <>
+                    <Text
+                        size="xs"
+                        c="dimmed"
+                        mb={4}
+                    >
+                        compact: 12.5K (12,500)
+                    </Text>
+                    <PAmount
+                        value={toBranded<Copia>(12500n)}
+                        coloring
+                        size="xl"
+                        leadingIcon
+                        compact
+                    />
+                </>
+                <>
+                    <Text
+                        size="xs"
+                        c="dimmed"
+                        mb={4}
+                    >
+                        compact: -100M (負の値)
+                    </Text>
+                    <PAmount
+                        value={toBranded<Copia>(-100000000n)}
+                        coloring
+                        size="xl"
+                        leadingIcon
+                        compact
+                    />
+                </>
+                <>
+                    <Text
+                        size="xs"
+                        c="dimmed"
+                        mb={4}
+                    >
                         負の値（グループなし）
                     </Text>
                     <PAmount
