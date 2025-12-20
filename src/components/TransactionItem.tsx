@@ -31,11 +31,11 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
     };
 
     const getProjectName = () => {
-        return toBranded<ProjectName>(transaction.project.name);
+        return toBranded<ProjectName>(transaction.project?.name ?? "");
     };
 
     const getUserName = () => {
-        return toBranded<UserName>(transaction.user.name);
+        return toBranded<UserName>(transaction.user?.name ?? "");
     };
 
     const fromAvatar = (
@@ -114,6 +114,7 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
                             )}
                             leadingIcon
                             coloring={direction !== "both"}
+                            compact
                             fw={600}
                             size="lg"
                         />

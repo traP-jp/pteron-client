@@ -36,6 +36,7 @@ export const SystemTotalCard = ({ total }: SystemTotalCardProps) => {
                     <PAmount
                         value={toBranded<Copia>(BigInt(total))}
                         leadingIcon
+                        compact
                         size="lg"
                         fw={700}
                     />
