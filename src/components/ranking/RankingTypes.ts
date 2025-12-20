@@ -33,6 +33,14 @@ export type RankedProject = RankedItem<Project>;
 export type RankingType = "user" | "project";
 
 /**
+ * 値の表示形式（拡張性のため）
+ * - "copia": PAmount コンポーネントでコピアアイコン付き表示
+ * - "percent": パーセント表示（将来対応）
+ * - "plain": プレーンテキスト表示
+ */
+export type ValueDisplayType = "copia" | "percent" | "plain";
+
+/**
  * ランキングコンポーネント共通のprops
  */
 export interface RankingBaseProps<T extends RankingEntity = RankingEntity> {
@@ -42,6 +50,8 @@ export interface RankingBaseProps<T extends RankingEntity = RankingEntity> {
     items: RankedItem<T>[];
     /** クリック時のコールバック */
     onItemClick?: (item: RankedItem<T>) => void;
+    /** 値の表示形式（デフォルト: copia） */
+    valueDisplay?: ValueDisplayType;
 }
 
 /**
