@@ -80,39 +80,188 @@ const PAmountSample = () => (
         </Accordion.Control>
         <Accordion.Panel>
             <ErrorBoundary>
-                <Stack gap="sm">
-                    <>
+                <Stack gap="md">
+                    <div>
                         <Text
-                            size="xs"
-                            c="dimmed"
-                            mb={4}
+                            size="sm"
+                            fw={500}
+                            mb="xs"
                         >
-                            正の値（カスタムサイズ・アイコン付き・ダッシュ付き）
+                            基本
                         </Text>
-                        <PAmount
-                            value={toBranded<Copia>(100000000n)}
-                            coloring
-                            size="custom"
-                            customSize={5}
-                            leadingIcon
-                            trailingDash
-                        />
-                    </>
-                    <>
+                        <Stack gap="xs">
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={100}
+                                    c="dimmed"
+                                >
+                                    標準 (1,000)
+                                </Text>
+                                <PAmount value={toBranded<Copia>(1000n)} />
+                            </Group>
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={100}
+                                    c="dimmed"
+                                >
+                                    ゼロ (0)
+                                </Text>
+                                <PAmount value={toBranded<Copia>(0n)} />
+                            </Group>
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={100}
+                                    c="dimmed"
+                                >
+                                    負の値 (-500)
+                                </Text>
+                                <PAmount value={toBranded<Copia>(-500n)} />
+                            </Group>
+                        </Stack>
+                    </div>
+
+                    <div>
                         <Text
-                            size="xs"
-                            c="dimmed"
-                            mb={4}
+                            size="sm"
+                            fw={500}
+                            mb="xs"
                         >
-                            負の値（グループなし）
+                            省略表示 (compact)
                         </Text>
-                        <PAmount
-                            value={toBranded<Copia>(-100000000n)}
-                            coloring
-                            size="xl"
-                            formatOptions={{ useGrouping: false }}
-                        />
-                    </>
+                        <Stack gap="xs">
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={100}
+                                    c="dimmed"
+                                >
+                                    Thousands (1,234)
+                                </Text>
+                                <PAmount
+                                    value={toBranded<Copia>(1234n)}
+                                    compact
+                                />
+                            </Group>
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={100}
+                                    c="dimmed"
+                                >
+                                    Millions (1,234,567)
+                                </Text>
+                                <PAmount
+                                    value={toBranded<Copia>(1234567n)}
+                                    compact
+                                />
+                            </Group>
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={100}
+                                    c="dimmed"
+                                >
+                                    Billions (1,234,567,890)
+                                </Text>
+                                <PAmount
+                                    value={toBranded<Copia>(1234567890n)}
+                                    compact
+                                />
+                            </Group>
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={100}
+                                    c="dimmed"
+                                >
+                                    Tooltip確認用
+                                </Text>
+                                <PAmount
+                                    value={toBranded<Copia>(1234567890n)}
+                                    compact
+                                    leadingIcon
+                                />
+                            </Group>
+                        </Stack>
+                    </div>
+
+                    <div>
+                        <Text
+                            size="sm"
+                            fw={500}
+                            mb="xs"
+                        >
+                            スタイル・オプション
+                        </Text>
+                        <Stack gap="xs">
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={200}
+                                    c="dimmed"
+                                >
+                                    Coloring (正: 緑, 負: 赤, 0: 黒)
+                                </Text>
+                                <PAmount
+                                    value={toBranded<Copia>(1000n)}
+                                    coloring
+                                />
+                                <PAmount
+                                    value={toBranded<Copia>(-1000n)}
+                                    coloring
+                                />
+                                <PAmount
+                                    value={toBranded<Copia>(0n)}
+                                    coloring
+                                />
+                            </Group>
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={200}
+                                    c="dimmed"
+                                >
+                                    Leading Icon
+                                </Text>
+                                <PAmount
+                                    value={toBranded<Copia>(5000n)}
+                                    leadingIcon
+                                />
+                            </Group>
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={200}
+                                    c="dimmed"
+                                >
+                                    Trailing Dash
+                                </Text>
+                                <PAmount
+                                    value={toBranded<Copia>(5000n)}
+                                    trailingDash
+                                />
+                            </Group>
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={200}
+                                    c="dimmed"
+                                >
+                                    Custom Size (size=&quot;custom&quot;)
+                                </Text>
+                                <PAmount
+                                    value={toBranded<Copia>(10000n)}
+                                    size="custom"
+                                    customSize={3}
+                                    leadingIcon
+                                    coloring
+                                />
+                            </Group>
+                        </Stack>
+                    </div>
                 </Stack>
             </ErrorBoundary>
         </Accordion.Panel>
