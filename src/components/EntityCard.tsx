@@ -1,16 +1,21 @@
 import { ActionIcon, Card, type CardProps, Flex, Group, Text } from "@mantine/core";
 import { IconExternalLink } from "@tabler/icons-react";
 
+import { buildProjectPageUrl, buildUserPageUrl } from "/@/api";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
+import { createExternalLinkHander } from "/@/lib/link";
 import type { Amount } from "/@/types/amount";
-import type { UserOrProject, UserOrProjectType } from "/@/types/userOrProject";
+import { type Url, toBranded } from "/@/types/entity";
+import type { Href } from "/@/types/href";
+import {
+    type UserOrProject,
+    type UserOrProjectType,
+    isProject,
+    isUser,
+} from "/@/types/userOrProject";
 
 import { MaybeLink } from "./MaybeLink";
-import { createExternalLinkHander } from "./lib/link";
-
-import { type Url, toBranded } from "../types/entity";
-import type { Href } from "../types/href";
 
 export type EntityCardProps<Type extends UserOrProjectType> = CardProps &
     Amount &
@@ -19,15 +24,16 @@ export type EntityCardProps<Type extends UserOrProjectType> = CardProps &
         extraLink?: Url;
     };
 
-export const EntityCard = <Type extends UserOrProjectType>({
-    type,
-    name,
-    amount,
-    href = toBranded<Url>(""),
-    extraLink = toBranded<Url>(""),
-    ...props
-}: EntityCardProps<Type>) => {
-    const handleExternalLinkClick = createExternalLinkHander(href);
+export const EntityCard = <Type extends UserOrProjectType>(_props: EntityCardProps<Type>) => {
+    const { type, name, amount, href: _href, extraLink = toBranded<Url>(""), ...props } = _props;
+    const href =
+        _href ??
+        (isUser(_props)
+            ? buildUserPageUrl(_props.name)
+            : isProject(_props)
+              ? buildProjectPageUrl(_props.name)
+              : undefined);
+    const handleExternalLinkClick = createExternalLinkHander(extraLink);
 
     return (
         <Card {...props}>
