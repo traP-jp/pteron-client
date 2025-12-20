@@ -1,19 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useOutletContext, useParams } from "react-router-dom";
 
-import {
-    ActionIcon,
-    Center,
-    Group,
-    Loader,
-    Pagination,
-    Stack,
-    Text,
-    TextInput,
-    Title,
-} from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
-import { IconArrowLeft, IconSearch } from "@tabler/icons-react";
+import { ActionIcon, Center, Group, Loader, Pagination, Stack, Text, Title } from "@mantine/core";
+import { IconArrowLeft } from "@tabler/icons-react";
 
 import apis from "/@/api";
 import type { Project } from "/@/api/schema/internal";
@@ -44,8 +33,6 @@ const StatsProjectDetails = () => {
 
     const [items, setItems] = useState<RankedItem<Project>[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [debouncedQuery] = useDebouncedValue(searchQuery, 300);
     const [currentPage, setCurrentPage] = useState(1);
 
     // ランキング名のバリデーション
@@ -58,7 +45,7 @@ const StatsProjectDetails = () => {
             try {
                 const response = await apis.internal.stats.getProjectRankings(validRankingName, {
                     term: period,
-                    limit: 100, // 全件取得（クライアントサイドフィルタ用）
+                    limit: 100,
                 });
                 const rankedItems: RankedItem<Project>[] =
                     response.data.items?.map(item => ({
@@ -79,22 +66,10 @@ const StatsProjectDetails = () => {
         setCurrentPage(1);
     }, [validRankingName, period]);
 
-    // 検索でページをリセット
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [debouncedQuery]);
-
-    // フィルタリング
-    const filteredItems = debouncedQuery
-        ? items.filter(item =>
-              item.entity.name?.toLowerCase().includes(debouncedQuery.toLowerCase())
-          )
-        : items;
-
     // ページネーション計算
-    const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const paginatedItems = filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    const paginatedItems = items.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
     // 表示用にrankを再計算
     const displayItems: RankedItem<Project>[] = paginatedItems.map((item, index) => ({
@@ -125,27 +100,17 @@ const StatsProjectDetails = () => {
                 <Title order={3}>{title}</Title>
             </Group>
 
-            {/* 検索 */}
-            <TextInput
-                leftSection={<IconSearch size={16} />}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="プロジェクト名で検索..."
-                value={searchQuery}
-            />
-
             {/* ランキング表示 */}
-            {filteredItems.length === 0 ? (
+            {items.length === 0 ? (
                 <Center py="xl">
-                    <Text c="dimmed">
-                        {debouncedQuery ? "検索結果がありません" : "データがありません"}
-                    </Text>
+                    <Text c="dimmed">データがありません</Text>
                 </Center>
             ) : (
                 <>
                     <RankingFull
                         items={displayItems}
                         maxItems={ITEMS_PER_PAGE}
-                        showTop3={currentPage === 1 && !debouncedQuery}
+                        showTop3={currentPage === 1}
                         type="project"
                     />
 
