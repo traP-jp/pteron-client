@@ -128,23 +128,16 @@ const Projects = () => {
     const [sortBy, setSortBy] = useState<SortOption>("balance-desc");
 
     const fetch = async () => {
-        try {
-            const { data: userData } = await apis.internal.me.getCurrentUser();
-            // 認証エラー時は空の配列を返す
-            if (!userData?.id) {
-                return { projects: [], ownProjects: [] };
-            }
+        const {
+            data: { id },
+        } = await apis.internal.me.getCurrentUser();
 
-            const { data: projectsData } = await apis.internal.projects.getProjects();
-            const { data: ownProjects } = await apis.internal.users.getUserProjects(userData.id);
+        const {
+            data: { items: projects },
+        } = await apis.internal.projects.getProjects();
+        const { data: ownProjects } = await apis.internal.users.getUserProjects(id);
 
-            return {
-                projects: projectsData?.items ?? [],
-                ownProjects: ownProjects ?? [],
-            };
-        } catch {
-            return { projects: [], ownProjects: [] };
-        }
+        return { projects, ownProjects };
     };
 
     const [fetcher, setFetcher] = useState<Fetcher>(fetch());
