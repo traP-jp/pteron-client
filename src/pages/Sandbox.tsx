@@ -13,6 +13,8 @@ import { RankingFull } from "/@/components/ranking";
 import BalanceChart from "/@/components/ranking/BalanceChart";
 import { type Copia, type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
 
+import { SYSTEM_NAME } from "../config/constants";
+
 const TrendIndicatorSample = () => (
     <Accordion.Item value="trend-indicator">
         <Accordion.Control>
@@ -151,6 +153,19 @@ const PAvatarSample = () => (
                     <PAvatar
                         name={toBranded<ProjectName>("awesome_project")}
                         type="project"
+                    />
+                </>
+                <>
+                    <Text
+                        size="xs"
+                        c="dimmed"
+                        mb={4}
+                    >
+                        {'type="system"'}
+                    </Text>
+                    <PAvatar
+                        type="system"
+                        name={SYSTEM_NAME}
                     />
                 </>
             </Stack>
