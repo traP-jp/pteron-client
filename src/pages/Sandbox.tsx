@@ -593,61 +593,63 @@ const EditProjectModalSample = ({ projectName }: { projectName: ProjectName }) =
 
 export const Sandbox = () => {
     return (
-        <Stack
-            gap="md"
-            p="md"
-        >
-            <Title order={1}>Sandbox</Title>
-            <Text
-                c="dimmed"
-                size="sm"
+        <ErrorBoundary>
+            <Stack
+                gap="md"
+                p="md"
             >
-                コンポーネントのデバッグ・動作確認用ページ
-            </Text>
-
-            {/* 基本部品 */}
-            <Accordion
-                variant="separated"
-                multiple
-                defaultValue={["trend-indicator"]}
-            >
-                <Title
-                    order={3}
-                    mb="xs"
+                <Title order={1}>Sandbox</Title>
+                <Text
+                    c="dimmed"
+                    size="sm"
                 >
-                    基本部品
-                </Title>
+                    コンポーネントのデバッグ・動作確認用ページ
+                </Text>
 
-                <TrendIndicatorSample />
-
-                <PAmountSample />
-
-                <PAvatarSample />
-
-                <EntityCardSample />
-
-                <BalanceChartSample />
-            </Accordion>
-
-            {/* 複合コンポーネント */}
-            <Accordion
-                variant="separated"
-                multiple
-            >
-                <Title
-                    order={3}
-                    mb="xs"
+                {/* 基本部品 */}
+                <Accordion
+                    variant="separated"
+                    multiple
+                    defaultValue={["trend-indicator"]}
                 >
-                    複合コンポーネント
-                </Title>
+                    <Title
+                        order={3}
+                        mb="xs"
+                    >
+                        基本部品
+                    </Title>
 
-                <RankingFullSample />
+                    <TrendIndicatorSample />
 
-                <CreateProjectModalSample />
-                <TransactionListSample />
-                <EditProjectModalSample projectName={mockProjectName} />
-            </Accordion>
-        </Stack>
+                    <PAmountSample />
+
+                    <PAvatarSample />
+
+                    <EntityCardSample />
+
+                    <BalanceChartSample />
+                </Accordion>
+
+                {/* 複合コンポーネント */}
+                <Accordion
+                    variant="separated"
+                    multiple
+                >
+                    <Title
+                        order={3}
+                        mb="xs"
+                    >
+                        複合コンポーネント
+                    </Title>
+
+                    <RankingFullSample />
+
+                    <CreateProjectModalSample />
+                    <TransactionListSample />
+                    <EditProjectModalSample projectName={mockProjectName} />
+                </Accordion>
+            </Stack>
+        </ErrorBoundary>
     );
 };
 

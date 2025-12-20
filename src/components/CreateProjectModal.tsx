@@ -3,9 +3,12 @@ import { useState } from "react";
 import { Button, Modal, type ModalProps, TextInput } from "@mantine/core";
 
 import apis from "/@/api";
+import type { Project } from "/@/api/schema/internal";
 import ErrorBoundary from "/@/components/ErrorBoundary";
 
-export type CreateProjectModalProps = Omit<ModalProps, "title">;
+export type CreateProjectModalProps = Omit<ModalProps, "title"> & {
+    onSuccess?: (project: Project) => void;
+};
 
 function projectNameValidator(name: string): string {
     if (name.length === 0) return "プロジェクト名は必須項目です";
@@ -22,10 +25,22 @@ async function createProject(name: string, url: string) {
     });
 }
 
-function CreateProjectModalContents({ onClose }: Pick<CreateProjectModalProps, "onClose">) {
+function CreateProjectModalContents({
+    onClose,
+    onSuccess,
+}: Pick<CreateProjectModalProps, "onClose" | "onSuccess">) {
     const [name, setName] = useState("");
     const [url, setUrl] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+
+    const handleCreate = async () => {
+        const response = await createProject(name, url);
+        if (response) {
+            onSuccess?.(response.data);
+        }
+        onClose?.();
+    };
+
     return (
         <>
             <TextInput
@@ -49,7 +64,7 @@ function CreateProjectModalContents({ onClose }: Pick<CreateProjectModalProps, "
             <div className="flex justify-end mt-4">
                 <Button
                     disabled={!name || !!errorMessage}
-                    onClick={() => createProject(name, url).then(onClose)}
+                    onClick={handleCreate}
                 >
                     作成
                 </Button>
@@ -65,7 +80,10 @@ export function CreateProjectModal(props: CreateProjectModalProps) {
             title="新規プロジェクト"
         >
             <ErrorBoundary>
-                <CreateProjectModalContents onClose={props.onClose} />
+                <CreateProjectModalContents
+                    onClose={props.onClose}
+                    onSuccess={props.onSuccess}
+                />
             </ErrorBoundary>
         </Modal>
     );

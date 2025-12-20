@@ -1,9 +1,21 @@
-import { useEffect, useState } from "react";
+import { Suspense, use, useMemo, useState } from "react";
 
-import { Button, Flex, Modal, type ModalProps, MultiSelect, Text, TextInput } from "@mantine/core";
+import {
+    Button,
+    Center,
+    Flex,
+    Loader,
+    Modal,
+    type ModalProps,
+    MultiSelect,
+    Text,
+    TextInput,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
+import { encode } from "js-base64";
 
+import ErrorBoundary from "./ErrorBoundary";
 import { PAvatar } from "./PAvatar";
 import SecretCopyInput from "./SecretCopyInput";
 
@@ -13,6 +25,14 @@ import { type ProjectName, type Url, type UserName, toBranded } from "../types/e
 
 export type EditProjectModalProps = Omit<ModalProps, "title"> & { projectName: ProjectName };
 type AddAdminModalProps = Omit<ModalProps, "title">;
+
+type EditProjectData = {
+    project: Project;
+    apiClients: APIClient[];
+    users: User[];
+};
+
+type Fetcher = Promise<EditProjectData>;
 
 function Admin({
     userName,
@@ -61,7 +81,7 @@ function ClientKeyBox({
     createdAt: Date;
     onDelete: () => void;
 }) {
-    const accessToken = secret ? `${id}.${secret}` : "";
+    const accessToken = secret ? encode(`${id}:${secret}`) : "";
     const displayClientId = `${id.slice(-12)}`;
 
     return (
@@ -162,36 +182,20 @@ function AddAdminModal({
     );
 }
 
-function EditProjectModalContents({ projectName }: { projectName: ProjectName }) {
-    const [project, setProject] = useState<Project | null>(null);
-    const [apiClients, setApiClients] = useState<APIClient[]>([]);
-    const [admins, setAdmins] = useState<User[]>([]);
-    const [users, setUsers] = useState<User[]>([]);
-    const [url, setUrl] = useState<Url>(toBranded<Url>(""));
+function EditProjectModalContents({
+    projectName,
+    fetcher,
+}: {
+    projectName: ProjectName;
+    fetcher: Fetcher;
+}) {
+    const { project, apiClients: initialApiClients, users } = use(fetcher);
+
+    const [apiClients, setApiClients] = useState<APIClient[]>(initialApiClients);
+    const [admins, setAdmins] = useState<User[]>([...project.admins, project.owner]);
+    const [url, setUrl] = useState<Url>(toBranded<Url>(project.url ?? ""));
 
     const [opened, { open, close }] = useDisclosure(false);
-
-    useEffect(() => {
-        apis.internal.projects.getProject(projectName).then(({ data }) => {
-            setProject(data);
-            setUrl(toBranded<Url>(data.url ?? ""));
-            setAdmins(toBranded<User[]>([...data.admins, data.owner]));
-        });
-    }, [projectName]);
-
-    useEffect(() => {
-        apis.internal.projects
-            .getProjectApiClients(projectName)
-            .then(({ data }) => setApiClients(data));
-    }, [projectName]);
-
-    useEffect(() => {
-        apis.internal.users.getUsers().then(({ data }) => {
-            setUsers(data.items);
-        });
-    }, []);
-
-    if (!project) return <></>;
 
     const projectAdmins = toBranded<User[]>(project.admins);
     const projectOwner = toBranded<User>(project.owner);
@@ -204,22 +208,20 @@ function EditProjectModalContents({ projectName }: { projectName: ProjectName })
 
     function deleteApiClient(clientId: string) {
         apis.internal.projects.deleteProjectApiClient(projectName, clientId).then(() => {
-            setApiClients(apiClients.filter(client => client.client_id != clientId));
+            setApiClients(apiClients.filter(client => client.clientId != clientId));
         });
     }
 
     function addNewAdmins(userIds: string[]) {
         return Promise.all(
-            userIds.map(userId =>
-                apis.internal.projects.addProjectAdmin(projectName, { user_id: userId })
-            )
+            userIds.map(userId => apis.internal.projects.addProjectAdmin(projectName, { userId }))
         ).then(() => {
             setAdmins([...admins, ...users.filter(user => userIds.some(id => id === user.id))]);
         });
     }
 
     function deleteAdmin(userId: string) {
-        apis.internal.projects.removeProjectAdmin(projectName, { user_id: userId }).then(() => {
+        apis.internal.projects.removeProjectAdmin(projectName, { userId }).then(() => {
             setAdmins(admins.filter(admin => admin.id !== userId));
         });
     }
@@ -320,11 +322,11 @@ function EditProjectModalContents({ projectName }: { projectName: ProjectName })
                 >
                     {apiClients.map(client => (
                         <ClientKeyBox
-                            key={client.client_id}
-                            id={client.client_id}
-                            secret={client.client_secret}
-                            createdAt={new Date(client.created_at)}
-                            onDelete={() => deleteApiClient(client.client_id)}
+                            key={client.clientId}
+                            id={client.clientId}
+                            secret={client.clientSecret}
+                            createdAt={new Date(client.createdAt)}
+                            onDelete={() => deleteApiClient(client.clientId)}
                         />
                     ))}
                 </Flex>
@@ -333,16 +335,43 @@ function EditProjectModalContents({ projectName }: { projectName: ProjectName })
     );
 }
 
+const fetchEditProjectData = async (projectName: ProjectName): Promise<EditProjectData> => {
+    const [projectRes, apiClientsRes, usersRes] = await Promise.all([
+        apis.internal.projects.getProject(projectName),
+        apis.internal.projects.getProjectApiClients(projectName),
+        apis.internal.users.getUsers(),
+    ]);
+
+    return {
+        project: projectRes.data,
+        apiClients: apiClientsRes.data,
+        users: usersRes.data.items,
+    };
+};
+
 export function EditProjectModal(props: EditProjectModalProps & { projectName: ProjectName }) {
+    const fetcher = useMemo(() => fetchEditProjectData(props.projectName), [props.projectName]);
+
     return (
-        <>
-            <Modal
-                size="lg"
-                {...props}
-                title="プロジェクト管理"
-            >
-                <EditProjectModalContents projectName={props.projectName} />
-            </Modal>
-        </>
+        <Modal
+            size="lg"
+            {...props}
+            title="プロジェクト管理"
+        >
+            <ErrorBoundary>
+                <Suspense
+                    fallback={
+                        <Center h="200px">
+                            <Loader size="lg" />
+                        </Center>
+                    }
+                >
+                    <EditProjectModalContents
+                        projectName={props.projectName}
+                        fetcher={fetcher}
+                    />
+                </Suspense>
+            </ErrorBoundary>
+        </Modal>
     );
 }

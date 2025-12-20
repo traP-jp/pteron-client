@@ -22,6 +22,7 @@
         "@tabler/icons-react": "^3.36.0",
         "axios": "^1",
         "axios-cache-interceptor": "^1.10.0",
+        "js-base64": "^3.7.8",
         "react": "~19.2",
         "react-dom": "^19.1.1",
         "react-error-boundary": "^6.0.0",
