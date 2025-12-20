@@ -2,6 +2,7 @@ import { AreaChart, type AreaChartProps } from "@mantine/charts";
 import { Center, Text } from "@mantine/core";
 
 import { type Transaction } from "/@/api/schema/internal";
+import ErrorBoundary from "/@/components/ErrorBoundary";
 
 export interface BalanceChartProps extends Omit<AreaChartProps, "dataKey" | "data" | "series"> {
     transactions: Transaction[];
@@ -23,10 +24,10 @@ const formatTransactionData = (start: number, transactions: Transaction[]): Char
 
     const data: ChartData = [];
 
-    let prevDate = new Date(transactions[0]!.created_at);
+    let prevDate = new Date(transactions[0]!.createdAt);
 
-    transactions.forEach(({ amount, created_at }: Transaction) => {
-        const date = new Date(created_at);
+    transactions.forEach(({ amount, createdAt }: Transaction) => {
+        const date = new Date(createdAt);
         if (prevDate.toDateString() != date.toDateString()) {
             data.push({
                 sum,
@@ -61,14 +62,16 @@ const BalanceChart = ({
     }
 
     return (
-        <AreaChart
-            data={formatTransactionData(0, transactions)}
-            dataKey="date"
-            series={[{ name: "sum", color: "blue.6" }]}
-            tickLine={tickLine}
-            curveType={curveType}
-            {...props}
-        />
+        <ErrorBoundary>
+            <AreaChart
+                data={formatTransactionData(0, transactions)}
+                dataKey="date"
+                series={[{ name: "sum", color: "blue.6" }]}
+                tickLine={tickLine}
+                curveType={curveType}
+                {...props}
+            />
+        </ErrorBoundary>
     );
 };
 

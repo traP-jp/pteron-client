@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 
 import { Anchor, Divider, Paper, Stack, Text } from "@mantine/core";
 
+import ErrorBoundary from "/@/components/ErrorBoundary";
+
 import { RankingList } from "./RankingList";
 import { RankingTop3 } from "./RankingTop3";
 import type { RankedItem, RankingBaseProps, RankingEntity } from "./RankingTypes";
@@ -62,50 +64,52 @@ export const RankingFull = <T extends RankingEntity>({
             radius="md"
             withBorder
         >
-            <Stack gap="md">
-                {title &&
-                    (titleLink ? (
-                        <Anchor
-                            component={Link}
-                            fw={700}
-                            size="lg"
-                            to={titleLink}
-                            underline="hover"
-                        >
-                            {title}
-                        </Anchor>
-                    ) : (
-                        <Text
-                            fw={700}
-                            size="lg"
-                        >
-                            {title}
-                        </Text>
-                    ))}
+            <ErrorBoundary>
+                <Stack gap="md">
+                    {title &&
+                        (titleLink ? (
+                            <Anchor
+                                component={Link}
+                                fw={700}
+                                size="lg"
+                                to={titleLink}
+                                underline="hover"
+                            >
+                                {title}
+                            </Anchor>
+                        ) : (
+                            <Text
+                                fw={700}
+                                size="lg"
+                            >
+                                {title}
+                            </Text>
+                        ))}
 
-                {/* 3位まで */}
-                {showTop3 && top3Items.length > 0 && (
-                    <>
-                        <RankingTop3
-                            items={top3Items}
+                    {/* 3位まで */}
+                    {showTop3 && top3Items.length > 0 && (
+                        <>
+                            <RankingTop3
+                                items={top3Items}
+                                onItemClick={onItemClick}
+                                type={type}
+                                valueDisplay={valueDisplay}
+                            />
+                            {restItems.length > 0 && <Divider my="sm" />}
+                        </>
+                    )}
+
+                    {/* 4位以降 */}
+                    {restItems.length > 0 && (
+                        <RankingList
+                            items={restItems}
                             onItemClick={onItemClick}
                             type={type}
                             valueDisplay={valueDisplay}
                         />
-                        {restItems.length > 0 && <Divider my="sm" />}
-                    </>
-                )}
-
-                {/* 4位以降 */}
-                {restItems.length > 0 && (
-                    <RankingList
-                        items={restItems}
-                        onItemClick={onItemClick}
-                        type={type}
-                        valueDisplay={valueDisplay}
-                    />
-                )}
-            </Stack>
+                    )}
+                </Stack>
+            </ErrorBoundary>
         </Paper>
     );
 };
