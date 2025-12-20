@@ -10,20 +10,13 @@ export type CreateProjectModalProps = Omit<ModalProps, "title"> & {
     onSuccess?: (project: Project) => void;
 };
 
-function projectNameValidator(name: string): string {
+const validateProjectName = (name: string): string => {
     if (name.length === 0) return "プロジェクト名は必須項目です";
-    const regex = /^[A-Za-z0-9_-]+$/;
-    if (!regex.test(name)) return "プロジェクト名には英数字と '_'、'-' のみ使用できます";
+    if (!/^[A-Za-z0-9_-]+$/.test(name)) {
+        return "プロジェクト名には英数字と '_'、'-' のみ使用できます";
+    }
     return "";
-}
-
-async function createProject(name: string, url: string) {
-    if (name.length === 0) return;
-    return apis.internal.projects.createProject({
-        name,
-        url: url || undefined,
-    });
-}
+};
 
 function CreateProjectModalContents({
     onClose,
@@ -33,13 +26,24 @@ function CreateProjectModalContents({
     const [url, setUrl] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
+    const handleNameChange = (newName: string) => {
+        setName(newName);
+        setErrorMessage(validateProjectName(newName));
+    };
+
     const handleCreate = async () => {
-        const response = await createProject(name, url);
-        if (response) {
-            onSuccess?.(response.data);
-        }
+        if (name.length === 0) return;
+
+        const { data } = await apis.internal.projects.createProject({
+            name,
+            url: url || undefined,
+        });
+
+        onSuccess?.(data);
         onClose?.();
     };
+
+    const isSubmitDisabled = !name || !!errorMessage;
 
     return (
         <>
@@ -49,21 +53,17 @@ function CreateProjectModalContents({
                 required
                 value={name}
                 error={errorMessage}
-                onChange={event => {
-                    const newName = event.currentTarget.value;
-                    setName(newName);
-                    setErrorMessage(projectNameValidator(newName));
-                }}
+                onChange={e => handleNameChange(e.currentTarget.value)}
             />
             <TextInput
                 label="プロジェクトURL"
                 description="プロジェクトURLは後から変更することができます"
                 value={url}
-                onChange={event => setUrl(event.currentTarget.value)}
+                onChange={e => setUrl(e.currentTarget.value)}
             />
             <div className="flex justify-end mt-4">
                 <Button
-                    disabled={!name || !!errorMessage}
+                    disabled={isSubmitDisabled}
                     onClick={handleCreate}
                 >
                     作成
@@ -73,7 +73,7 @@ function CreateProjectModalContents({
     );
 }
 
-export function CreateProjectModal(props: CreateProjectModalProps) {
+export function CreateProjectModal({ onSuccess, ...props }: CreateProjectModalProps) {
     return (
         <Modal
             {...props}
@@ -82,7 +82,7 @@ export function CreateProjectModal(props: CreateProjectModalProps) {
             <ErrorBoundary>
                 <CreateProjectModalContents
                     onClose={props.onClose}
-                    onSuccess={props.onSuccess}
+                    onSuccess={onSuccess}
                 />
             </ErrorBoundary>
         </Modal>

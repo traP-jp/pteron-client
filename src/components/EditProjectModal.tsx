@@ -36,37 +36,35 @@ type Fetcher = Promise<EditProjectData>;
 
 function Admin({
     userName,
-    isAdmin: isOwner = false,
+    isOwner = false,
     onDelete,
 }: {
     userName: UserName;
     onDelete?: () => void;
-    isAdmin?: boolean;
+    isOwner?: boolean;
 }) {
     return (
-        <>
-            <Flex
-                direction="row"
-                gap="sm"
-                align="center"
-            >
-                <PAvatar
-                    type="user"
-                    name={userName}
-                />
-                <Text>{userName}</Text>
-                {isOwner && <Text c="blue">(Owner)</Text>}
-                {!isOwner && (
-                    <Button
-                        color="red"
-                        ml="auto"
-                        onClick={onDelete}
-                    >
-                        削除
-                    </Button>
-                )}
-            </Flex>
-        </>
+        <Flex
+            direction="row"
+            gap="sm"
+            align="center"
+        >
+            <PAvatar
+                type="user"
+                name={userName}
+            />
+            <Text>{userName}</Text>
+            {isOwner && <Text c="blue">(Owner)</Text>}
+            {!isOwner && (
+                <Button
+                    color="red"
+                    ml="auto"
+                    onClick={onDelete}
+                >
+                    削除
+                </Button>
+            )}
+        </Flex>
     );
 }
 
@@ -126,59 +124,64 @@ function ClientKeyBox({
 
 function AddAdminModal({
     onClose: _onClose,
+    admins,
+    users,
+    owner,
+    onAddAdmins,
     ...props
 }: AddAdminModalProps & {
     admins: User[];
     users: User[];
     owner: User;
-    addNewAdmins: (admins: string[]) => Promise<void>;
+    onAddAdmins: (userNames: string[]) => Promise<void>;
 }) {
-    const [candidateIds, setCandidateIds] = useState<string[]>([]);
+    const [candidateNames, setCandidateNames] = useState<string[]>([]);
 
-    const onClose = () => {
-        setCandidateIds([]);
+    const handleClose = () => {
+        setCandidateNames([]);
         _onClose();
     };
+
+    const handleAdd = async () => {
+        await onAddAdmins(candidateNames);
+        handleClose();
+    };
+
+    const availableUsers = users
+        .filter(user => !admins.some(admin => admin.id === user.id) && owner.id !== user.id)
+        .map(user => user.name);
+
     return (
-        <>
-            <Modal
-                onClose={onClose}
-                {...props}
-                title="管理者追加"
+        <Modal
+            onClose={handleClose}
+            {...props}
+            title="管理者追加"
+        >
+            <Flex
+                direction="column"
+                gap="md"
             >
+                <MultiSelect
+                    data={availableUsers}
+                    value={candidateNames}
+                    onChange={setCandidateNames}
+                    searchable
+                />
                 <Flex
-                    direction="column"
+                    direction="row"
                     gap="md"
+                    justify="flex-end"
                 >
-                    <MultiSelect
-                        data={props.users
-                            .filter(
-                                user =>
-                                    !props.admins.some(
-                                        admin => admin.id === user.id || props.owner.id === user.id
-                                    )
-                            )
-                            .map(user => user.name)}
-                        value={candidateIds}
-                        onChange={setCandidateIds}
-                        searchable
-                    />
-                    <Flex
-                        direction="row"
-                        gap="md"
-                        justify="flex-end"
+                    <Button onClick={handleClose}>キャンセル</Button>
+                    <Button
+                        disabled={candidateNames.length === 0}
+                        onClick={handleAdd}
                     >
-                        <Button onClick={onClose}>キャンセル</Button>
-                        <Button
-                            disabled={candidateIds.length === 0}
-                            onClick={() => props.addNewAdmins(candidateIds).then(onClose)}
-                        >
-                            追加
-                        </Button>
-                    </Flex>
+                        追加
+                    </Button>
                 </Flex>
-            </Modal>
-        </>
+            </Flex>
+        </Modal>
     );
 }
 
@@ -192,43 +195,41 @@ function EditProjectModalContents({
     const { project, apiClients: initialApiClients, users } = use(fetcher);
 
     const [apiClients, setApiClients] = useState<APIClient[]>(initialApiClients);
-    const [admins, setAdmins] = useState<User[]>([...project.admins, project.owner]);
+    const [admins, setAdmins] = useState<User[]>(project.admins);
     const [url, setUrl] = useState<Url>(toBranded<Url>(project.url ?? ""));
 
     const [opened, { open, close }] = useDisclosure(false);
 
-    const projectAdmins = toBranded<User[]>(project.admins);
-    const projectOwner = toBranded<User>(project.owner);
+    const projectOwner = project.owner;
 
-    function createApiClient() {
-        apis.internal.projects.createProjectApiClient(projectName).then(({ data }) => {
-            setApiClients([...apiClients, data]);
-        });
-    }
+    const handleCreateApiClient = async () => {
+        const { data } = await apis.internal.projects.createProjectApiClient(projectName);
+        setApiClients(prev => [...prev, data]);
+    };
 
-    function deleteApiClient(clientId: string) {
-        apis.internal.projects.deleteProjectApiClient(projectName, clientId).then(() => {
-            setApiClients(apiClients.filter(client => client.clientId != clientId));
-        });
-    }
+    const handleDeleteApiClient = async (clientId: string) => {
+        await apis.internal.projects.deleteProjectApiClient(projectName, clientId);
+        setApiClients(prev => prev.filter(client => client.clientId !== clientId));
+    };
 
-    function addNewAdmins(userIds: string[]) {
-        return Promise.all(
-            userIds.map(userId => apis.internal.projects.addProjectAdmin(projectName, { userId }))
-        ).then(() => {
-            setAdmins([...admins, ...users.filter(user => userIds.some(id => id === user.id))]);
-        });
-    }
+    const handleAddAdmins = async (userNames: string[]) => {
+        await Promise.all(
+            userNames.map(userName =>
+                apis.internal.projects.addProjectAdmin(projectName, { userId: userName })
+            )
+        );
+        const newAdmins = users.filter(user => userNames.includes(user.name));
+        setAdmins(prev => [...prev, ...newAdmins]);
+    };
 
-    function deleteAdmin(userId: string) {
-        apis.internal.projects.removeProjectAdmin(projectName, { userId }).then(() => {
-            setAdmins(admins.filter(admin => admin.id !== userId));
-        });
-    }
+    const handleDeleteAdmin = async (userId: string) => {
+        await apis.internal.projects.removeProjectAdmin(projectName, { userId });
+        setAdmins(prev => prev.filter(admin => admin.id !== userId));
+    };
 
-    function updateUrl() {
-        apis.internal.projects.updateProject(projectName, { url: url });
-    }
+    const handleUpdateUrl = () => {
+        apis.internal.projects.updateProject(projectName, { url });
+    };
 
     return (
         <>
@@ -241,11 +242,9 @@ function EditProjectModalContents({
                     className="flex-auto"
                     label="URL"
                     value={url}
-                    onChange={e => {
-                        setUrl(toBranded<Url>(e.currentTarget.value));
-                    }}
+                    onChange={e => setUrl(toBranded<Url>(e.currentTarget.value))}
                 />
-                <Button onClick={updateUrl}>更新</Button>
+                <Button onClick={handleUpdateUrl}>更新</Button>
             </Flex>
             <Flex
                 direction="column"
@@ -259,10 +258,10 @@ function EditProjectModalContents({
                 >
                     <Text>管理者</Text>
                     <AddAdminModal
-                        admins={projectAdmins}
+                        admins={admins}
                         users={users}
                         owner={projectOwner}
-                        addNewAdmins={addNewAdmins}
+                        onAddAdmins={handleAddAdmins}
                         opened={opened}
                         onClose={close}
                     />
@@ -271,7 +270,7 @@ function EditProjectModalContents({
                         size="xs"
                         onClick={open}
                     >
-                        <IconPlus /> 追加{" "}
+                        <IconPlus /> 追加
                     </Button>
                 </Flex>
                 <Flex
@@ -280,13 +279,13 @@ function EditProjectModalContents({
                 >
                     <Admin
                         userName={toBranded<UserName>(projectOwner.name)}
-                        isAdmin
+                        isOwner
                     />
-                    {projectAdmins.map(admin => (
+                    {admins.map(admin => (
                         <Admin
                             key={admin.id}
                             userName={toBranded<UserName>(admin.name)}
-                            onDelete={() => deleteAdmin(admin.id)}
+                            onDelete={() => handleDeleteAdmin(admin.id)}
                         />
                     ))}
                 </Flex>
@@ -305,9 +304,9 @@ function EditProjectModalContents({
                     <Button
                         color="green.5"
                         size="xs"
-                        onClick={() => createApiClient()}
+                        onClick={handleCreateApiClient}
                     >
-                        <IconPlus /> 追加{" "}
+                        <IconPlus /> 追加
                     </Button>
                 </Flex>
                 <Text
@@ -326,7 +325,7 @@ function EditProjectModalContents({
                             id={client.clientId}
                             secret={client.clientSecret}
                             createdAt={new Date(client.createdAt)}
-                            onDelete={() => deleteApiClient(client.clientId)}
+                            onDelete={() => handleDeleteApiClient(client.clientId)}
                         />
                     ))}
                 </Flex>
