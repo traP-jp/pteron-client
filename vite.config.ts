@@ -22,10 +22,16 @@ export default defineConfig({
     },
     preview: {
         open: "/",
-        // preview時はステージングAPIに接続
+        // preview時はAPIに接続
         proxy: {
-            "/api/internal": "https://pteron-api-dev.trap.show",
-            "/api/v1": "https://pteron-api-dev.trap.show",
+            "/api/internal": {
+                target: "https://pteron-api.trap.show",
+                changeOrigin: true,
+            },
+            "/api/v1": {
+                target: "https://pteron-api.trap.show",
+                changeOrigin: true,
+            },
         },
     },
 });
