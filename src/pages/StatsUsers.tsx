@@ -103,6 +103,7 @@ const StatsUsers = () => {
                     items={ranking.items}
                     maxItems={5}
                     title={ranking.title}
+                    titleLink={`/stats/users/${ranking.rankingName}`}
                     type="user"
                 />
             ))}
