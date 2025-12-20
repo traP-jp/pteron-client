@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Suspense, use } from "react";
 import { useParams } from "react-router-dom";
 
 import { Card, Divider, Flex, SimpleGrid, Text, Title } from "@mantine/core";
@@ -11,54 +11,52 @@ import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
 import BalanceChart from "/@/components/ranking/BalanceChart";
-import { type Copia, type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
+import { type Copia, type ProjectName, type UserName, toBranded } from "/@/types/entity";
 
-const UserProfileHeder = ({ name, balance }: { name: UserName; balance: Copia }) => {
+const ProjectHeader = ({ name, balance }: { name: ProjectName; balance: Copia }) => {
     return (
-        <>
+        <Flex
+            direction="column"
+            mt="lg"
+            mb="xs"
+        >
             <Flex
-                direction="column"
-                mt="lg"
-                mb="xs"
+                direction="row"
+                align="center"
             >
                 <Flex
                     direction="row"
                     align="center"
+                    gap="xl"
+                    ml="xl"
                 >
-                    <Flex
-                        direction="row"
-                        align="center"
-                        gap="xl"
-                        ml="xl"
-                    >
-                        <PAvatar
-                            size="xl"
-                            name={name}
-                            type="user"
-                        />
-                        <Text
-                            size="xl"
-                            fw={700}
-                        >
-                            {name}
-                        </Text>
-                    </Flex>
-                    <PAmount
-                        ml="auto"
-                        mr="xl"
-                        value={balance}
-                        leadingIcon
-                        coloring
-                        size="custom"
-                        customSize={2}
+                    <PAvatar
+                        size="xl"
+                        name={name}
+                        type="project"
                     />
+                    <Text
+                        size="xl"
+                        fw={700}
+                    >
+                        {name}
+                    </Text>
                 </Flex>
+                <PAmount
+                    ml="auto"
+                    mr="xl"
+                    value={balance}
+                    leadingIcon
+                    coloring
+                    size="custom"
+                    customSize={2}
+                />
             </Flex>
-        </>
+        </Flex>
     );
 };
 
-const UserProfileDetail = ({ transactions }: { transactions: Transaction[] }) => {
+const ProjectDetail = ({ transactions }: { transactions: Transaction[] }) => {
     return (
         <Flex
             wrap="wrap"
@@ -77,9 +75,10 @@ const UserProfileDetail = ({ transactions }: { transactions: Transaction[] }) =>
                 >
                     推移
                 </Title>
+                {/* transactions が undefined の場合は空配列を渡してクラッシュを防ぐ */}
                 <BalanceChart
                     h={320}
-                    transactions={transactions}
+                    transactions={transactions ?? []}
                 />
             </Card>
 
@@ -100,9 +99,10 @@ const UserProfileDetail = ({ transactions }: { transactions: Transaction[] }) =>
                 </Title>
                 {!transactions && <Text c="dimmed">取引履歴がありません</Text>}
                 <div className="h-80 overflow-auto">
+                    {/* 同様に安全な配列を渡す */}
                     <TransactionList
-                        transactions={transactions}
-                        currentType="user"
+                        transactions={transactions ?? []}
+                        currentType="project"
                     />
                 </div>
             </Card>
@@ -110,30 +110,31 @@ const UserProfileDetail = ({ transactions }: { transactions: Transaction[] }) =>
     );
 };
 
-const UserProfileProjectList = ({ projects }: { projects: Project[] }) => {
+const ProjectMemberList = ({ owner, admins }: { owner?: User; admins?: User[] }) => {
+    const members = [...(owner ? [owner] : []), ...(admins ?? [])].filter(Boolean);
+
     return (
         <>
             <Title
                 order={2}
                 fw={400}
             >
-                所属しているプロジェクト
+                メンバー
             </Title>
 
             <SimpleGrid
                 cols={{ base: 1, md: 2, xl: 3 }}
                 spacing="md"
             >
-                {projects.map(({ id, balance, name, url }) => (
+                {members.map(u => (
                     <EntityCard
-                        key={id}
+                        key={u.id}
                         p="xl"
                         withBorder
                         radius="md"
-                        type="project"
-                        amount={toBranded<Copia>(BigInt(balance))}
-                        name={toBranded<ProjectName>(name)}
-                        extraLink={url ? toBranded<Url>(url) : undefined}
+                        type="user"
+                        amount={toBranded<Copia>(BigInt(u.balance))}
+                        name={toBranded<UserName>(u.name)}
                     />
                 ))}
             </SimpleGrid>
@@ -141,53 +142,55 @@ const UserProfileProjectList = ({ projects }: { projects: Project[] }) => {
     );
 };
 
-const UserProfile = () => {
-    const { userId: _userName } = useParams();
-    const [user, setUser] = useState<User | null>(null);
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [userProjects, setUserProjects] = useState<Project[]>([]);
+const TheProjectDetails = ({
+    fetcher,
+}: {
+    fetcher: Promise<{ project: Project; transactions: Transaction[] }>;
+}) => {
+    const { project, transactions } = use(fetcher);
 
-    useEffect(() => {
-        apis.internal.users.getUser(_userName!).then(({ data }) => {
-            setUser(data);
-        });
-    }, [_userName]);
-
-    useEffect(() => {
-        apis.internal.transactions.getUserTransactions(_userName!).then(({ data }) => {
-            setTransactions(data.items);
-        });
-    }, [_userName]);
-
-    useEffect(() => {
-        apis.internal.users.getUserProjects(_userName!).then(({ data }) => {
-            setUserProjects(data);
-        });
-    }, [_userName]);
-
-    if (!user) return <></>;
-
-    const name = toBranded<UserName>(user.name);
-    const balance = toBranded<Copia>(BigInt(user.balance));
-    const projects = toBranded<Project[]>(userProjects);
+    const name = toBranded<ProjectName>(project.name);
+    const balance = toBranded<Copia>(BigInt(project.balance));
 
     return (
-        <>
-            <Flex
-                direction="column"
-                gap="md"
-            >
-                <UserProfileHeder
-                    name={name}
-                    balance={balance}
-                />
-                <Divider />
-                <UserProfileDetail transactions={transactions} />
-                <Divider />
-                <UserProfileProjectList projects={projects} />
-            </Flex>
-        </>
+        <Flex
+            direction="column"
+            gap="md"
+        >
+            <ProjectHeader
+                name={name}
+                balance={balance}
+            />
+            <Divider />
+            <ProjectDetail transactions={transactions} />
+            <Divider />
+            <ProjectMemberList
+                owner={project.owner}
+                admins={project.admins}
+            />
+        </Flex>
     );
 };
 
-export default UserProfile;
+const ProjectDetails = () => {
+    const { projectId: _projectName } = useParams();
+    const projectName = toBranded<ProjectName>(_projectName ?? "");
+
+    const fetch = async () => {
+        const { data: project } = await apis.internal.projects.getProject(projectName);
+        const {
+            data: { items: transactions },
+        } = await apis.internal.transactions.getProjectTransactions(projectName);
+
+        // transactions が undefined の場合は空配列を返す
+        return { project, transactions: transactions ?? [] };
+    };
+
+    // Suspense に fallback を渡す（コメントは JSX の外へ）
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <TheProjectDetails fetcher={fetch()} />
+        </Suspense>
+    );
+};
+export default ProjectDetails;
