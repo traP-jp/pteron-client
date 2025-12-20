@@ -5,6 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
+        "dev:api": "VITE_USE_MOCK=false vite",
         "build": "tsc -b && vite build",
         "preview": "vite preview",
         "preview:with-build": "npm run build && npm run preview",
@@ -18,10 +19,12 @@
         "@mantine/core": "8.3.10",
         "@mantine/hooks": "8.3.10",
         "@mantine/modals": "^8.3.10",
+        "@mantine/notifications": "^8.3.10",
         "@tabler/icons-react": "^3.36.0",
         "axios": "^1.13.2",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
+        "react-error-boundary": "^6.0.0",
         "react-router-dom": "^7.10.1",
         "recharts": "^3.6.0"
     },

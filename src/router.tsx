@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { createBrowserRouter } from "react-router-dom";
+import { Navigate, createBrowserRouter } from "react-router-dom";
 
 import { DashboardLayout } from "./Layout";
 
@@ -31,6 +31,33 @@ export const router = createBrowserRouter([
             {
                 path: "stats",
                 Component: lazy(() => import("./pages/Stats")),
+                children: [
+                    {
+                        index: true,
+                        element: (
+                            <Navigate
+                                to="users"
+                                replace
+                            />
+                        ),
+                    },
+                    {
+                        path: "users",
+                        Component: lazy(() => import("./pages/UserStats")),
+                    },
+                    {
+                        path: "users/:rankingName",
+                        Component: lazy(() => import("./pages/UserStatsDetail")),
+                    },
+                    {
+                        path: "projects",
+                        Component: lazy(() => import("./pages/ProjectStats")),
+                    },
+                    {
+                        path: "projects/:rankingName",
+                        Component: lazy(() => import("./pages/ProjectStatsDetail")),
+                    },
+                ],
             },
             // 開発環境のみsandboxを追加
             ...(import.meta.env.DEV

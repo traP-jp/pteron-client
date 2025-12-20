@@ -1,32 +1,52 @@
-import { useEffect, useState } from "react";
+import { Suspense, use } from "react";
 
 import { Avatar, type AvatarProps, type MantineSize } from "@mantine/core";
 
-import { buildFallbackIconUrl, buildTraqIconUrl } from "/@/api";
+import { buildFallbackIconUrl, buildTraqIconUrl } from "/@/api/paths";
+import copiaIcon from "/@/assets/icons/copia.svg";
+import { type Entity, type EntityType, isProject, isUser } from "/@/types/composed";
 import { type Url, toBranded } from "/@/types/entity";
 
-import { type UserOrProject, type UserOrProjectType, isUser } from "../types/userOrProject";
-
-export type PAvatarProps<Type extends UserOrProjectType> = AvatarProps & {
+export type PAvatarProps<Type extends EntityType> = AvatarProps & {
     size?: MantineSize | "checkout";
-} & UserOrProject<Type>;
+} & Entity<Type>;
 
-export const PAvatar = <Type extends UserOrProjectType>(_props: PAvatarProps<Type>) => {
-    const { name, ...props } = _props;
-    const [src, setSrc] = useState<Url>(toBranded<Url>(""));
+const getUrl = async (entity: Entity) =>
+    isUser(entity)
+        ? buildTraqIconUrl(entity.name)
+        : isProject(entity)
+          ? buildFallbackIconUrl(entity.name)
+          : toBranded<Url>(copiaIcon);
 
-    useEffect(() => {
-        const buildUrl = async () =>
-            isUser(_props) ? buildTraqIconUrl(_props.name) : buildFallbackIconUrl(_props.name);
-
-        buildUrl().then(url => setSrc(url));
-    });
-
+const ThePAvatar = ({
+    urlGetter,
+    ...props
+}: AvatarProps & {
+    urlGetter: Promise<Url>;
+}) => {
     return (
         <Avatar
-            alt={name}
-            src={src}
+            src={use(urlGetter)}
             {...props}
         />
+    );
+};
+
+export const PAvatar = <Type extends EntityType>({ type, name, ...props }: PAvatarProps<Type>) => {
+    return (
+        <Suspense
+            fallback={
+                <Avatar
+                    alt={name}
+                    {...props}
+                />
+            }
+        >
+            <ThePAvatar
+                alt={name}
+                urlGetter={getUrl({ type, name })}
+                {...props}
+            />
+        </Suspense>
     );
 };

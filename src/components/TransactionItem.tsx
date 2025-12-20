@@ -74,6 +74,7 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
         >
             <Accordion.Control>
                 <Group
+                    px="xs"
                     justify="space-between"
                     wrap="nowrap"
                 >
@@ -104,8 +105,15 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
                         align="flex-end"
                     >
                         <PAmount
-                            value={toBranded<Copia>(BigInt(transaction.amount || 0))}
+                            value={toBranded<Copia>(
+                                BigInt(
+                                    direction === "to"
+                                        ? -1 * transaction.amount
+                                        : transaction.amount
+                                )
+                            )}
                             leadingIcon
+                            coloring={direction !== "both"}
                             fw={600}
                             size="lg"
                         />
@@ -113,7 +121,7 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
                             size="xs"
                             c="dimmed"
                         >
-                            {formatDate(transaction.created_at)}
+                            {formatDate(transaction.createdAt)}
                         </Text>
                     </Stack>
                 </Group>
@@ -182,7 +190,7 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
                         >
                             日時:
                         </Text>
-                        <Text size="sm">{formatDate(transaction.created_at)}</Text>
+                        <Text size="sm">{formatDate(transaction.createdAt)}</Text>
                     </Group>
                     <Group gap="xs">
                         <Text
