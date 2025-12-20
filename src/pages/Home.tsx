@@ -29,23 +29,22 @@ export const Home = () => {
 
     useEffect(() => {
         apis.internal.me.getCurrentUser().then(({ data }) => {
-            if (!data?.name) return; // 認証エラー時は何もしない
             setCurrentUser(data);
             apis.internal.transactions.getUserTransactions(data.name).then(({ data }) => {
-                setUserTransactions(data?.items ?? []);
+                setUserTransactions(data.items);
             });
         });
 
         apis.internal.users.getUsers().then(({ data }) => {
-            setUsers(data?.items ?? []);
+            setUsers(data.items);
         });
 
         apis.internal.projects.getProjects().then(({ data }) => {
-            setProjects(data?.items ?? []);
+            setProjects(data.items);
         });
 
         apis.internal.transactions.getTransactions().then(({ data }) => {
-            setTransactions(data?.items ?? []);
+            setTransactions(data.items);
         });
 
         apis.internal.stats.getSystemStats({ term: "7days" }).then(({ data }) => {
