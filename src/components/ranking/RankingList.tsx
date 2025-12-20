@@ -1,6 +1,7 @@
 import { Flex, Group, Paper, Stack, Text } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 
+import ErrorBoundary from "/@/components/ErrorBoundary";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
@@ -220,25 +221,27 @@ export const RankingList = <T extends RankingEntity>({
     }
 
     return (
-        <div className="flex flex-col gap-2">
-            {title && (
-                <Text
-                    fw={600}
-                    mb="xs"
-                    size="sm"
-                >
-                    {title}
-                </Text>
-            )}
-            {items.map(rankedItem => (
-                <RankingListItem
-                    key={rankedItem.entity.id}
-                    onItemClick={onItemClick}
-                    rankedItem={rankedItem}
-                    type={type}
-                    valueDisplay={valueDisplay}
-                />
-            ))}
-        </div>
+        <ErrorBoundary>
+            <div className="flex flex-col gap-2">
+                {title && (
+                    <Text
+                        fw={600}
+                        mb="xs"
+                        size="sm"
+                    >
+                        {title}
+                    </Text>
+                )}
+                {items.map(rankedItem => (
+                    <RankingListItem
+                        key={rankedItem.entity.id}
+                        onItemClick={onItemClick}
+                        rankedItem={rankedItem}
+                        type={type}
+                        valueDisplay={valueDisplay}
+                    />
+                ))}
+            </div>
+        </ErrorBoundary>
     );
 };

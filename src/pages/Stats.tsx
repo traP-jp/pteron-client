@@ -3,6 +3,8 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import { Group, SegmentedControl, Select, Stack, Text, Title } from "@mantine/core";
 
+import ErrorBoundary from "/@/components/ErrorBoundary";
+
 type Period = "24hours" | "7days" | "30days" | "365days";
 
 const periodOptions = [
@@ -25,40 +27,42 @@ const Stats = () => {
     };
 
     return (
-        <Stack
-            gap="lg"
-            p="md"
-        >
-            <Group justify="space-between">
-                <Title order={2}>統計ダッシュボード</Title>
-                <Group gap="md">
-                    <Text
-                        c="dimmed"
-                        size="sm"
-                    >
-                        最終更新: {new Date().toLocaleString("ja-JP")}
-                    </Text>
-                    <Select
-                        data={periodOptions}
-                        onChange={v => v && setPeriod(v as Period)}
-                        size="sm"
-                        value={period}
-                        w={120}
-                    />
+        <ErrorBoundary>
+            <Stack
+                gap="lg"
+                p="md"
+            >
+                <Group justify="space-between">
+                    <Title order={2}>統計ダッシュボード</Title>
+                    <Group gap="md">
+                        <Text
+                            c="dimmed"
+                            size="sm"
+                        >
+                            最終更新: {new Date().toLocaleString("ja-JP")}
+                        </Text>
+                        <Select
+                            data={periodOptions}
+                            onChange={v => v && setPeriod(v as Period)}
+                            size="sm"
+                            value={period}
+                            w={120}
+                        />
+                    </Group>
                 </Group>
-            </Group>
 
-            <SegmentedControl
-                data={[
-                    { value: "users", label: "ユーザーランキング" },
-                    { value: "projects", label: "プロジェクトランキング" },
-                ]}
-                onChange={handleTabChange}
-                value={currentTab}
-            />
+                <SegmentedControl
+                    data={[
+                        { value: "users", label: "ユーザーランキング" },
+                        { value: "projects", label: "プロジェクトランキング" },
+                    ]}
+                    onChange={handleTabChange}
+                    value={currentTab}
+                />
 
-            <Outlet context={{ period }} />
-        </Stack>
+                <Outlet context={{ period }} />
+            </Stack>
+        </ErrorBoundary>
     );
 };
 

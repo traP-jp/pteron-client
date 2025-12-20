@@ -2,12 +2,12 @@
  * モックデータ定義
  * Internal API と Public API で使用するサンプルデータ
  */
-import type { APIClient, Bill, Project, Transaction, User } from "../api/schema/internal";
+import type { APIClient, Bill, Project, Transaction, User } from "/@/api/schema/internal";
 import type {
     Bill as PublicBill,
     Project as PublicProject,
     Transaction as PublicTransaction,
-} from "../api/schema/public";
+} from "/@/api/schema/public";
 
 // ========== ユーザーデータ ==========
 export const mockUsers: User[] = [
@@ -184,7 +184,7 @@ export const mockTransactions: Transaction[] = [
         project: mockProjects[0]!,
         user: mockCurrentUser,
         description: "バグ報告報酬",
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2時間前
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2時間前
     },
     {
         id: "770e8400-e29b-41d4-a716-446655440002",
@@ -193,7 +193,7 @@ export const mockTransactions: Transaction[] = [
         project: mockProjects[1]!,
         user: mockCurrentUser,
         description: "サービス利用料",
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1日前
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1日前
     },
     {
         id: "770e8400-e29b-41d4-a716-446655440003",
@@ -202,7 +202,7 @@ export const mockTransactions: Transaction[] = [
         project: mockProjects[2]!,
         user: mockCurrentUser,
         description: "コントリビューション報酬",
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(), // 3日前
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(), // 3日前
     },
 ];
 
@@ -215,7 +215,7 @@ export const mockBills: Bill[] = [
         description: "イベント参加費",
         project: mockProjects[0]!,
         status: "PENDING",
-        created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30分前
+        createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30分前
     },
     {
         id: "880e8400-e29b-41d4-a716-446655440002",
@@ -224,19 +224,19 @@ export const mockBills: Bill[] = [
         description: "プレミアム機能利用料",
         project: mockProjects[1]!,
         status: "COMPLETED",
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2日前
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2日前
     },
 ];
 
 // ========== APIクライアントデータ ==========
 export const mockAPIClients: APIClient[] = [
     {
-        client_id: "client_001",
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(), // 30日前
+        clientId: "client_001",
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(), // 30日前
     },
     {
-        client_id: "client_002",
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(), // 7日前
+        clientId: "client_002",
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(), // 7日前
     },
 ];
 
@@ -253,21 +253,21 @@ export const mockPublicTransactions: PublicTransaction[] = mockTransactions
         id: t.id,
         amount: t.amount,
         type: t.type,
-        user_id: t.user?.id,
-        user_name: t.user?.name,
-        project_id: t.project?.id,
+        userId: t.user?.id,
+        userName: t.user?.name,
+        projectId: t.project?.id,
         description: t.description,
-        created_at: t.created_at,
+        createdAt: t.createdAt,
     }));
 
 export const mockPublicBills: PublicBill[] = mockBills.map(b => ({
     id: b.id,
     amount: b.amount,
-    user_id: b.user?.id,
-    user_name: b.user?.name,
+    userId: b.user?.id,
+    userName: b.user?.name,
     description: b.description,
     status: b.status,
-    created_at: b.created_at,
+    createdAt: b.createdAt,
 }));
 
 // ========== ユーティリティ ==========
