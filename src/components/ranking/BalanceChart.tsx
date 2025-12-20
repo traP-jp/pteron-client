@@ -23,10 +23,10 @@ const formatTransactionData = (start: number, transactions: Transaction[]): Char
 
     const data: ChartData = [];
 
-    let prevDate = new Date(transactions[0]!.created_at);
+    let prevDate = new Date(transactions[0]!.createdAt);
 
-    transactions.forEach(({ amount, created_at }: Transaction) => {
-        const date = new Date(created_at);
+    transactions.forEach(({ amount, createdAt }: Transaction) => {
+        const date = new Date(createdAt);
         if (prevDate.toDateString() != date.toDateString()) {
             data.push({
                 sum,

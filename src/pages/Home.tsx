@@ -81,7 +81,7 @@ export const Home = () => {
     const calculatedBalance = calculateBalance(userTransactions);
 
     const recentTransactions = [...userTransactions]
-        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         .slice(0, 10);
 
     const recentBalanceChange = recentTransactions.reduce((acc, tx) => {
