@@ -1,6 +1,6 @@
 import { Suspense, use, useState } from "react";
 
-import { Flex, Select, SimpleGrid, Text } from "@mantine/core";
+import { Center, Flex, Loader, Select, SimpleGrid, Text } from "@mantine/core";
 
 import apis from "/@/api";
 import type { User } from "/@/api/schema/internal";
@@ -12,6 +12,8 @@ type SortOption = "balance-desc" | "balance-asc" | "name-asc" | "name-desc";
 const TheUsers = ({ fetcher }: { fetcher: Promise<User[]> }) => {
     const [sortBy, setSortBy] = useState<SortOption>("balance-desc");
     const users = use(fetcher);
+
+    if (!users) return <></>;
 
     users.sort((a, b) => {
         switch (sortBy) {
@@ -27,8 +29,6 @@ const TheUsers = ({ fetcher }: { fetcher: Promise<User[]> }) => {
                 return 0;
         }
     });
-
-    if (!users) return <></>;
 
     return (
         <>
@@ -88,7 +88,13 @@ export const Users = () => {
     };
 
     return (
-        <Suspense>
+        <Suspense
+            fallback={
+                <Center h="50vh">
+                    <Loader size="lg" />
+                </Center>
+            }
+        >
             <TheUsers fetcher={fetch()} />
         </Suspense>
     );

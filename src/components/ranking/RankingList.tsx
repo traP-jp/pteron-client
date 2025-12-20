@@ -1,4 +1,5 @@
-import { Group, Paper, Text } from "@mantine/core";
+import { Flex, Group, Paper, Stack, Text } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
@@ -31,6 +32,7 @@ const RankingListItem = <T extends RankingEntity>({
     valueDisplay = "copia",
 }: RankingListItemProps<T>) => {
     const { rank, rankDiff, entity } = rankedItem;
+    const isVerySmall = useMediaQuery("(max-width: 400px)");
 
     return (
         <Paper
@@ -40,76 +42,158 @@ const RankingListItem = <T extends RankingEntity>({
             radius="sm"
             withBorder
         >
-            <Group
-                gap="md"
-                wrap="nowrap"
-            >
-                {/* 順位 */}
-                <Text
-                    c="dimmed"
-                    className="w-8 text-center"
-                    fw={600}
-                    size="sm"
+            {isVerySmall ? (
+                <Stack
+                    align="center"
+                    gap="sm"
                 >
-                    {rank}
-                </Text>
+                    {/* 1行目：順位・順位変動 */}
+                    <Group
+                        gap="md"
+                        wrap="nowrap"
+                    >
+                        <Text
+                            c="dimmed"
+                            className="w-8 text-center"
+                            fw={600}
+                            size="sm"
+                        >
+                            {rank}
+                        </Text>
+                        {rankDiff !== undefined && (
+                            <div className="w-8 flex justify-center">
+                                <TrendIndicator diff={rankDiff} />
+                            </div>
+                        )}
+                    </Group>
 
-                {/* 順位変動 */}
-                {rankDiff !== undefined && (
-                    <div className="w-8 flex justify-center">
-                        <TrendIndicator diff={rankDiff} />
-                    </div>
-                )}
+                    {/* 2行目：アバター・名前 */}
+                    <Group
+                        gap="xs"
+                        wrap="nowrap"
+                    >
+                        <PAvatar
+                            name={
+                                type === "user"
+                                    ? toBranded<UserName>(entity.name ?? "")
+                                    : toBranded<ProjectName>(entity.name ?? "")
+                            }
+                            size="sm"
+                            type={type}
+                        />
+                        <Text
+                            fw={500}
+                            lineClamp={1}
+                            size="sm"
+                        >
+                            {entity.name}
+                        </Text>
+                    </Group>
 
-                {/* アバター */}
-                <PAvatar
-                    name={
-                        type === "user"
-                            ? toBranded<UserName>(entity.name ?? "")
-                            : toBranded<ProjectName>(entity.name ?? "")
-                    }
-                    size="sm"
-                    type={type}
-                />
-
-                {/* 名前 */}
-                <Text
-                    className="flex-1"
-                    fw={500}
-                    lineClamp={1}
-                    size="sm"
+                    {/* 3行目：ポイント */}
+                    {valueDisplay === "copia" ? (
+                        <PAmount
+                            coloring
+                            leadingIcon
+                            size="sm"
+                            value={toBranded<Copia>(BigInt(entity.balance ?? 0))}
+                        />
+                    ) : valueDisplay === "percent" ? (
+                        <Text
+                            c="blue"
+                            fw={600}
+                            size="sm"
+                        >
+                            {entity.balance?.toLocaleString() ?? 0}%
+                        </Text>
+                    ) : (
+                        <Text
+                            c="blue"
+                            fw={600}
+                            size="sm"
+                        >
+                            {entity.balance?.toLocaleString() ?? 0}
+                        </Text>
+                    )}
+                </Stack>
+            ) : (
+                <Flex
+                    align="center"
+                    direction={{ base: "column", xs: "row" }}
+                    gap="md"
+                    justify={{ base: "center", xs: "space-between" }}
+                    wrap="wrap"
                 >
-                    {entity.name}
-                </Text>
-
-                {/* プロジェクトの場合のみ外部リンクアイコン */}
-
-                {/* ポイント */}
-                {valueDisplay === "copia" ? (
-                    <PAmount
-                        coloring
-                        leadingIcon
-                        size="sm"
-                        value={toBranded<Copia>(BigInt(entity.balance ?? 0))}
-                    />
-                ) : valueDisplay === "percent" ? (
-                    <Text
-                        c="blue"
-                        fw={600}
-                        size="sm"
+                    <Group
+                        gap="md"
+                        wrap="nowrap"
                     >
-                        {entity.balance?.toLocaleString() ?? 0}%
-                    </Text>
-                ) : (
-                    <Text
-                        c="blue"
-                        fw={600}
-                        size="sm"
-                    >
-                        {entity.balance?.toLocaleString() ?? 0}
-                    </Text>
-                )}
-            </Group>
+                        {/* 順位 */}
+                        <Text
+                            c="dimmed"
+                            className="w-8 text-center"
+                            fw={600}
+                            size="sm"
+                        >
+                            {rank}
+                        </Text>
+
+                        {/* 順位変動 */}
+                        {rankDiff !== undefined && (
+                            <div className="w-8 flex justify-center">
+                                <TrendIndicator diff={rankDiff} />
+                            </div>
+                        )}
+
+                        {/* アバター */}
+                        <PAvatar
+                            name={
+                                type === "user"
+                                    ? toBranded<UserName>(entity.name ?? "")
+                                    : toBranded<ProjectName>(entity.name ?? "")
+                            }
+                            size="sm"
+                            type={type}
+                        />
+
+                        {/* 名前 */}
+                        <Text
+                            fw={500}
+                            lineClamp={1}
+                            size="sm"
+                            style={{ minWidth: 100 }}
+                        >
+                            {entity.name}
+                        </Text>
+                    </Group>
+
+                    {/* ポイント */}
+                    {valueDisplay === "copia" ? (
+                        <PAmount
+                            coloring
+                            leadingIcon
+                            size="md"
+                            value={toBranded<Copia>(BigInt(entity.balance ?? 0))}
+                        />
+                    ) : valueDisplay === "percent" ? (
+                        <Text
+                            c="blue"
+                            fw={600}
+                            size="sm"
+                        >
+                            {entity.balance?.toLocaleString() ?? 0}%
+                        </Text>
+                    ) : (
+                        <Text
+                            c="blue"
+                            fw={600}
+                            size="sm"
+                        >
+                            {entity.balance?.toLocaleString() ?? 0}
+                        </Text>
+                    )}
+                </Flex>
+            )}
         </Paper>
     );
 };
