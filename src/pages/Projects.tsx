@@ -1,6 +1,6 @@
 import { Suspense, use, useState } from "react";
 
-import { Button, Flex, Select, SimpleGrid, Text } from "@mantine/core";
+import { Button, Center, Flex, Loader, Select, SimpleGrid, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 
@@ -70,6 +70,7 @@ const TheProjects = ({ refresh, fetcher }: { refresh: Invocable; fetcher: Fetche
     const [sortBy, setSortBy] = useState<SortOption>("balance-desc");
 
     const { projects, ownProjects } = use(fetcher);
+
     const sortedProjects = sortProjects(projects, sortBy);
 
     return (
@@ -189,7 +190,13 @@ const Projects = () => {
     const refresh = () => setFetcher(fetch());
 
     return (
-        <Suspense>
+        <Suspense
+            fallback={
+                <Center h="50vh">
+                    <Loader size="lg" />
+                </Center>
+            }
+        >
             <TheProjects
                 refresh={refresh}
                 fetcher={fetcher}
