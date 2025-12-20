@@ -4,6 +4,7 @@ import {
     Flex,
     type FlexProps,
     PasswordInput,
+    type PasswordInputProps,
     Tooltip,
 } from "@mantine/core";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
@@ -34,7 +35,7 @@ function CopyValue({ value }: { value: string }) {
 }
 
 export default function SecretCopyInput(
-    props: FlexProps & { value: string; label?: string; description?: string }
+    props: PasswordInputProps & FlexProps & { value: string; label?: string; description?: string }
 ) {
     return (
         <Flex
@@ -46,11 +47,12 @@ export default function SecretCopyInput(
         >
             <PasswordInput
                 className="w-full"
-                value={props.value}
                 label={props.label}
-                description
+                description={props.description}
+                readOnly
+                {...props}
             />
-            <CopyValue value={props.value} />
+            {props.value && <CopyValue value={props.value} />}
         </Flex>
     );
 }
