@@ -38,6 +38,7 @@ export const UserBalanceCard = ({ balance, recentChange }: UserBalanceCardProps)
                     <PAmount
                         value={toBranded<Copia>(BigInt(balance))}
                         leadingIcon
+                        compact
                         size="lg"
                         fw={700}
                     />
