@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Card, Flex, Grid, Text } from "@mantine/core";
+import { Card, Divider, Flex, SimpleGrid, Text, Title } from "@mantine/core";
 
 import apis from "/@/api";
 import type { Project, User } from "/@/api/schema/internal";
@@ -13,55 +13,52 @@ import { TransactionList } from "/@/components/TransactionList";
 import BalanceChart from "/@/components/ranking/BalanceChart";
 import { type Copia, type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
 
-function UserProfileTop({ name, balance }: { name: UserName; balance: Copia }) {
+const UserProfileHeder = ({ name, balance }: { name: UserName; balance: Copia }) => {
     return (
         <>
-            <Card
-                padding="xs"
-                p="lg"
-                withBorder
-                radius="md"
+            <Flex
+                direction="column"
+                mt="lg"
+                mb="xs"
             >
-                <Flex direction="column">
+                <Flex
+                    direction="row"
+                    align="center"
+                >
                     <Flex
                         direction="row"
                         align="center"
+                        gap="xl"
+                        ml="xl"
                     >
-                        <Flex
-                            direction="row"
-                            align="center"
-                            gap="xl"
-                            ml="xl"
-                        >
-                            <PAvatar
-                                size="xl"
-                                name={name}
-                                type="user"
-                            />
-                            <Text
-                                size="xl"
-                                fw={700}
-                            >
-                                {name}
-                            </Text>
-                        </Flex>
-                        <PAmount
-                            ml="auto"
-                            mr="xl"
-                            value={balance}
-                            leadingIcon
-                            coloring
-                            size="custom"
-                            customSize={2}
+                        <PAvatar
+                            size="xl"
+                            name={name}
+                            type="user"
                         />
+                        <Text
+                            size="xl"
+                            fw={700}
+                        >
+                            {name}
+                        </Text>
                     </Flex>
+                    <PAmount
+                        ml="auto"
+                        mr="xl"
+                        value={balance}
+                        leadingIcon
+                        coloring
+                        size="custom"
+                        customSize={2}
+                    />
                 </Flex>
-            </Card>
+            </Flex>
         </>
     );
-}
+};
 
-function UserProfileMiddle({ transactions }: { transactions: Transaction[] }) {
+const UserProfileDetail = ({ transactions }: { transactions: Transaction[] }) => {
     return (
         <Flex
             wrap="wrap"
@@ -70,37 +67,37 @@ function UserProfileMiddle({ transactions }: { transactions: Transaction[] }) {
         >
             <Card
                 className="flex-auto"
-                withBorder
-                radius="md"
                 p="lg"
                 h="100%"
             >
-                <Text
-                    size="xl"
+                <Title
+                    order={2}
+                    fw={400}
                     mb="md"
                 >
-                    概要
-                </Text>
+                    推移
+                </Title>
                 <BalanceChart
                     h={320}
                     transactions={transactions}
                 />
             </Card>
 
+            <Divider orientation="vertical" />
+
             <Card
-                withBorder
-                className="min-w-100"
-                radius="md"
+                className="min-w-md"
                 p="lg"
                 h="100%"
                 style={{ display: "flex", flexDirection: "column" }}
             >
-                <Text
-                    size="xl"
+                <Title
+                    order={2}
+                    fw={400}
                     mb="md"
                 >
                     取引履歴
-                </Text>
+                </Title>
                 {!transactions && <Text c="dimmed">取引履歴がありません</Text>}
                 <div className="h-80 overflow-auto">
                     <TransactionList
@@ -111,38 +108,38 @@ function UserProfileMiddle({ transactions }: { transactions: Transaction[] }) {
             </Card>
         </Flex>
     );
-}
+};
 
-function UserProfileBottom({ projects }: { projects: Project[] }) {
+const UserProfileProjectList = ({ projects }: { projects: Project[] }) => {
     return (
         <>
-            <Text
-                size="xl"
-                // mb="md"
+            <Title
+                order={2}
+                fw={400}
             >
                 所属しているプロジェクト
-            </Text>
-            <Grid>
-                {projects.map(project => (
-                    <Grid.Col
-                        span={{ base: 12, sm: 6, md: 4, lg: 3 }}
-                        key={project.id}
-                    >
-                        <EntityCard
-                            p="xl"
-                            withBorder
-                            radius="md"
-                            type="project"
-                            amount={toBranded<Copia>(BigInt(project.balance))}
-                            name={toBranded<ProjectName>(project.name)}
-                            extraLink={project.url ? toBranded<Url>(project.url) : undefined}
-                        />
-                    </Grid.Col>
+            </Title>
+
+            <SimpleGrid
+                cols={{ base: 1, md: 2, xl: 3 }}
+                spacing="md"
+            >
+                {projects.map(({ id, balance, name, url }) => (
+                    <EntityCard
+                        key={id}
+                        p="xl"
+                        withBorder
+                        radius="md"
+                        type="project"
+                        amount={toBranded<Copia>(BigInt(balance))}
+                        name={toBranded<ProjectName>(name)}
+                        extraLink={url ? toBranded<Url>(url) : undefined}
+                    />
                 ))}
-            </Grid>
+            </SimpleGrid>
         </>
     );
-}
+};
 
 const UserProfile = () => {
     const { userId: _userName } = useParams();
@@ -180,12 +177,14 @@ const UserProfile = () => {
                 direction="column"
                 gap="md"
             >
-                <UserProfileTop
+                <UserProfileHeder
                     name={name}
                     balance={balance}
                 />
-                <UserProfileMiddle transactions={transactions} />
-                <UserProfileBottom projects={projects} />
+                <Divider />
+                <UserProfileDetail transactions={transactions} />
+                <Divider />
+                <UserProfileProjectList projects={projects} />
             </Flex>
         </>
     );
