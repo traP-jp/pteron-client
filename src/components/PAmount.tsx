@@ -38,7 +38,6 @@ const formatCompact = (value: bigint): string => {
     return value.toString();
 };
 
-
 export type PAmountProps<Size extends PAmountSize> = TextProps & {
     size?: Size;
     leadingIcon?: boolean;
@@ -77,7 +76,9 @@ export const PAmount = <Size extends PAmountSize = undefined>(_props: PAmountPro
     const color = value > 0 ? "green" : value < 0 ? "red" : "black";
 
     // 省略表示かどうかで表示形式を切り替え
-    const displayValue = compact ? formatCompact(value) : value.toLocaleString(locales, formatOptions);
+    const displayValue = compact
+        ? formatCompact(value)
+        : value.toLocaleString(locales, formatOptions);
     // 省略されている場合のみツールチップを表示
     const isCompacted = compact && (value >= 1000n || value <= -1000n);
 
@@ -106,7 +107,10 @@ export const PAmount = <Size extends PAmountSize = undefined>(_props: PAmountPro
     // 省略されている場合はツールチップで正確な値を表示
     if (isCompacted) {
         return (
-            <Tooltip label={value.toLocaleString(locales, formatOptions)} withArrow>
+            <Tooltip
+                label={value.toLocaleString(locales, formatOptions)}
+                withArrow
+            >
                 {content}
             </Tooltip>
         );
