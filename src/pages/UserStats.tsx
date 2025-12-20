@@ -42,8 +42,8 @@ const TheUserStats = ({ fetcher }: { fetcher: Promise<RankingData[]> }) => {
 
     return (
         <SimpleGrid
-            cols={{ base: 1, sm: 2, lg: 3 }}
-            spacing="md"
+            cols={{ base: 1, lg: 2 }}
+            spacing="xs"
         >
             {rankings.map(ranking => (
                 <RankingFull
