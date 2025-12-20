@@ -151,7 +151,7 @@ export const Home = () => {
                                 style={{ color: "var(--mantine-color-blue-6)" }}
                             />
                         </Group>
-                        {systemStats ? (
+                        {systemStats && systemStats.balance !== undefined ? (
                             <PAmount
                                 value={toBranded<Copia>(BigInt(systemStats.balance))}
                                 leadingIcon
@@ -166,7 +166,7 @@ export const Home = () => {
                                 -
                             </Text>
                         )}
-                        {systemStats && (
+                        {systemStats && systemStats.difference !== undefined && (
                             <Group
                                 gap="xs"
                                 mt="xs"
@@ -210,7 +210,7 @@ export const Home = () => {
                                 style={{ color: "var(--mantine-color-green-6)" }}
                             />
                         </Group>
-                        {systemStats ? (
+                        {systemStats && systemStats.total !== undefined ? (
                             <PAmount
                                 value={toBranded<Copia>(BigInt(systemStats.total))}
                                 leadingIcon
@@ -262,7 +262,7 @@ export const Home = () => {
                             size="lg"
                             fw={700}
                         >
-                            {systemStats ? systemStats.count.toLocaleString() : "-"}
+                            {systemStats && systemStats.count !== undefined ? systemStats.count.toLocaleString() : "-"}
                         </Text>
                         {systemStats && (
                             <Text
