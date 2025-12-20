@@ -5,6 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
+        "dev:api": "VITE_USE_MOCK=false vite",
         "build": "tsc -b && vite build",
         "preview": "vite preview",
         "preview:with-build": "npm run build && npm run preview",
