@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Suspense, use, useState } from "react";
 import { Link, useOutletContext, useParams } from "react-router-dom";
 
 import { ActionIcon, Center, Group, Loader, Pagination, Stack, Text, Title } from "@mantine/core";
@@ -27,44 +27,16 @@ const rankingTitles: Record<RankingName, string> = {
 
 const ITEMS_PER_PAGE = 20;
 
-const StatsUserDetails = () => {
-    const { rankingName } = useParams<{ rankingName: string }>();
-    const { period } = useOutletContext<StatsContext>();
-
-    const [items, setItems] = useState<RankedItem<User>[]>([]);
-    const [loading, setLoading] = useState(true);
+const TheUserStatsDetail = ({
+    title,
+    fetcher,
+}: {
+    title: string;
+    fetcher: Promise<RankedItem<User>[]>;
+}) => {
     const [currentPage, setCurrentPage] = useState(1);
 
-    // ランキング名のバリデーション
-    const validRankingName = (rankingName as RankingName) || "balance";
-    const title = rankingTitles[validRankingName] || "ランキング";
-
-    useEffect(() => {
-        const fetchRanking = async () => {
-            setLoading(true);
-            try {
-                const response = await apis.internal.stats.getUserRankings(validRankingName, {
-                    term: period,
-                    limit: 100,
-                });
-                const rankedItems: RankedItem<User>[] =
-                    response.data.items?.map(item => ({
-                        rank: item.rank,
-                        rankDiff: item.difference,
-                        entity: item.user,
-                    })) ?? [];
-                setItems(rankedItems);
-            } catch (error) {
-                console.error("Failed to fetch ranking:", error);
-                setItems([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchRanking();
-        setCurrentPage(1);
-    }, [validRankingName, period]);
+    const items: RankedItem<User>[] = use(fetcher);
 
     // ページネーション計算
     const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
@@ -76,14 +48,6 @@ const StatsUserDetails = () => {
         ...item,
         rank: startIndex + index + 1,
     }));
-
-    if (loading) {
-        return (
-            <Center py="xl">
-                <Loader size="lg" />
-            </Center>
-        );
-    }
 
     return (
         <Stack gap="md">
@@ -130,4 +94,45 @@ const StatsUserDetails = () => {
     );
 };
 
-export default StatsUserDetails;
+const UserStatsDetail = () => {
+    const { rankingName } = useParams<{ rankingName: string }>();
+    const { period } = useOutletContext<StatsContext>();
+
+    // ランキング名のバリデーション
+    const validRankingName = (rankingName as RankingName) || "balance";
+    const title = rankingTitles[validRankingName] || "ランキング";
+
+    const fetch = async () => {
+        const {
+            data: { items },
+        } = await apis.internal.stats.getUserRankings(validRankingName, {
+            term: period,
+            limit: 100,
+        });
+
+        return (
+            items?.map(item => ({
+                rank: item.rank,
+                rankDiff: item.difference,
+                entity: item.user,
+            })) ?? []
+        );
+    };
+
+    return (
+        <Suspense
+            fallback={
+                <Center py="xl">
+                    <Loader size="lg" />
+                </Center>
+            }
+        >
+            <TheUserStatsDetail
+                title={title}
+                fetcher={fetch()}
+            />
+        </Suspense>
+    );
+};
+
+export default UserStatsDetail;

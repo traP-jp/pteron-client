@@ -1,25 +1,19 @@
-import { useEffect, useState } from "react";
+import { Suspense, use, useState } from "react";
 
 import { Flex, Select, SimpleGrid, Text } from "@mantine/core";
 
-import apis from "../api";
-import type { User } from "../api/schema/internal";
-import { EntityCard } from "../components/EntityCard";
-import { type Copia, type UserName, toBranded } from "../types/entity";
+import apis from "/@/api";
+import type { User } from "/@/api/schema/internal";
+import { EntityCard } from "/@/components/EntityCard";
+import { type Copia, type UserName, toBranded } from "/@/types/entity";
 
 type SortOption = "balance-desc" | "balance-asc" | "name-asc" | "name-desc";
 
-const Users = () => {
-    const [users, setUsers] = useState<User[]>([]);
+const TheUsers = ({ fetcher }: { fetcher: Promise<User[]> }) => {
     const [sortBy, setSortBy] = useState<SortOption>("balance-desc");
+    const users = use(fetcher);
 
-    useEffect(() => {
-        apis.internal.users.getUsers().then(({ data }) => {
-            setUsers(data.items);
-        });
-    }, []);
-
-    const sortedUsers = [...users].sort((a, b) => {
+    users.sort((a, b) => {
         switch (sortBy) {
             case "balance-desc":
                 return b.balance - a.balance;
@@ -67,7 +61,7 @@ const Users = () => {
                 cols={{ base: 1, md: 2, xl: 3 }}
                 spacing="md"
             >
-                {sortedUsers.map(user => (
+                {users.map(user => (
                     <EntityCard
                         key={user.id}
                         type="user"
@@ -81,6 +75,22 @@ const Users = () => {
                 ))}
             </SimpleGrid>
         </>
+    );
+};
+
+export const Users = () => {
+    const fetch = async () => {
+        const {
+            data: { items: users },
+        } = await apis.internal.users.getUsers();
+
+        return users;
+    };
+
+    return (
+        <Suspense>
+            <TheUsers fetcher={fetch()} />
+        </Suspense>
     );
 };
 
