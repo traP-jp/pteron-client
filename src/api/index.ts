@@ -1,30 +1,23 @@
+import { makeInterceptorInjector } from "./client";
+import { authErrorHandler, axiosErrorHandler } from "./errors";
 import { type ApiConfig, Api as InternalApiClient } from "./schema/internal";
 import { Api as PublicApiClient } from "./schema/public";
 import { Api as TraqApiClient } from "./schema/traq";
 
-export * from "./paths";
-
 const config: ApiConfig = {};
 
-const apis = {
-    internal: new InternalApiClient(config),
-    public: new PublicApiClient(config),
-    traq: new TraqApiClient(config),
-};
+const injectGeneralErrorHandler = makeInterceptorInjector({
+    response: [response => response, axiosErrorHandler],
+});
 
-// 認証エラー時のグローバルハンドリング
-// 本番サーバーは認証なしの場合 401 ではなく 404 を返すことがある
-apis.internal.instance.interceptors.response.use(
-    response => response,
-    error => {
-        const status = error.response?.status;
-        if (status === 401 || status === 404) {
-            console.warn(`[API] 認証エラー (${status}): ログインが必要です。`);
-            // 空のレスポンスを返してUIがクラッシュしないようにする
-            return Promise.resolve({ data: { items: [] }, status });
-        }
-        return Promise.reject(error);
-    }
-);
+const injectAuthErrorHandler = makeInterceptorInjector({
+    response: [response => response, authErrorHandler],
+});
+
+const apis = {
+    internal: injectGeneralErrorHandler(injectAuthErrorHandler(new InternalApiClient(config))),
+    public: injectGeneralErrorHandler(new PublicApiClient(config)),
+    traq: injectGeneralErrorHandler(new TraqApiClient(config)),
+};
 
 export default apis;

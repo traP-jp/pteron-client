@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button, Modal, type ModalProps, TextInput } from "@mantine/core";
 
 import apis from "/@/api";
+import ErrorBoundary from "/@/components/ErrorBoundary";
 
 export type CreateProjectModalProps = Omit<ModalProps, "title">;
 
@@ -63,7 +64,9 @@ export function CreateProjectModal(props: CreateProjectModalProps) {
             {...props}
             title="新規プロジェクト"
         >
-            <CreateProjectModalContents onClose={props.onClose} />
+            <ErrorBoundary>
+                <CreateProjectModalContents onClose={props.onClose} />
+            </ErrorBoundary>
         </Modal>
     );
 }

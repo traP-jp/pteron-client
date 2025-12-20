@@ -2,6 +2,7 @@ import { Card, Group, Stack, Text } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
 import { IconCrown } from "@tabler/icons-react";
 
+import ErrorBoundary from "/@/components/ErrorBoundary";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
@@ -178,42 +179,46 @@ export const RankingTop3 = <T extends RankingEntity>({
 
     if (isNarrow) {
         return (
-            <Stack
+            <ErrorBoundary>
+                <Stack
+                    ref={ref}
+                    align="center"
+                    gap="md"
+                >
+                    {orderedItems.map(rankedItem => (
+                        <RankingTop3Item
+                            key={rankedItem.entity.id}
+                            isNarrow
+                            onItemClick={onItemClick}
+                            rankedItem={rankedItem}
+                            type={type}
+                            valueDisplay={valueDisplay}
+                        />
+                    ))}
+                </Stack>
+            </ErrorBoundary>
+        );
+    }
+
+    return (
+        <ErrorBoundary>
+            <Group
                 ref={ref}
-                align="center"
+                align="end" // 下揃えにして表彰台の高低差を自然に見せる
                 gap="md"
+                grow
+                wrap="nowrap"
             >
                 {orderedItems.map(rankedItem => (
                     <RankingTop3Item
                         key={rankedItem.entity.id}
-                        isNarrow
                         onItemClick={onItemClick}
                         rankedItem={rankedItem}
                         type={type}
                         valueDisplay={valueDisplay}
                     />
                 ))}
-            </Stack>
-        );
-    }
-
-    return (
-        <Group
-            ref={ref}
-            align="end" // 下揃えにして表彰台の高低差を自然に見せる
-            gap="md"
-            grow
-            wrap="nowrap"
-        >
-            {orderedItems.map(rankedItem => (
-                <RankingTop3Item
-                    key={rankedItem.entity.id}
-                    onItemClick={onItemClick}
-                    rankedItem={rankedItem}
-                    type={type}
-                    valueDisplay={valueDisplay}
-                />
-            ))}
-        </Group>
+            </Group>
+        </ErrorBoundary>
     );
 };

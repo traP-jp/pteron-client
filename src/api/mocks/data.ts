@@ -2,12 +2,12 @@
  * モックデータ定義
  * Internal API と Public API で使用するサンプルデータ
  */
-import type { APIClient, Bill, Project, Transaction, User } from "../api/schema/internal";
+import type { APIClient, Bill, Project, Transaction, User } from "/@/api/schema/internal";
 import type {
     Bill as PublicBill,
     Project as PublicProject,
     Transaction as PublicTransaction,
-} from "../api/schema/public";
+} from "/@/api/schema/public";
 
 // ========== ユーザーデータ ==========
 export const mockUsers: User[] = [
