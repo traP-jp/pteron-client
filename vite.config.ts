@@ -16,16 +16,16 @@ export default defineConfig({
         open: "/sandbox",
         // MSW無効時 (VITE_USE_MOCK=false) に実APIへ転送
         proxy: {
-            "/internal": "http://localhost:8080",
-            "/v1": "http://localhost:8080",
+            "/api/internal": "http://localhost:8080",
+            "/api/v1": "http://localhost:8080",
         },
     },
     preview: {
         open: "/",
         // preview時はステージングAPIに接続
         proxy: {
-            "/internal": "https://pteron-api-dev.trap.show",
-            "/v1": "https://pteron-api-dev.trap.show",
+            "/api/internal": "https://pteron-api-dev.trap.show",
+            "/api/v1": "https://pteron-api-dev.trap.show",
         },
     },
 });
