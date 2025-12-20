@@ -121,7 +121,7 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
                             size="xs"
                             c="dimmed"
                         >
-                            {formatDate(transaction.created_at)}
+                            {formatDate(transaction.createdAt)}
                         </Text>
                     </Stack>
                 </Group>
@@ -190,7 +190,7 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
                         >
                             日時:
                         </Text>
-                        <Text size="sm">{formatDate(transaction.created_at)}</Text>
+                        <Text size="sm">{formatDate(transaction.createdAt)}</Text>
                     </Group>
                     <Group gap="xs">
                         <Text

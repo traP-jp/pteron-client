@@ -567,7 +567,7 @@ const mockTransactions: Transaction[] = [
         project: mockProject1,
         user: mockUser1,
         description: "プロジェクトからの報酬",
-        created_at: "2025-12-18T10:00:00Z",
+        createdAt: "2025-12-18T10:00:00Z",
     },
     {
         id: "2b3c4d5e-6f7a-8901-bcde-f12345678901",
@@ -576,7 +576,7 @@ const mockTransactions: Transaction[] = [
         project: mockProject2,
         user: mockUser1,
         description: "サービス利用料",
-        created_at: "2025-12-17T15:30:00Z",
+        createdAt: "2025-12-17T15:30:00Z",
     },
     {
         id: "3c4d5e6f-7a8b-9012-cdef-123456789012",
@@ -585,7 +585,7 @@ const mockTransactions: Transaction[] = [
         project: mockProject1,
         user: mockUser2,
         description: "ボーナス",
-        created_at: "2025-12-16T09:00:00Z",
+        createdAt: "2025-12-16T09:00:00Z",
     },
     {
         id: "4d5e6f7a-8b9c-0123-def1-234567890123",
@@ -594,6 +594,6 @@ const mockTransactions: Transaction[] = [
         project: mockProject3,
         user: mockUser1,
         description: "月額料金",
-        created_at: "2025-12-15T12:00:00Z",
+        createdAt: "2025-12-15T12:00:00Z",
     },
 ];
