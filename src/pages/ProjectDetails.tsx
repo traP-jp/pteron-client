@@ -235,17 +235,24 @@ const ProjectDetails = () => {
     const projectName = toBranded<ProjectName>(_projectName ?? "");
 
     const fetch = async () => {
-        const { data: project } = await apis.internal.projects.getProject(projectName);
-        const {
-            data: { items: transactions },
-        } = await apis.internal.transactions.getProjectTransactions(projectName);
-        const { data: currentUser } = await apis.internal.me.getCurrentUser();
+        try {
+            const { data: project } = await apis.internal.projects.getProject(projectName);
+            const { data: transactionsData } =
+                await apis.internal.transactions.getProjectTransactions(projectName);
+            const { data: currentUser } = await apis.internal.me.getCurrentUser();
 
-        return {
-            project,
-            transactions: transactions ?? [],
-            currentUserId: currentUser.id,
-        };
+            // transactions が undefined または items が undefined の場合に安全に処理
+            const transactions = (transactionsData?.items ?? []).filter(Boolean);
+
+            return {
+                project,
+                transactions,
+                currentUserId: currentUser.id,
+            };
+        } catch (error) {
+            console.error("Failed to fetch project details:", error);
+            throw error;
+        }
     };
 
     return (
