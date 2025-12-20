@@ -79,7 +79,7 @@ const RankingTop3Item = <T extends RankingEntity>({
                 {/* ポイント */}
                 {valueDisplay === "copia" ? (
                     <PAmount
-                        c="blue"
+                        coloring
                         fw={700}
                         leadingIcon
                         size={isFirst ? "xl" : "lg"}
