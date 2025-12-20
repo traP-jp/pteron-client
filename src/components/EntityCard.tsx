@@ -79,6 +79,7 @@ export const EntityCard = <Type extends EntityType>(_props: EntityCardProps<Type
                             value={amount}
                             leadingIcon
                             coloring
+                            compact
                         />
                     </Flex>
                 </Group>

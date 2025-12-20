@@ -114,6 +114,7 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
                             )}
                             leadingIcon
                             coloring={direction !== "both"}
+                            compact
                             fw={600}
                             size="lg"
                         />

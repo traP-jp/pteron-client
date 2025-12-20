@@ -50,6 +50,7 @@ const UserProfileHeder = ({ name, balance }: { name: UserName; balance: Copia })
                         value={balance}
                         leadingIcon
                         coloring
+                        compact
                         size="custom"
                         customSize={2}
                     />
