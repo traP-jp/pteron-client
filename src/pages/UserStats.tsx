@@ -1,4 +1,4 @@
-import { Suspense, use } from "react";
+import { Suspense, use, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 
 import { Center, Loader, SimpleGrid, Text } from "@mantine/core";
@@ -63,20 +63,24 @@ const TheUserStats = ({ fetcher }: { fetcher: Promise<RankingData[]> }) => {
 const UserStats = () => {
     const { period } = useOutletContext<StatsContext>();
 
-    const fetcher = Promise.all(
-        rankingConfigs.map(async config => {
-            const response = await apis.internal.stats.getUserRankings(config.rankingName, {
-                term: period,
-                limit: 8,
-            });
-            const items: RankedItem<User>[] =
-                response.data.items?.map(item => ({
-                    rank: item.rank,
-                    rankDiff: item.difference,
-                    entity: item.user,
-                })) ?? [];
-            return { ...config, items, loading: false };
-        })
+    const fetcher = useMemo(
+        () =>
+            Promise.all(
+                rankingConfigs.map(async config => {
+                    const response = await apis.internal.stats.getUserRankings(config.rankingName, {
+                        term: period,
+                        limit: 8,
+                    });
+                    const items: RankedItem<User>[] =
+                        response.data.items?.map(item => ({
+                            rank: item.rank,
+                            rankDiff: item.difference,
+                            entity: item.user,
+                        })) ?? [];
+                    return { ...config, items, loading: false };
+                })
+            ),
+        [period]
     );
 
     return (
