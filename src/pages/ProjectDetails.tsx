@@ -25,6 +25,7 @@ import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
 import BalanceChart from "/@/components/ranking/BalanceChart";
+import { ProjectRankingBadges, ProjectRankingCards } from "/@/components/ranking/RankingBadges";
 import { createExternalLinkHandler } from "/@/lib/link";
 import { type Copia, type ProjectName, type UserName, toBranded } from "/@/types/entity";
 import type { Url } from "/@/types/entity";
@@ -50,6 +51,7 @@ const ProjectHeader = ({
             direction="column"
             mt="lg"
             mb="xs"
+            gap="sm"
         >
             <Flex
                 direction="row"
@@ -116,6 +118,9 @@ const ProjectHeader = ({
                     size="custom"
                     customSize={2}
                 />
+            </Flex>
+            <Flex ml="xl">
+                <ProjectRankingBadges projectName={name} />
             </Flex>
         </Flex>
     );
@@ -239,6 +244,16 @@ const TheProjectDetails = ({
                 owner={project.owner}
                 admins={project.admins}
             />
+            <Divider />
+            <ErrorBoundary>
+                <Title
+                    order={2}
+                    fw={400}
+                >
+                    ランキング
+                </Title>
+                <ProjectRankingCards projectName={name} />
+            </ErrorBoundary>
         </Flex>
     );
 };
