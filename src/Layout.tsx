@@ -99,7 +99,15 @@ function DashboardLayout() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const isActive = useCallback((path: string) => location.pathname === path, [location.pathname]);
+    const isActive = useCallback(
+        (path: string) => {
+            if (path === "/") {
+                return location.pathname === "/";
+            }
+            return location.pathname === path || location.pathname.startsWith(`${path}/`);
+        },
+        [location.pathname]
+    );
 
     const userFetcher = useMemo(
         () => apis.internal.me.getCurrentUser().then(({ data }) => data),
