@@ -2,6 +2,18 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
+        <script>
+            (function () {
+                var stored = localStorage.getItem("pteron-color-scheme");
+                var scheme = stored || "auto";
+                if (scheme === "auto") {
+                    scheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+                        ? "dark"
+                        : "light";
+                }
+                document.documentElement.setAttribute("data-mantine-color-scheme", scheme);
+            })();
+        </script>
         <link
             rel="icon"
             type="image/svg+xml"

@@ -56,7 +56,7 @@ const RankingTop3Item = <T extends RankingEntity>({
         <Card
             component={Link}
             to={detailPath}
-            className={`cursor-pointer transition-transform hover:scale-105 ${isFirst ? "border-2 border-yellow-400" : ""}`}
+            className="cursor-pointer transition-transform hover:scale-105"
             padding="sm"
             radius="md"
             shadow="sm"
@@ -160,8 +160,8 @@ export const RankingTop3 = <T extends RankingEntity>({
     valueDisplay = "copia",
 }: RankingTop3Props<T>) => {
     const { ref, width } = useElementSize();
-    // コンテナ幅が480px未満の場合は縦並び
-    const isNarrow = width < 480;
+    // コンテナ幅が360px未満の場合は縦並び
+    const isNarrow = width < 360;
 
     // 狭い場合は順位順 (1位, 2位, 3位 ...)
     // 広い場合は表彰台形式 (2位, 1位, 3位 ...)

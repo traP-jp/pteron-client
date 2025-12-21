@@ -23,7 +23,10 @@ export const UserBalanceCard = ({ fetcher }: UserBalanceCardProps) => {
         <Card
             padding="md"
             radius="md"
-            bg="gray.1"
+            style={{
+                backgroundColor:
+                    "light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-6))",
+            }}
             withBorder={false}
         >
             <ErrorBoundary>

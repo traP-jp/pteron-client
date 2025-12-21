@@ -13,6 +13,7 @@ import {
     Text,
     UnstyledButton,
     rem,
+    useMantineColorScheme,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { IconArrowDown, IconArrowRight, IconCheck, IconX } from "@tabler/icons-react";
@@ -20,6 +21,7 @@ import axios from "axios";
 
 import { Api, type Bill, type User } from "/@/api/schema/internal";
 import CopiaLogoSrc from "/@/assets/icons/copiaLogo.svg";
+import WhiteIconSrc from "/@/assets/icons/white_icon.svg";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { CheckoutPageSkeleton } from "/@/components/skeletons/PageSkeletons";
@@ -55,11 +57,17 @@ const declineBill = async (billId: string) => {
 };
 
 const CopiaLogo = ({ clickable = false }: { clickable?: boolean }) => {
+    const { colorScheme } = useMantineColorScheme();
+    const logoSrc = colorScheme === "dark" ? WhiteIconSrc : CopiaLogoSrc;
+
     const logo = (
         <img
-            src={CopiaLogoSrc}
+            src={logoSrc}
             alt="Copia Logo"
-            style={{ width: rem(32), height: rem(32) }}
+            style={{
+                width: rem(32),
+                height: rem(32),
+            }}
         />
     );
 

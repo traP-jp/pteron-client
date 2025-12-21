@@ -20,15 +20,16 @@ interface RankingData {
     title: string;
     rankingName: RankingName;
     items: RankedItem<Project>[];
+    order?: "asc" | "desc";
 }
 
-const rankingConfigs: { title: string; rankingName: RankingName }[] = [
-    { title: "残高ランキング", rankingName: "balance" },
-    { title: "取引数ランキング", rankingName: "count" },
-    { title: "収入ランキング", rankingName: "in" },
-    { title: "支出ランキング", rankingName: "out" },
-    { title: "差額ランキング", rankingName: "difference" },
-    { title: "総額ランキング", rankingName: "total" },
+const rankingConfigs: { title: string; rankingName: RankingName; order?: "asc" | "desc" }[] = [
+    { title: "残高変動トップ", rankingName: "difference", order: "desc" },
+    { title: "残高変動ワースト", rankingName: "difference", order: "asc" },
+    { title: "残高トップ", rankingName: "balance", order: "desc" },
+    { title: "残高ワースト", rankingName: "balance", order: "asc" },
+    { title: "取引総額トップ", rankingName: "total", order: "desc" },
+    { title: "収入トップ", rankingName: "in", order: "desc" },
 ];
 
 const TheRanking = ({ fetcher }: { fetcher: Promise<RankingData> }) => {
@@ -42,13 +43,15 @@ const TheRanking = ({ fetcher }: { fetcher: Promise<RankingData> }) => {
         );
     }
 
+    const titleLink = `/stats/projects/${ranking.rankingName}${ranking.order ? `?order=${ranking.order}` : ""}`;
+
     return (
         <RankingFull
-            key={ranking.rankingName}
+            key={`${ranking.rankingName}-${ranking.order}`}
             items={ranking.items}
             maxItems={5}
             title={ranking.title}
-            titleLink={`/stats/projects/${ranking.rankingName}`}
+            titleLink={titleLink}
             type="project"
         />
     );
@@ -64,7 +67,8 @@ const ProjectStats = () => {
                     data: { items },
                 } = await apis.internal.stats.getProjectRankings(config.rankingName, {
                     term: period,
-                    limit: 8,
+                    limit: 5,
+                    order: config.order,
                 });
 
                 return {
@@ -82,7 +86,7 @@ const ProjectStats = () => {
 
     return (
         <SimpleGrid
-            cols={{ base: 1, xl: 2 }}
+            cols={{ base: 1, md: 2, lg: 3 }}
             spacing="xs"
         >
             {fetchers.map((fetcher, index) => (

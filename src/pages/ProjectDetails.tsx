@@ -188,22 +188,37 @@ const ProjectMemberList = ({ owner, admins }: { owner?: User; admins?: User[] })
                 メンバー
             </Text>
 
-            <SimpleGrid
-                cols={{ base: 1, md: 2, xl: 3 }}
-                spacing="md"
-            >
-                {members.map(u => (
-                    <EntityCard
-                        key={u.id}
-                        p="xl"
-                        withBorder
-                        radius="md"
-                        type="user"
-                        amount={toBranded<Copia>(BigInt(u.balance))}
-                        name={toBranded<UserName>(u.name)}
-                    />
-                ))}
-            </SimpleGrid>
+            {members.length === 0 ? (
+                <Flex
+                    justify="center"
+                    align="center"
+                    style={{ minHeight: 200 }}
+                >
+                    <Text
+                        size="lg"
+                        c="dimmed"
+                    >
+                        メンバーがいません
+                    </Text>
+                </Flex>
+            ) : (
+                <SimpleGrid
+                    cols={{ base: 1, md: 2, xl: 3 }}
+                    spacing="md"
+                >
+                    {members.map(u => (
+                        <EntityCard
+                            key={u.id}
+                            p="xl"
+                            withBorder
+                            radius="md"
+                            type="user"
+                            amount={toBranded<Copia>(BigInt(u.balance))}
+                            name={toBranded<UserName>(u.name)}
+                        />
+                    ))}
+                </SimpleGrid>
+            )}
         </>
     );
 };

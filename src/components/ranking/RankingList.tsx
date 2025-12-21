@@ -41,7 +41,7 @@ const RankingListItem = <T extends RankingEntity>({
         <Paper
             component={Link}
             to={detailPath}
-            className="cursor-pointer transition-colors hover:bg-gray-50"
+            className="cursor-pointer transition-colors ranking-list-item"
             p="sm"
             radius="sm"
             withBorder
