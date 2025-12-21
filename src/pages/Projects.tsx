@@ -110,25 +110,40 @@ export const AllProjects = ({
 
     return (
         <ErrorBoundary>
-            <SimpleGrid
-                cols={{ base: 1, md: 2, xl: 3 }}
-                spacing="md"
-            >
-                {sortedProjects.map(project => {
-                    return (
-                        <EntityCard
-                            key={project.id}
-                            type="project"
-                            name={toBranded<ProjectName>(project.name)}
-                            amount={toBranded<Copia>(BigInt(project.balance))}
-                            withBorder
-                            p="xl"
-                            radius="md"
-                            extraLink={toBranded<Url>(project.url ?? "")}
-                        />
-                    );
-                })}
-            </SimpleGrid>
+            {sortedProjects.length === 0 ? (
+                <Flex
+                    justify="center"
+                    align="center"
+                    style={{ minHeight: 200 }}
+                >
+                    <Text
+                        size="lg"
+                        c="dimmed"
+                    >
+                        表示するプロジェクトがありません
+                    </Text>
+                </Flex>
+            ) : (
+                <SimpleGrid
+                    cols={{ base: 1, md: 2, xl: 3 }}
+                    spacing="md"
+                >
+                    {sortedProjects.map(project => {
+                        return (
+                            <EntityCard
+                                key={project.id}
+                                type="project"
+                                name={toBranded<ProjectName>(project.name)}
+                                amount={toBranded<Copia>(BigInt(project.balance))}
+                                withBorder
+                                p="xl"
+                                radius="md"
+                                extraLink={toBranded<Url>(project.url ?? "")}
+                            />
+                        );
+                    })}
+                </SimpleGrid>
+            )}
         </ErrorBoundary>
     );
 };
@@ -144,28 +159,44 @@ export const OwnProjects = ({
 }) => {
     const { ownProjects: initialOwnProjects } = use(fetcher);
     const ownProjects = [...initialOwnProjects, ...additionalProjects];
+    const sortedOwnProjects = sortProjects(ownProjects, sortBy);
 
     return (
         <ErrorBoundary>
-            <SimpleGrid
-                cols={{ base: 1, md: 2, xl: 3 }}
-                spacing="md"
-            >
-                {sortProjects(ownProjects, sortBy).map(project => {
-                    return (
-                        <EntityCard
-                            key={project.id}
-                            type="project"
-                            name={toBranded<ProjectName>(project.name)}
-                            amount={toBranded<Copia>(BigInt(project.balance))}
-                            withBorder
-                            p="xl"
-                            radius="md"
-                            extraLink={toBranded<Url>(project.url ?? "")}
-                        />
-                    );
-                })}
-            </SimpleGrid>
+            {sortedOwnProjects.length === 0 ? (
+                <Flex
+                    justify="center"
+                    align="center"
+                    style={{ minHeight: 200 }}
+                >
+                    <Text
+                        size="lg"
+                        c="dimmed"
+                    >
+                        管理しているプロジェクトがありません
+                    </Text>
+                </Flex>
+            ) : (
+                <SimpleGrid
+                    cols={{ base: 1, md: 2, xl: 3 }}
+                    spacing="md"
+                >
+                    {sortedOwnProjects.map(project => {
+                        return (
+                            <EntityCard
+                                key={project.id}
+                                type="project"
+                                name={toBranded<ProjectName>(project.name)}
+                                amount={toBranded<Copia>(BigInt(project.balance))}
+                                withBorder
+                                p="xl"
+                                radius="md"
+                                extraLink={toBranded<Url>(project.url ?? "")}
+                            />
+                        );
+                    })}
+                </SimpleGrid>
+            )}
         </ErrorBoundary>
     );
 };
