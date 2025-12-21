@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@lottiefiles/dotlottie-react':
+        specifier: ^0.17.10
+        version: 0.17.10(react@19.2.3)
       '@mantine/charts':
         specifier: ^8.3.10
         version: 8.3.10(@mantine/core@8.3.10(@mantine/hooks@8.3.10(react@19.2.3))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.10(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(recharts@3.6.0(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react-is@16.13.1)(react@19.2.3)(redux@5.0.1))
@@ -565,6 +568,14 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@lottiefiles/dotlottie-react@0.17.10':
+    resolution: {integrity: sha512-ikrN05/q0/KjqIU+n48uNwmE7DeZIC9y3Nd19httcKqe273zoOeNYycEaQzLSdcpEGnWLmHaZpgtoo07aQZAXg==}
+    peerDependencies:
+      react: ^17 || ^18 || ^19
+
+  '@lottiefiles/dotlottie-web@0.58.1':
+    resolution: {integrity: sha512-YC4pmScrV0R3rd11gU5xHrjeNczlCic69zlnMH/buDIzYxIbpR88oPUhGtKgu5ln7EJchoLpeRJbA3uLCzSeTA==}
 
   '@mantine/charts@8.3.10':
     resolution: {integrity: sha512-/JbuxY7qzrxrZR7ZjKj9dD8OXq03nAIClqJ+fD5ezF8J1cVYH9nx0IaIu8RPpaT4UwRdxz+TH/EutQ0LdeOz8w==}
@@ -3880,6 +3891,13 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@lottiefiles/dotlottie-react@0.17.10(react@19.2.3)':
+    dependencies:
+      '@lottiefiles/dotlottie-web': 0.58.1
+      react: 19.2.3
+
+  '@lottiefiles/dotlottie-web@0.58.1': {}
 
   '@mantine/charts@8.3.10(@mantine/core@8.3.10(@mantine/hooks@8.3.10(react@19.2.3))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mantine/hooks@8.3.10(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(recharts@3.6.0(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react-is@16.13.1)(react@19.2.3)(redux@5.0.1))':
     dependencies:
