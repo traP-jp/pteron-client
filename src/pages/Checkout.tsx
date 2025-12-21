@@ -1,4 +1,4 @@
-import { Suspense, use, useCallback, useMemo, useState } from "react";
+import React, { Suspense, use, useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
@@ -11,26 +11,87 @@ import {
     Grid,
     Group,
     Loader,
+    Stack,
     Text,
+    UnstyledButton,
     rem,
 } from "@mantine/core";
-import { IconAlertCircle, IconCheck, IconX } from "@tabler/icons-react";
+import { IconCheck, IconX } from "@tabler/icons-react";
+import axios from "axios";
 
-import apis from "/@/api";
-import type { Bill } from "/@/api/schema/internal";
+import type { Bill, User } from "/@/api/schema/internal";
 import CopiaLogoSrc from "/@/assets/icons/copiaLogo.svg";
-import ErrorBoundary from "/@/components/ErrorBoundary";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { type Copia, type ProjectName, type UserName, toBranded } from "/@/types/entity";
 
-const fetchBill = async (billId: string): Promise<Bill> => {
-    const { data } = await apis.internal.me.getBill(billId);
+// エラーハンドラーをバイパスするために直接axiosを使用
+const checkoutApiClient = axios.create({
+    baseURL: "/api/internal",
+    headers: {
+        "Content-Type": "application/json",
+    },
+});
+
+type CheckoutData = {
+    bill: Bill;
+    currentUser: User;
+};
+
+const fetchCheckoutData = async (billId: string): Promise<CheckoutData> => {
+    const [billResponse, userResponse] = await Promise.all([
+        checkoutApiClient.get<Bill>(`/me/bills/${billId}`),
+        checkoutApiClient.get<User>("/me"),
+    ]);
+    return {
+        bill: billResponse.data,
+        currentUser: userResponse.data,
+    };
+};
+
+const approveBill = async (billId: string): Promise<{ redirectUrl: string }> => {
+    const { data } = await checkoutApiClient.post<{ redirectUrl: string }>(
+        `/me/bills/${billId}/approve`
+    );
     return data;
 };
 
-const CheckoutContent = ({ fetcher, billId }: { fetcher: Promise<Bill>; billId: string }) => {
-    const bill = use(fetcher);
+const declineBill = async (billId: string): Promise<void> => {
+    await checkoutApiClient.post(`/me/bills/${billId}/decline`);
+};
+
+const CopiaLogo = ({ clickable = false }: { clickable?: boolean }) => {
+    const logo = (
+        <img
+            src={CopiaLogoSrc}
+            alt="Copia Logo"
+            style={{ width: rem(32), height: rem(32) }}
+        />
+    );
+
+    if (clickable) {
+        return (
+            <UnstyledButton
+                onClick={() => {
+                    window.location.href = "/";
+                }}
+            >
+                {logo}
+            </UnstyledButton>
+        );
+    }
+
+    return logo;
+};
+
+const CheckoutContent = ({
+    fetcher,
+    billId,
+}: {
+    fetcher: Promise<CheckoutData>;
+    billId: string;
+}) => {
+    const { bill, currentUser } = use(fetcher);
 
     const [actionType, setActionType] = useState<"approve" | "decline" | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -39,11 +100,28 @@ const CheckoutContent = ({ fetcher, billId }: { fetcher: Promise<Bill>; billId: 
 
     const isCompleted = bill.status !== "PENDING";
 
+    const currentBalance = BigInt(currentUser.balance);
+    const billAmount = BigInt(bill.amount);
+    const balanceAfterPayment = currentBalance - billAmount;
+
+    const getCompletedMessage = () => {
+        switch (bill.status) {
+            case "COMPLETED":
+                return "この請求は既に支払い済みです。";
+            case "REJECTED":
+                return "この請求は既に拒否されています。";
+            case "FAILED":
+                return "この請求の処理に失敗しました。";
+            default:
+                return "この請求は既に処理されています。";
+        }
+    };
+
     const handleApprove = useCallback(async () => {
         setActionType("approve");
         setIsProcessing(true);
         try {
-            const { data } = await apis.internal.me.approveBill(billId);
+            const data = await approveBill(billId);
             setResultMessage("支払いが完了しました。リダイレクトしています...");
             setIsProcessing(false);
             setCompletedAction("approve");
@@ -61,7 +139,7 @@ const CheckoutContent = ({ fetcher, billId }: { fetcher: Promise<Bill>; billId: 
         setActionType("decline");
         setIsProcessing(true);
         try {
-            await apis.internal.me.declineBill(billId);
+            await declineBill(billId);
             setResultMessage("請求を拒否しました。リダイレクトしています...");
             setIsProcessing(false);
             setCompletedAction("decline");
@@ -78,11 +156,7 @@ const CheckoutContent = ({ fetcher, billId }: { fetcher: Promise<Bill>; billId: 
     return (
         <Container className="relative h-screen overflow-hidden">
             <Center mt="md">
-                <img
-                    src={CopiaLogoSrc}
-                    alt="Copia Logo"
-                    style={{ width: rem(32), height: rem(32) }}
-                />
+                <CopiaLogo />
             </Center>
             <Grid
                 gutter="md"
@@ -158,7 +232,7 @@ const CheckoutContent = ({ fetcher, billId }: { fetcher: Promise<Bill>; billId: 
             </Grid>
             <Center mt="xl">
                 <PAmount
-                    value={toBranded<Copia>(BigInt(bill.amount))}
+                    value={toBranded<Copia>(billAmount)}
                     size="custom"
                     customSize={5}
                     leadingIcon
@@ -175,14 +249,70 @@ const CheckoutContent = ({ fetcher, billId }: { fetcher: Promise<Bill>; billId: 
                     </Text>
                 </Center>
             )}
+            {/* 残高情報 - PENDINGの場合のみ表示 */}
+            {!isCompleted && (
+                <Center mt="lg">
+                    <Stack
+                        gap="xs"
+                        align="stretch"
+                    >
+                        <Flex
+                            gap="xs"
+                            align="center"
+                        >
+                            <Text
+                                size="sm"
+                                c="dimmed"
+                                style={{ width: 120, textAlign: "right" }}
+                            >
+                                現在の残高
+                            </Text>
+                            <Text
+                                size="sm"
+                                c="dimmed"
+                            >
+                                :
+                            </Text>
+                            <PAmount
+                                value={toBranded<Copia>(currentBalance)}
+                                size="sm"
+                                leadingIcon
+                            />
+                        </Flex>
+                        <Flex
+                            gap="xs"
+                            align="center"
+                        >
+                            <Text
+                                size="sm"
+                                c="dimmed"
+                                style={{ width: 120, textAlign: "right" }}
+                            >
+                                支払い後の残高
+                            </Text>
+                            <Text
+                                size="sm"
+                                c="dimmed"
+                            >
+                                :
+                            </Text>
+                            <PAmount
+                                value={toBranded<Copia>(balanceAfterPayment)}
+                                size="sm"
+                                leadingIcon
+                            />
+                        </Flex>
+                    </Stack>
+                </Center>
+            )}
             {isCompleted && (
                 <Center mt="xl">
                     <Alert
-                        color="yellow"
-                        title="処理済み"
-                        icon={<IconAlertCircle />}
+                        color="red"
+                        title="処理できません"
+                        icon={<IconX />}
                     >
-                        この請求は既に処理されています（ステータス: {bill.status}）
+                        {getCompletedMessage()}
                     </Alert>
                 </Center>
             )}
@@ -229,22 +359,76 @@ const CheckoutContent = ({ fetcher, billId }: { fetcher: Promise<Bill>; billId: 
     );
 };
 
+const CheckoutError = ({ error }: { error: unknown }) => {
+    let message = "請求の取得中にエラーが発生しました。";
+
+    if (axios.isAxiosError(error)) {
+        if (error.response?.status === 404) {
+            message = "指定された請求が見つかりません。URLを確認してください。";
+        } else if (error.response?.status === 401 || error.response?.status === 403) {
+            message = "この請求にアクセスする権限がありません。";
+        }
+    }
+
+    return (
+        <Container className="relative h-screen overflow-hidden">
+            <Center mt="md">
+                <CopiaLogo clickable />
+            </Center>
+            <Center h="80%">
+                <Alert
+                    color="red"
+                    title="エラー"
+                    icon={<IconX />}
+                >
+                    {message}
+                </Alert>
+            </Center>
+        </Container>
+    );
+};
+
+class CheckoutErrorBoundary extends React.Component<
+    { children: React.ReactNode },
+    { error: unknown | null }
+> {
+    constructor(props: { children: React.ReactNode }) {
+        super(props);
+        this.state = { error: null };
+    }
+
+    static getDerivedStateFromError(error: unknown) {
+        return { error };
+    }
+
+    render() {
+        if (this.state.error) {
+            return <CheckoutError error={this.state.error} />;
+        }
+        return this.props.children;
+    }
+}
+
 export default function Checkout() {
     const [searchParams] = useSearchParams();
     const billId = searchParams.get("id");
 
     const fetcher = useMemo(() => {
         if (!billId) return Promise.reject(new Error("billId is required"));
-        return fetchBill(billId);
+        return fetchCheckoutData(billId);
     }, [billId]);
 
     if (!billId) {
         return (
             <Container className="relative h-screen overflow-hidden">
-                <Center h="100%">
+                <Center mt="md">
+                    <CopiaLogo clickable />
+                </Center>
+                <Center h="80%">
                     <Alert
                         color="red"
                         title="エラー"
+                        icon={<IconX />}
                     >
                         請求IDが指定されていません。
                     </Alert>
@@ -254,7 +438,7 @@ export default function Checkout() {
     }
 
     return (
-        <ErrorBoundary>
+        <CheckoutErrorBoundary>
             <Suspense
                 fallback={
                     <Container className="relative h-screen overflow-hidden">
@@ -269,6 +453,6 @@ export default function Checkout() {
                     billId={billId}
                 />
             </Suspense>
-        </ErrorBoundary>
+        </CheckoutErrorBoundary>
     );
 }
