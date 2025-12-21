@@ -15,21 +15,13 @@ import { RankingBadgesSkeleton, RankingCardsSkeleton } from "../skeletons/PageSk
 
 type RankingName = "balance" | "difference" | "in" | "out" | "count" | "total" | "ratio";
 type Period = "24hours" | "7days" | "30days" | "365days";
+type SortOrder = "desc" | "asc";
 
 interface RankingConfig {
     title: string;
     rankingName: RankingName;
+    order: SortOrder;
 }
-
-const rankingTitles: Record<RankingName, string> = {
-    balance: "残高ランキング",
-    difference: "差額ランキング",
-    in: "収入ランキング",
-    out: "支出ランキング",
-    count: "取引数ランキング",
-    total: "総額ランキング",
-    ratio: "比率ランキング",
-};
 
 // コピア単位のランキング
 const copiaRankings: RankingName[] = ["balance", "difference", "in", "out", "total"];
@@ -37,36 +29,49 @@ const copiaRankings: RankingName[] = ["balance", "difference", "in", "out", "tot
 // 負になり得ないランキング（カラーリングなし）
 const nonNegativeRankings: RankingName[] = ["in", "out", "count", "total"];
 
+// ユーザー詳細ページ用: 6つのランキング項目
 const userRankingConfigs: RankingConfig[] = [
-    { title: "残高", rankingName: "balance" },
-    { title: "取引数", rankingName: "count" },
-    { title: "収入", rankingName: "in" },
-    { title: "支出", rankingName: "out" },
-    { title: "差額", rankingName: "difference" },
-    { title: "総額", rankingName: "total" },
+    { title: "残高変動トップ", rankingName: "difference", order: "desc" },
+    { title: "残高変動ワースト", rankingName: "difference", order: "asc" },
+    { title: "残高トップ", rankingName: "balance", order: "desc" },
+    { title: "残高ワースト", rankingName: "balance", order: "asc" },
+    { title: "取引総額トップ", rankingName: "total", order: "desc" },
+    { title: "支出トップ", rankingName: "out", order: "desc" },
 ];
 
-const allRankingConfigs: RankingConfig[] = [
-    { title: "残高", rankingName: "balance" },
-    { title: "差額", rankingName: "difference" },
-    { title: "収入", rankingName: "in" },
-    { title: "支出", rankingName: "out" },
-    { title: "取引数", rankingName: "count" },
-    { title: "総額", rankingName: "total" },
-];
-
+// プロジェクト詳細ページ用: 6つのランキング項目
 const projectRankingConfigs: RankingConfig[] = [
-    { title: "残高", rankingName: "balance" },
-    { title: "取引数", rankingName: "count" },
-    { title: "収入", rankingName: "in" },
-    { title: "支出", rankingName: "out" },
-    { title: "差額", rankingName: "difference" },
-    { title: "総額", rankingName: "total" },
+    { title: "残高変動トップ", rankingName: "difference", order: "desc" },
+    { title: "残高変動ワースト", rankingName: "difference", order: "asc" },
+    { title: "残高トップ", rankingName: "balance", order: "desc" },
+    { title: "残高ワースト", rankingName: "balance", order: "asc" },
+    { title: "取引総額トップ", rankingName: "total", order: "desc" },
+    { title: "収入トップ", rankingName: "in", order: "desc" },
+];
+
+// カード表示用（すべてのランキング）
+const allUserRankingConfigs: RankingConfig[] = [
+    { title: "残高変動トップ", rankingName: "difference", order: "desc" },
+    { title: "残高変動ワースト", rankingName: "difference", order: "asc" },
+    { title: "残高トップ", rankingName: "balance", order: "desc" },
+    { title: "残高ワースト", rankingName: "balance", order: "asc" },
+    { title: "取引総額トップ", rankingName: "total", order: "desc" },
+    { title: "支出トップ", rankingName: "out", order: "desc" },
+];
+
+const allProjectRankingConfigs: RankingConfig[] = [
+    { title: "残高変動トップ", rankingName: "difference", order: "desc" },
+    { title: "残高変動ワースト", rankingName: "difference", order: "asc" },
+    { title: "残高トップ", rankingName: "balance", order: "desc" },
+    { title: "残高ワースト", rankingName: "balance", order: "asc" },
+    { title: "取引総額トップ", rankingName: "total", order: "desc" },
+    { title: "収入トップ", rankingName: "in", order: "desc" },
 ];
 
 interface RankInfo {
     title: string;
     rankingName: RankingName;
+    order: SortOrder;
     rank: number | null;
 }
 
@@ -84,6 +89,11 @@ const getBadgeColor = (rank: number | null) => {
     return "gray";
 };
 
+const getRankingPath = (type: "user" | "project", rankingName: RankingName, order: SortOrder) => {
+    const baseType = type === "user" ? "users" : "projects";
+    return `/stats/${baseType}/${rankingName}?order=${order}`;
+};
+
 const RankingBadgesContent = ({ fetcher, type }: RankingBadgesContentProps) => {
     const rankings = use(fetcher);
 
@@ -96,15 +106,15 @@ const RankingBadgesContent = ({ fetcher, type }: RankingBadgesContentProps) => {
 
     return (
         <Group gap="xs">
-            {topRankings.map(({ title, rankingName, rank }) => (
+            {topRankings.map(({ title, rankingName, order, rank }) => (
                 <Tooltip
-                    key={rankingName}
-                    label={`${title}ランキング ${rank}位`}
+                    key={`${rankingName}-${order}`}
+                    label={`${title} ${rank}位`}
                     withArrow
                 >
                     <Anchor
                         component={Link}
-                        to={`/stats/${type === "user" ? "users" : "projects"}/${rankingName}`}
+                        to={getRankingPath(type, rankingName, order)}
                         underline="never"
                     >
                         <Badge
@@ -138,6 +148,7 @@ export const UserRankingBadges = ({ userName, period = "7days" }: UserRankingBad
                             {
                                 term: period,
                                 limit: 100,
+                                order: config.order,
                             }
                         );
                         const item = response.data.items?.find(i => i.user.name === userName);
@@ -184,6 +195,7 @@ export const ProjectRankingBadges = ({
                             {
                                 term: period,
                                 limit: 100,
+                                order: config.order,
                             }
                         );
                         const item = response.data.items?.find(i => i.project.name === projectName);
@@ -216,7 +228,9 @@ export const ProjectRankingBadges = ({
 // =====================================================
 
 interface RankingDetailInfo {
+    title: string;
     rankingName: RankingName;
+    order: SortOrder;
     rank: number | null;
     rankDiff: number | null;
     value: number | null;
@@ -229,8 +243,8 @@ interface RankingCardItemProps {
 }
 
 const RankingCardItem = ({ type, name, info }: RankingCardItemProps) => {
-    const { rankingName, rank, value } = info;
-    const rankingDetailPath = `/stats/${type === "user" ? "users" : "projects"}/${rankingName}`;
+    const { title, rankingName, order, rank, value } = info;
+    const rankingDetailPath = getRankingPath(type, rankingName, order);
     const entityDetailPath = type === "user" ? `/users/${name}` : `/projects/${name}`;
 
     if (rank === null) {
@@ -248,7 +262,7 @@ const RankingCardItem = ({ type, name, info }: RankingCardItemProps) => {
                     size="sm"
                     fw={500}
                 >
-                    {rankingTitles[rankingName]}
+                    {title}
                 </Anchor>
                 <Text
                     size="sm"
@@ -274,7 +288,7 @@ const RankingCardItem = ({ type, name, info }: RankingCardItemProps) => {
                 size="sm"
                 fw={500}
             >
-                {rankingTitles[rankingName]}
+                {title}
             </Anchor>
             <Group
                 justify="space-between"
@@ -359,7 +373,7 @@ const RankingCardsContent = ({ fetcher, type, name }: RankingCardsContentProps) 
         >
             {rankings.map(info => (
                 <Stack
-                    key={info.rankingName}
+                    key={`${info.rankingName}-${info.order}`}
                     gap={0}
                     style={{
                         backgroundColor:
@@ -387,25 +401,30 @@ export const UserRankingCards = ({ userName, period = "7days" }: UserRankingCard
     const fetcher = useMemo(
         () =>
             Promise.all(
-                allRankingConfigs.map(async config => {
+                allUserRankingConfigs.map(async config => {
                     try {
                         const response = await apis.internal.stats.getUserRankings(
                             config.rankingName,
                             {
                                 term: period,
                                 limit: 100,
+                                order: config.order,
                             }
                         );
                         const item = response.data.items?.find(i => i.user.name === userName);
                         return {
+                            title: config.title,
                             rankingName: config.rankingName,
+                            order: config.order,
                             rank: item?.rank ?? null,
                             rankDiff: item?.difference ?? null,
                             value: item?.value ?? null,
                         };
                     } catch {
                         return {
+                            title: config.title,
                             rankingName: config.rankingName,
+                            order: config.order,
                             rank: null,
                             rankDiff: null,
                             value: null,
@@ -441,25 +460,30 @@ export const ProjectRankingCards = ({
     const fetcher = useMemo(
         () =>
             Promise.all(
-                allRankingConfigs.map(async config => {
+                allProjectRankingConfigs.map(async config => {
                     try {
                         const response = await apis.internal.stats.getProjectRankings(
                             config.rankingName,
                             {
                                 term: period,
                                 limit: 100,
+                                order: config.order,
                             }
                         );
                         const item = response.data.items?.find(i => i.project.name === projectName);
                         return {
+                            title: config.title,
                             rankingName: config.rankingName,
+                            order: config.order,
                             rank: item?.rank ?? null,
                             rankDiff: item?.difference ?? null,
                             value: item?.value ?? null,
                         };
                     } catch {
                         return {
+                            title: config.title,
                             rankingName: config.rankingName,
+                            order: config.order,
                             rank: null,
                             rankDiff: null,
                             value: null,
