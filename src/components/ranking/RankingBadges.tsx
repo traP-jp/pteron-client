@@ -1,17 +1,7 @@
 import { Suspense, use, useMemo } from "react";
 import { Link } from "react-router-dom";
 
-import {
-    Anchor,
-    Badge,
-    Flex,
-    Group,
-    Loader,
-    SimpleGrid,
-    Stack,
-    Text,
-    Tooltip,
-} from "@mantine/core";
+import { Anchor, Badge, Flex, Group, SimpleGrid, Stack, Text, Tooltip } from "@mantine/core";
 import { IconTrophy } from "@tabler/icons-react";
 
 import apis from "/@/api";
@@ -22,6 +12,7 @@ import ErrorBoundary from "../ErrorBoundary";
 import { PAmount } from "../PAmount";
 import { PAvatar } from "../PAvatar";
 import { TrendIndicator } from "../TrendIndicator";
+import { RankingBadgesSkeleton, RankingCardsSkeleton } from "../skeletons/PageSkeletons";
 
 type RankingName = "balance" | "difference" | "in" | "out" | "count" | "total" | "ratio";
 type Period = "24hours" | "7days" | "30days" | "365days";
@@ -165,7 +156,7 @@ export const UserRankingBadges = ({ userName, period = "7days" }: UserRankingBad
 
     return (
         <ErrorBoundary>
-            <Suspense fallback={<Loader size="xs" />}>
+            <Suspense fallback={<RankingBadgesSkeleton />}>
                 <RankingBadgesContent
                     fetcher={fetcher}
                     type="user"
@@ -211,7 +202,7 @@ export const ProjectRankingBadges = ({
 
     return (
         <ErrorBoundary>
-            <Suspense fallback={<Loader size="xs" />}>
+            <Suspense fallback={<RankingBadgesSkeleton />}>
                 <RankingBadgesContent
                     fetcher={fetcher}
                     type="project"
@@ -433,41 +424,7 @@ export const UserRankingCards = ({ userName, period = "7days" }: UserRankingCard
 
     return (
         <ErrorBoundary>
-            <Suspense
-                fallback={
-                    <SimpleGrid
-                        cols={{ base: 1, md: 2, xl: 3 }}
-                        spacing="md"
-                    >
-                        {allRankingConfigs.map(config => (
-                            <Stack
-                                key={config.rankingName}
-                                gap={0}
-                                style={{
-                                    border: "1px solid var(--mantine-color-gray-3)",
-                                    borderRadius: 8,
-                                    backgroundColor: "var(--mantine-color-gray-0)",
-                                }}
-                            >
-                                <Flex
-                                    p="sm"
-                                    direction="column"
-                                    gap="xs"
-                                >
-                                    <Text
-                                        size="sm"
-                                        c="dimmed"
-                                        fw={500}
-                                    >
-                                        {rankingTitles[config.rankingName]}
-                                    </Text>
-                                    <Loader size="sm" />
-                                </Flex>
-                            </Stack>
-                        ))}
-                    </SimpleGrid>
-                }
-            >
+            <Suspense fallback={<RankingCardsSkeleton />}>
                 <RankingCardsContent
                     fetcher={fetcher}
                     type="user"
@@ -521,41 +478,7 @@ export const ProjectRankingCards = ({
 
     return (
         <ErrorBoundary>
-            <Suspense
-                fallback={
-                    <SimpleGrid
-                        cols={{ base: 1, md: 2, xl: 3 }}
-                        spacing="md"
-                    >
-                        {allRankingConfigs.map(config => (
-                            <Stack
-                                key={config.rankingName}
-                                gap={0}
-                                style={{
-                                    border: "1px solid var(--mantine-color-gray-3)",
-                                    borderRadius: 8,
-                                    backgroundColor: "var(--mantine-color-gray-0)",
-                                }}
-                            >
-                                <Flex
-                                    p="sm"
-                                    direction="column"
-                                    gap="xs"
-                                >
-                                    <Text
-                                        size="sm"
-                                        c="dimmed"
-                                        fw={500}
-                                    >
-                                        {rankingTitles[config.rankingName]}
-                                    </Text>
-                                    <Loader size="sm" />
-                                </Flex>
-                            </Stack>
-                        ))}
-                    </SimpleGrid>
-                }
-            >
+            <Suspense fallback={<RankingCardsSkeleton />}>
                 <RankingCardsContent
                     fetcher={fetcher}
                     type="project"

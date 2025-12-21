@@ -1,7 +1,7 @@
 import { Suspense, use, useMemo, useState } from "react";
 import { Link, useOutletContext, useParams } from "react-router-dom";
 
-import { ActionIcon, Center, Group, Loader, Pagination, Stack, Text, Title } from "@mantine/core";
+import { ActionIcon, Center, Group, Pagination, Stack, Text, Title } from "@mantine/core";
 import { IconArrowLeft } from "@tabler/icons-react";
 
 import apis from "/@/api";
@@ -9,6 +9,7 @@ import type { Project } from "/@/api/schema/internal";
 import ErrorBoundary from "/@/components/ErrorBoundary";
 import { RankingFull } from "/@/components/ranking/RankingFull";
 import type { RankedItem } from "/@/components/ranking/RankingTypes";
+import { RankingDetailSkeleton } from "/@/components/skeletons/PageSkeletons";
 
 interface StatsContext {
     period: "24hours" | "7days" | "30days" | "365days";
@@ -123,13 +124,7 @@ const ProjectStatsDetail = () => {
 
     return (
         <ErrorBoundary>
-            <Suspense
-                fallback={
-                    <Center py="xl">
-                        <Loader size="lg" />
-                    </Center>
-                }
-            >
+            <Suspense fallback={<RankingDetailSkeleton />}>
                 <TheProjectStatsDetail
                     title={title}
                     fetcher={fetcher}

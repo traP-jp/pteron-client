@@ -9,7 +9,6 @@ import {
     Container,
     Flex,
     Group,
-    Loader,
     Stack,
     Text,
     UnstyledButton,
@@ -23,6 +22,7 @@ import type { Bill, User } from "/@/api/schema/internal";
 import CopiaLogoSrc from "/@/assets/icons/copiaLogo.svg";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
+import { CheckoutPageSkeleton } from "/@/components/skeletons/PageSkeletons";
 import { type Copia, type ProjectName, type UserName, toBranded } from "/@/types/entity";
 
 // エラーハンドラーをバイパスするために直接axiosを使用
@@ -551,15 +551,7 @@ export default function Checkout() {
 
     return (
         <CheckoutErrorBoundary>
-            <Suspense
-                fallback={
-                    <Container className="relative h-screen overflow-hidden">
-                        <Center h="100%">
-                            <Loader size="xl" />
-                        </Center>
-                    </Container>
-                }
-            >
+            <Suspense fallback={<CheckoutPageSkeleton />}>
                 <CheckoutContent
                     fetcher={fetcher}
                     billId={billId}
