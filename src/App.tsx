@@ -15,7 +15,10 @@ import { theme } from "./theme";
 export default function App() {
     return (
         <MantineProvider theme={theme}>
-            <Notifications position="bottom-left" />
+            <Notifications
+                position="bottom-left"
+                zIndex={9999}
+            />
             <ModalsProvider>
                 <Suspense>
                     <RouterProvider router={router} />
