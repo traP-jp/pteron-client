@@ -287,6 +287,7 @@ const internalHandlers = [
     http.get("/api/internal/users/:user_id/projects", ({ params }) => {
         const userId = params.user_id as string;
         const userProjects = getProjectsByOwnerOrAdminIdOrName(userId);
+        // 本番APIに合わせて { items: [...], nextCursor: ... } 形式で返す
         return HttpResponse.json({
             items: userProjects,
             nextCursor: null,

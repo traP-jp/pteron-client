@@ -29,11 +29,11 @@ const fetchProjectsData = async (): Promise<ProjectsData> => {
         data: { items: projects },
     } = await apis.internal.projects.getProjects();
 
-    const {
-        data: { items: ownProjects },
-    } = (await apis.internal.users.getUserProjects(id)) as unknown as {
-        data: { items: Project[] };
-    };
+    const { data: ownProjectsResponse } = await apis.internal.users.getUserProjects(id);
+    // APIスキーマは Project[] だが、本番APIは { items: [...] } を返す場合がある
+    const ownProjects = Array.isArray(ownProjectsResponse)
+        ? ownProjectsResponse
+        : (ownProjectsResponse as unknown as { items: Project[] }).items;
 
     return { projects, ownProjects };
 };
