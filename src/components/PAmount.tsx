@@ -173,7 +173,14 @@ export const PAmount = <Size extends PAmountSize = undefined>(_props: PAmountPro
                 <></>
             )}
             <span className="value">{displayValue}</span>
-            {trailingDash ? <IconMinus data-custom-size={customSize} /> : <></>}
+            {trailingDash ? (
+                <IconMinus
+                    className={styles.trailingDash}
+                    data-custom-size={customSize}
+                />
+            ) : (
+                <></>
+            )}
         </Text>
     );
 
