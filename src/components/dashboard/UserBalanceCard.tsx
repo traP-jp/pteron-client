@@ -1,3 +1,5 @@
+import { use } from "react";
+
 import { Card, Group, Stack, Text } from "@mantine/core";
 import { IconWallet } from "@tabler/icons-react";
 
@@ -5,12 +7,17 @@ import ErrorBoundary from "/@/components/ErrorBoundary";
 import { PAmount } from "/@/components/PAmount";
 import { type Copia, toBranded } from "/@/types/entity";
 
-interface UserBalanceCardProps {
+interface UserBalanceData {
     balance: number;
     recentChange: number;
 }
 
-export const UserBalanceCard = ({ balance, recentChange }: UserBalanceCardProps) => {
+interface UserBalanceCardProps {
+    fetcher: Promise<UserBalanceData>;
+}
+
+export const UserBalanceCard = ({ fetcher }: UserBalanceCardProps) => {
+    const { balance, recentChange } = use(fetcher);
     return (
         <Card
             padding="md"
