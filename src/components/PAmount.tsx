@@ -1,7 +1,8 @@
 import { type MantineSize, Text, type TextProps, Tooltip } from "@mantine/core";
 import { IconMinus } from "@tabler/icons-react";
 
-import CopiaIcon from "/@/assets/icons/copia.svg?react";
+import CopiaIcon from "/@/assets/icons/copiaNarrow.svg?react";
+import styles from "/@/styles/p-amount.module.scss";
 import type { Copia } from "/@/types/entity";
 
 export type PAmountSize = MantineSize | "custom" | undefined;
@@ -93,7 +94,7 @@ export const PAmount = <Size extends PAmountSize = undefined>(_props: PAmountPro
         >
             {leadingIcon ? (
                 <CopiaIcon
-                    className="inline -mx-1"
+                    className={styles.copiaIcon}
                     data-custom-size={customSize}
                 />
             ) : (
