@@ -232,6 +232,14 @@ export const mockTransactions: Transaction[] = [
         description: "サーバー利用料",
         createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(),
     },
+    {
+        id: "770e8400-e29b-41d4-a716-446655440006",
+        type: "SYSTEM",
+        amount: 300,
+        user: mockUsers[0]!,
+        description: "Wellcome Bonus",
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 19).toISOString(),
+    },
 ];
 
 // ========== 請求データ ==========

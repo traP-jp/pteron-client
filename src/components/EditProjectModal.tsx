@@ -1,16 +1,6 @@
 import { Suspense, use, useMemo, useState } from "react";
 
-import {
-    Button,
-    Center,
-    Flex,
-    Loader,
-    Modal,
-    type ModalProps,
-    MultiSelect,
-    Text,
-    TextInput,
-} from "@mantine/core";
+import { Button, Flex, Modal, type ModalProps, MultiSelect, Text, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { showNotification } from "@mantine/notifications";
 import { IconPlus } from "@tabler/icons-react";
@@ -19,6 +9,7 @@ import { encode } from "js-base64";
 import ErrorBoundary from "./ErrorBoundary";
 import { PAvatar } from "./PAvatar";
 import SecretCopyInput from "./SecretCopyInput";
+import { EditProjectModalSkeleton } from "./skeletons/PageSkeletons";
 
 import apis from "../api";
 import type { APIClient, Project, User } from "../api/schema/internal";
@@ -401,13 +392,7 @@ export function EditProjectModal(props: EditProjectModalProps & { projectName: P
             title="プロジェクト管理"
         >
             <ErrorBoundary>
-                <Suspense
-                    fallback={
-                        <Center h="200px">
-                            <Loader size="lg" />
-                        </Center>
-                    }
-                >
+                <Suspense fallback={<EditProjectModalSkeleton />}>
                     <EditProjectModalContents
                         projectName={props.projectName}
                         fetcher={fetcher}

@@ -1,16 +1,6 @@
 import { Suspense, use, useMemo, useState } from "react";
 
-import {
-    Button,
-    Center,
-    Flex,
-    Loader,
-    Select,
-    SimpleGrid,
-    Stack,
-    Text,
-    Title,
-} from "@mantine/core";
+import { Button, Flex, Select, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 
@@ -19,6 +9,7 @@ import type { Project } from "/@/api/schema/internal";
 import { CreateProjectModal } from "/@/components/CreateProjectModal";
 import { EntityCard } from "/@/components/EntityCard";
 import ErrorBoundary from "/@/components/ErrorBoundary";
+import { EntityGridSkeleton } from "/@/components/skeletons/PageSkeletons";
 import { type Copia, type ProjectName, type Url, toBranded } from "/@/types/entity";
 
 type SortOption = "balance-desc" | "balance-asc" | "name-asc" | "name-desc";
@@ -214,13 +205,7 @@ const Projects = () => {
                         </Text>
                         <CreateNewProject onProjectCreated={handleProjectCreated} />
                     </Flex>
-                    <Suspense
-                        fallback={
-                            <Center h="20vh">
-                                <Loader size="lg" />
-                            </Center>
-                        }
-                    >
+                    <Suspense fallback={<EntityGridSkeleton count={3} />}>
                         <OwnProjects
                             sortBy={sortBy}
                             fetcher={fetcher}
@@ -257,13 +242,7 @@ const Projects = () => {
                             allowDeselect={false}
                         />
                     </Flex>
-                    <Suspense
-                        fallback={
-                            <Center h="20vh">
-                                <Loader size="lg" />
-                            </Center>
-                        }
-                    >
+                    <Suspense fallback={<EntityGridSkeleton count={6} />}>
                         <AllProjects
                             sortBy={sortBy}
                             fetcher={fetcher}
