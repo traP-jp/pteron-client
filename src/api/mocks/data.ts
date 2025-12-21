@@ -281,6 +281,15 @@ export const mockBills: Bill[] = [
         status: "PENDING",
         createdAt: new Date(Date.now() - 1000 * 60 * 2).toISOString(),
     },
+    {
+        id: "880e8400-e29b-41d4-a716-446655440006",
+        amount: 3000,
+        user: mockCurrentUser,
+        description: "決済処理エラー",
+        project: mockProjects[2]!, // traQ
+        status: "FAILED",
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    },
 ];
 
 // ========== APIクライアントデータ ==========
