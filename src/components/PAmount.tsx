@@ -39,6 +39,58 @@ const formatCompact = (value: bigint): string => {
     return value.toString();
 };
 
+/**
+ * キリの良い数値のみを省略表記に変換する安全なcompactモード
+ * 整数または小数点1桁で表現できる場合のみ省略（例: 1M, 1.5M）
+ * そうでない場合はフル表示（例: 1,234,567）
+ */
+const formatCompactSafe = (
+    value: bigint,
+    locales?: Intl.LocalesArgument,
+    formatOptions?: BigIntToLocaleStringOptions
+): { formatted: string; isCompacted: boolean } => {
+    const absValue = value < 0n ? -value : value;
+    const sign = value < 0n ? "-" : "";
+
+    // 各閾値でチェック (B, M, K)
+    const thresholds: Array<{ divisor: bigint; suffix: string }> = [
+        { divisor: 1_000_000_000n, suffix: "B" },
+        { divisor: 1_000_000n, suffix: "M" },
+        { divisor: 1_000n, suffix: "K" },
+    ];
+
+    for (const { divisor, suffix } of thresholds) {
+        if (absValue >= divisor) {
+            // 整数で割り切れる場合
+            if (absValue % divisor === 0n) {
+                return {
+                    formatted: `${sign}${absValue / divisor}${suffix}`,
+                    isCompacted: true,
+                };
+            }
+            // 小数点1桁で割り切れる場合 (例: 1.5M = 1,500,000)
+            if ((absValue * 10n) % divisor === 0n) {
+                const decimal = Number((absValue * 10n) / divisor) / 10;
+                return {
+                    formatted: `${sign}${decimal}${suffix}`,
+                    isCompacted: true,
+                };
+            }
+            // 割り切れない場合はフル表示
+            return {
+                formatted: value.toLocaleString(locales, formatOptions),
+                isCompacted: false,
+            };
+        }
+    }
+
+    // 1000未満はそのまま表示
+    return {
+        formatted: value.toLocaleString(locales, formatOptions),
+        isCompacted: false,
+    };
+};
+
 export type PAmountProps<Size extends PAmountSize> = TextProps & {
     size?: Size;
     leadingIcon?: boolean;
@@ -47,8 +99,12 @@ export type PAmountProps<Size extends PAmountSize> = TextProps & {
     formatOptions?: BigIntToLocaleStringOptions;
     locales?: Intl.LocalesArgument;
     value: Copia;
-    /** 大きな数値を省略表示する（K, M, Bなど） */
-    compact?: boolean;
+    /**
+     * 大きな数値を省略表示する
+     * - true: 通常のcompact（K, M, Bなど、有効数字3桁程度）
+     * - "safe": 安全なcompact（整数または小数1桁で割り切れる場合のみ省略）
+     */
+    compact?: boolean | "safe";
 } & (Size extends "custom"
         ? {
               customSize: number;
@@ -77,11 +133,23 @@ export const PAmount = <Size extends PAmountSize = undefined>(_props: PAmountPro
     const color = value > 0 ? "green" : value < 0 ? "red" : "black";
 
     // 省略表示かどうかで表示形式を切り替え
-    const displayValue = compact
-        ? formatCompact(value)
-        : value.toLocaleString(locales, formatOptions);
-    // 省略されている場合のみツールチップを表示
-    const isCompacted = compact && (value >= 1000n || value <= -1000n);
+    const getDisplayValue = (): { displayValue: string; isCompacted: boolean } => {
+        if (compact === "safe") {
+            const result = formatCompactSafe(value, locales, formatOptions);
+            return { displayValue: result.formatted, isCompacted: result.isCompacted };
+        }
+        if (compact === true) {
+            return {
+                displayValue: formatCompact(value),
+                isCompacted: value >= 1000n || value <= -1000n,
+            };
+        }
+        return {
+            displayValue: value.toLocaleString(locales, formatOptions),
+            isCompacted: false,
+        };
+    };
+    const { displayValue, isCompacted } = getDisplayValue();
 
     const content = (
         <Text
