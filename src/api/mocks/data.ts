@@ -212,7 +212,7 @@ export const mockTransactions: Transaction[] = [
         project: mockProjects[0]!,
         user: mockUsers[1]!,
         description: "機能実装報酬",
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
     },
     {
         id: "770e8400-e29b-41d4-a716-446655440005",
@@ -221,7 +221,7 @@ export const mockTransactions: Transaction[] = [
         project: mockProjects[1]!,
         user: mockUsers[2]!,
         description: "ドキュメント作成",
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
     },
     {
         id: "770e8400-e29b-41d4-a716-446655440006",
@@ -230,7 +230,7 @@ export const mockTransactions: Transaction[] = [
         project: mockProjects[2]!,
         user: mockUsers[3]!,
         description: "サーバー利用料",
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(),
     },
 ];
 
