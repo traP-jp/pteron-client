@@ -68,23 +68,38 @@ const TheUsers = ({ fetcher }: { fetcher: Promise<User[]> }) => {
                 />
             </Flex>
 
-            <SimpleGrid
-                cols={{ base: 1, md: 2, xl: 3 }}
-                spacing="md"
-            >
-                {sortedUsers.map(user => (
-                    <EntityCard
-                        key={user.id}
-                        type="user"
-                        name={toBranded<UserName>(user.name)}
-                        amount={toBranded<Copia>(BigInt(user.balance))}
-                        withBorder
-                        p="xl"
-                        radius="md"
-                        style={{ minWidth: 300 }}
-                    />
-                ))}
-            </SimpleGrid>
+            {sortedUsers.length === 0 ? (
+                <Flex
+                    justify="center"
+                    align="center"
+                    style={{ minHeight: 200 }}
+                >
+                    <Text
+                        size="lg"
+                        c="dimmed"
+                    >
+                        表示するユーザーがありません
+                    </Text>
+                </Flex>
+            ) : (
+                <SimpleGrid
+                    cols={{ base: 1, md: 2, xl: 3 }}
+                    spacing="md"
+                >
+                    {sortedUsers.map(user => (
+                        <EntityCard
+                            key={user.id}
+                            type="user"
+                            name={toBranded<UserName>(user.name)}
+                            amount={toBranded<Copia>(BigInt(user.balance))}
+                            withBorder
+                            p="xl"
+                            radius="md"
+                            style={{ minWidth: 300 }}
+                        />
+                    ))}
+                </SimpleGrid>
+            )}
         </Stack>
     );
 };
