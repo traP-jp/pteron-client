@@ -18,7 +18,7 @@ import { useMediaQuery } from "@mantine/hooks";
 import { IconArrowDown, IconArrowRight, IconCheck, IconX } from "@tabler/icons-react";
 import axios from "axios";
 
-import type { Bill, User } from "/@/api/schema/internal";
+import { Api, type Bill, type User } from "/@/api/schema/internal";
 import CopiaLogoSrc from "/@/assets/icons/copiaLogo.svg";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
@@ -26,12 +26,7 @@ import { CheckoutPageSkeleton } from "/@/components/skeletons/PageSkeletons";
 import { type Copia, type ProjectName, type UserName, toBranded } from "/@/types/entity";
 
 // エラーハンドラーをバイパスするために直接axiosを使用
-const checkoutApiClient = axios.create({
-    baseURL: "/api/internal",
-    headers: {
-        "Content-Type": "application/json",
-    },
-});
+const checkoutApiClient = new Api();
 
 type CheckoutData = {
     bill: Bill;
@@ -40,8 +35,8 @@ type CheckoutData = {
 
 const fetchCheckoutData = async (billId: string): Promise<CheckoutData> => {
     const [billResponse, userResponse] = await Promise.all([
-        checkoutApiClient.get<Bill>(`/me/bills/${billId}`),
-        checkoutApiClient.get<User>("/me"),
+        checkoutApiClient.me.getBill(billId),
+        checkoutApiClient.me.getCurrentUser(),
     ]);
     return {
         bill: billResponse.data,
@@ -50,14 +45,13 @@ const fetchCheckoutData = async (billId: string): Promise<CheckoutData> => {
 };
 
 const approveBill = async (billId: string): Promise<{ redirectUrl: string }> => {
-    const { data } = await checkoutApiClient.post<{ redirectUrl: string }>(
-        `/me/bills/${billId}/approve`
-    );
+    const { data } = await checkoutApiClient.me.approveBill(billId);
     return data;
 };
 
-const declineBill = async (billId: string): Promise<void> => {
-    await checkoutApiClient.post(`/me/bills/${billId}/decline`);
+const declineBill = async (billId: string) => {
+    const { data } = await checkoutApiClient.me.declineBill(billId);
+    return data;
 };
 
 const CopiaLogo = ({ clickable = false }: { clickable?: boolean }) => {
@@ -142,19 +136,19 @@ const CheckoutContent = ({
         setActionType("decline");
         setIsProcessing(true);
         try {
-            await declineBill(billId);
+            const data = await declineBill(billId);
             setResultMessage("請求を拒否しました。リダイレクトしています...");
             setIsProcessing(false);
             setCompletedAction("decline");
             setTimeout(() => {
-                window.location.href = bill.project.url ?? "/";
+                window.location.href = data.redirectUrl ?? "/";
             }, 750);
         } catch {
             setResultMessage("拒否に失敗しました。");
             setActionType(null);
             setIsProcessing(false);
         }
-    }, [billId, bill.project.url]);
+    }, [billId]);
 
     // ユーザー/プロジェクト表示コンポーネント
     const EntityDisplay = ({ type, name }: { type: "user" | "project"; name: string }) => (
