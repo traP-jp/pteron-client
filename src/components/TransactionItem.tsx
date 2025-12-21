@@ -190,7 +190,11 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
                                     name={from === "user" ? getUserName() : getProjectName()}
                                 />
                                 <Text size="sm">
-                                    {from === "user" ? getUserName() : getProjectName()}
+                                    {from === "user"
+                                        ? getUserName()
+                                        : from === "project"
+                                          ? getProjectName()
+                                          : "system"}
                                 </Text>
                             </Group>
                         </Anchor>
