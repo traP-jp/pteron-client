@@ -10,6 +10,8 @@ import type { Copia, ProjectName, UserName } from "/@/types/entity";
 import { PAmount } from "./PAmount";
 import { PAvatar } from "./PAvatar";
 
+import type { EntityType } from "../types/composed";
+
 export interface TransactionItemProps {
     transaction: Transaction;
     direction?: "from" | "to" | "both";
@@ -17,8 +19,17 @@ export interface TransactionItemProps {
 
 export const TransactionItem = ({ transaction, direction = "both" }: TransactionItemProps) => {
     const isTransfer = transaction.type === "TRANSFER";
-    const from = isTransfer ? "project" : "user";
-    const to = isTransfer ? "user" : "project";
+
+    const from: EntityType =
+        transaction.type === "SYSTEM" ? "system" : isTransfer ? "project" : "user";
+    const to: EntityType =
+        transaction.type === "SYSTEM"
+            ? transaction.user
+                ? "user"
+                : "project"
+            : isTransfer
+              ? "user"
+              : "project";
 
     const formatDate = (dateString?: string) => {
         if (!dateString) return "";
@@ -40,18 +51,18 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
         return toBranded<UserName>(transaction.user?.name ?? "");
     };
 
-    const getFromPath = () => {
-        return from === "user" ? `/users/${getUserName()}` : `/projects/${getProjectName()}`;
-    };
-
-    const getToPath = () => {
-        return to === "user" ? `/users/${getUserName()}` : `/projects/${getProjectName()}`;
+    const getPath = (x: EntityType) => {
+        return x === "user"
+            ? `/users/${getUserName()}`
+            : x === "project"
+              ? `/projects/${getProjectName()}`
+              : "";
     };
 
     const fromAvatar = (
         <Anchor
             component={Link}
-            to={getFromPath()}
+            to={getPath(to)}
             onClick={e => e.stopPropagation()}
             c="inherit"
         >
@@ -65,7 +76,7 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
     const toAvatar = (
         <Anchor
             component={Link}
-            to={getToPath()}
+            to={getPath(to)}
             onClick={e => e.stopPropagation()}
             c="inherit"
         >
@@ -168,7 +179,7 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
                     <Group gap="md">
                         <Anchor
                             component={Link}
-                            to={getFromPath()}
+                            to={getPath(from)}
                             underline="never"
                             c="inherit"
                         >
@@ -191,7 +202,7 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
                         </Text>
                         <Anchor
                             component={Link}
-                            to={getToPath()}
+                            to={getPath(to)}
                             underline="never"
                             c="inherit"
                         >
