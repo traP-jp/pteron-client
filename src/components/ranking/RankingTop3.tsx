@@ -56,16 +56,18 @@ const RankingTop3Item = <T extends RankingEntity>({
         <Card
             component={Link}
             to={detailPath}
-            className={`flex-1 cursor-pointer transition-transform hover:scale-105 ${isFirst ? "border-2 border-yellow-400" : ""}`}
-            padding="md"
+            className={`cursor-pointer transition-transform hover:scale-105 ${isFirst ? "border-2 border-yellow-400" : ""}`}
+            padding="sm"
             radius="md"
             shadow="sm"
             withBorder
             style={{
-                minWidth: isNarrow ? undefined : 200,
+                flex: isNarrow ? undefined : 1,
+                minWidth: isNarrow ? undefined : 0,
                 width: isNarrow ? "100%" : undefined,
                 textDecoration: "none",
                 color: "inherit",
+                overflow: "hidden",
             }}
         >
             <Stack
@@ -96,14 +98,14 @@ const RankingTop3Item = <T extends RankingEntity>({
                         compact
                         fw={700}
                         leadingIcon
-                        size={isFirst ? "lg" : "md"}
+                        size={isFirst ? "md" : "sm"}
                         value={toBranded<Copia>(BigInt(entity.balance ?? 0))}
                     />
                 ) : valueDisplay === "percent" ? (
                     <Text
                         c="blue"
                         fw={700}
-                        size={isFirst ? "lg" : "md"}
+                        size={isFirst ? "md" : "sm"}
                     >
                         {entity.balance?.toLocaleString() ?? 0}%
                     </Text>
@@ -111,16 +113,17 @@ const RankingTop3Item = <T extends RankingEntity>({
                     <Text
                         c="blue"
                         fw={700}
-                        size={isFirst ? "lg" : "md"}
+                        size={isFirst ? "md" : "sm"}
                     >
                         {entity.balance?.toLocaleString() ?? 0}
                     </Text>
                 )}
 
-                {/* アバター + 名前 + 外部リンク */}
+                {/* アバター + 名前 */}
                 <Group
                     gap="xs"
                     wrap="nowrap"
+                    style={{ maxWidth: "100%", overflow: "hidden" }}
                 >
                     <PAvatar
                         name={
@@ -133,8 +136,9 @@ const RankingTop3Item = <T extends RankingEntity>({
                     />
                     <Text
                         fw={500}
-                        lineClamp={1}
-                        size="sm"
+                        size="xs"
+                        truncate
+                        style={{ flex: 1, minWidth: 0 }}
                     >
                         {entity.name}
                     </Text>
@@ -156,8 +160,8 @@ export const RankingTop3 = <T extends RankingEntity>({
     valueDisplay = "copia",
 }: RankingTop3Props<T>) => {
     const { ref, width } = useElementSize();
-    // コンテナ幅が600px未満の場合は縦並び
-    const isNarrow = width < 620;
+    // コンテナ幅が480px未満の場合は縦並び
+    const isNarrow = width < 480;
 
     // 狭い場合は順位順 (1位, 2位, 3位 ...)
     // 広い場合は表彰台形式 (2位, 1位, 3位 ...)
