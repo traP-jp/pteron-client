@@ -28,14 +28,12 @@ const fetchProjectsData = async (): Promise<ProjectsData> => {
     const {
         data: { items: projects },
     } = await apis.internal.projects.getProjects();
-    const { data: ownProjectsResponse } = await apis.internal.users.getUserProjects(id);
 
-    // Normalize ownProjects - handle both array and { items: [] } responses
-    const ownProjects = Array.isArray(ownProjectsResponse)
-        ? ownProjectsResponse
-        : Array.isArray((ownProjectsResponse as { items?: Project[] })?.items)
-          ? (ownProjectsResponse as { items: Project[] }).items
-          : [];
+    const {
+        data: { items: ownProjects },
+    } = (await apis.internal.users.getUserProjects(id)) as unknown as {
+        data: { items: Project[] };
+    };
 
     return { projects, ownProjects };
 };

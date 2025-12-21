@@ -287,7 +287,10 @@ const internalHandlers = [
     http.get("/api/internal/users/:user_id/projects", ({ params }) => {
         const userId = params.user_id as string;
         const userProjects = getProjectsByOwnerOrAdminIdOrName(userId);
-        return HttpResponse.json(userProjects);
+        return HttpResponse.json({
+            items: userProjects,
+            nextCursor: null,
+        });
     }),
 
     // GET /internal/projects - 全プロジェクト一覧
