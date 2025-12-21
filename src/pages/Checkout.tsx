@@ -237,6 +237,7 @@ const CheckoutContent = ({
                     customSize={5}
                     leadingIcon
                     trailingDash
+                    compact="safe"
                 />
             </Center>
             {bill.description && (
