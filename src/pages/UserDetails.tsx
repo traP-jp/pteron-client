@@ -136,23 +136,38 @@ const UserProfileProjectList = ({ fetcher }: { fetcher: Promise<Project[]> }) =>
                 所属しているプロジェクト
             </Title>
 
-            <SimpleGrid
-                cols={{ base: 1, md: 2, xl: 3 }}
-                spacing="md"
-            >
-                {projects.map(({ id, balance, name, url }) => (
-                    <EntityCard
-                        key={id}
-                        p="xl"
-                        withBorder
-                        radius="md"
-                        type="project"
-                        amount={toBranded<Copia>(BigInt(balance))}
-                        name={toBranded<ProjectName>(name)}
-                        extraLink={url ? toBranded<Url>(url) : undefined}
-                    />
-                ))}
-            </SimpleGrid>
+            {projects.length === 0 ? (
+                <Flex
+                    justify="center"
+                    align="center"
+                    style={{ minHeight: 200 }}
+                >
+                    <Text
+                        size="lg"
+                        c="dimmed"
+                    >
+                        所属しているプロジェクトがありません
+                    </Text>
+                </Flex>
+            ) : (
+                <SimpleGrid
+                    cols={{ base: 1, md: 2, xl: 3 }}
+                    spacing="md"
+                >
+                    {projects.map(({ id, balance, name, url }) => (
+                        <EntityCard
+                            key={id}
+                            p="xl"
+                            withBorder
+                            radius="md"
+                            type="project"
+                            amount={toBranded<Copia>(BigInt(balance))}
+                            name={toBranded<ProjectName>(name)}
+                            extraLink={url ? toBranded<Url>(url) : undefined}
+                        />
+                    ))}
+                </SimpleGrid>
+            )}
         </>
     );
 };
