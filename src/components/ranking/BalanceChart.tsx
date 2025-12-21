@@ -11,8 +11,9 @@ export interface BalanceChartProps extends Omit<AreaChartProps, "dataKey" | "dat
 }
 
 interface ChartRecord {
-    date: string;
+    date: string | number;
     sum: number;
+    label?: string; // ツールチップ用などのフォーマット済みラベル
 }
 
 type ChartData = ChartRecord[];
@@ -37,7 +38,7 @@ const formatDailyData = (
     start: number,
     transactions: Transaction[],
     viewType: "user" | "project"
-): ChartData => {
+): { data: ChartData; isHourly: boolean } => {
     const toLocalDateKey = (date: Date): string => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -68,70 +69,85 @@ const formatDailyData = (
         running += delta;
         data.push({
             sum: running,
-            date: d.toLocaleDateString(),
+            date: key,
+            label: d.toLocaleDateString(),
         });
     }
-    return data;
+    return { data, isHourly: false };
 };
 
-/** 時間単位でデータを集約（データが少ない場合用） */
+/** 時間単位でデータを作成（正確な時刻を使用、Ticks生成付き） */
 const formatHourlyData = (
     start: number,
     transactions: Transaction[],
     viewType: "user" | "project"
-): ChartData => {
-    // 1時間単位のキーを取得するヘルパー (例: "14:00")
-    const toHourKey = (date: Date): string => {
-        const hour = String(date.getHours()).padStart(2, "0");
-        return `${hour}:00`;
-    };
+): { data: ChartData; isHourly: boolean; ticks: number[] } => {
+    // 取引を時系列順にソート
+    const sortedTransactions = [...transactions].sort(
+        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
 
-    // 時間ごとにデルタを集約
-    const hourDelta = new Map<string, number>();
-    for (const { amount, createdAt, type } of transactions) {
-        const d = new Date(createdAt);
-        const key = toHourKey(d);
-        const delta = getTransactionDelta(amount, type, viewType);
-        hourDelta.set(key, (hourDelta.get(key) ?? 0) + delta);
+    // Ticks生成 (毎正時)
+    const timeStamps = sortedTransactions.map(t => new Date(t.createdAt).getTime());
+    const minTime = Math.min(...timeStamps);
+    const maxTime = Math.max(...timeStamps);
+
+    const ticks: number[] = [];
+    const t = new Date(minTime);
+    t.setMinutes(0, 0, 0); // 最初の時間の00分
+
+    // 最後の取引時刻を超えるまでループ
+    while (t.getTime() <= maxTime) {
+        ticks.push(t.getTime());
+        t.setHours(t.getHours() + 1);
     }
-
-    // 取引の時間範囲を取得
-    const dates = transactions.map(t => new Date(t.createdAt));
-    const minHour = Math.min(...dates.map(d => d.getHours()));
-    const maxHour = Math.max(...dates.map(d => d.getHours()));
+    // 最後の取引より後の正時も一つ追加（グラフの右端用）
+    const nextHour = new Date(t);
+    ticks.push(nextHour.getTime());
 
     const data: ChartData = [];
     let running = start;
 
-    // 最初の時間から最後の時間まで1時間ごとにデータポイントを作成
-    for (let h = minHour; h <= maxHour; h++) {
-        const key = `${String(h).padStart(2, "0")}:00`;
-        const delta = hourDelta.get(key) ?? 0;
+    // 開始点（Ticksの最初）
+    const startTimeIndex = ticks[0]!;
+    data.push({
+        sum: running,
+        date: startTimeIndex,
+        label: new Date(startTimeIndex).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+        }),
+    });
+
+    // 各取引ごとにデータポイントを追加（正確な時刻）
+    for (const { amount, createdAt, type } of sortedTransactions) {
+        const delta = getTransactionDelta(amount, type, viewType);
         running += delta;
+        const d = new Date(createdAt);
         data.push({
             sum: running,
-            date: key,
+            date: d.getTime(),
+            label: d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         });
     }
 
-    // 現在時刻の次の時間まで表示（最新の状態を見せる）
-    const nowHour = new Date().getHours();
-    if (nowHour > maxHour) {
-        data.push({
-            sum: running,
-            date: `${String(nowHour).padStart(2, "0")}:00`,
-        });
-    }
+    // Ticksの最後（最新の正時）まで伸ばす
+    const lastTime = ticks[ticks.length - 1]!;
+    data.push({
+        sum: running,
+        date: lastTime,
+        label: new Date(lastTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    });
 
-    return data;
+    return { data, isHourly: true, ticks };
 };
 
 const formatTransactionData = (
     start: number,
     transactions: Transaction[],
     viewType: "user" | "project"
-): ChartData => {
-    if (!transactions || transactions.length === 0) return [];
+): { data: ChartData; isHourly: boolean; ticks?: number[] } => {
+    if (!transactions || transactions.length === 0) return { data: [], isHourly: false };
 
     // 日数範囲を計算
     const dates = transactions.map(t => new Date(t.createdAt));
@@ -164,14 +180,42 @@ const BalanceChart = ({
         );
     }
 
+    const { data, isHourly, ticks } = formatTransactionData(0, transactions, viewType);
+
+    // 時間単位の場合はX軸を数値（タイムスタンプ）として扱い、フォーマッターで時刻表示にする
+    const xAxisProps = isHourly
+        ? {
+              type: "number" as const,
+              domain:
+                  ticks && ticks.length > 0
+                      ? [ticks[0]!, ticks[ticks.length - 1]!]
+                      : ["auto", "auto"], // Ticksの範囲に合わせる
+              tickFormatter: (value: number) =>
+                  new Date(value).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+              ticks: ticks,
+              interval: 0, // 全Ticksを表示
+          }
+        : {
+              tickFormatter: (value: string) => {
+                  // YYYY-MM-DD -> MM/DD に短縮して表示
+                  try {
+                      const d = new Date(value);
+                      return `${d.getMonth() + 1}/${d.getDate()}`;
+                  } catch {
+                      return value;
+                  }
+              },
+          };
+
     return (
         <ErrorBoundary>
             <AreaChart
-                data={formatTransactionData(0, transactions, viewType)}
+                data={data}
                 dataKey="date"
                 series={[{ name: "sum", color: "blue.6" }]}
                 tickLine={tickLine}
-                curveType={curveType}
+                curveType={isHourly ? "stepAfter" : curveType} // 時間単位なら階段状（変化の瞬間まで値が維持される）が正確だが、好みに応じてlinearでも
+                xAxisProps={xAxisProps}
                 {...props}
             />
         </ErrorBoundary>
