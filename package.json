@@ -14,6 +14,7 @@
         "gen-api": "./scripts/gen-api.sh"
     },
     "dependencies": {
+        "@lottiefiles/dotlottie-react": "^0.17.10",
         "@mantine/charts": "^8.3.10",
         "@mantine/core": "8.3.10",
         "@mantine/hooks": "8.3.10",
@@ -22,6 +23,7 @@
         "@tabler/icons-react": "^3.36.0",
         "axios": "^1",
         "axios-cache-interceptor": "^1.10.0",
+        "js-base64": "^3.7.8",
         "react": "~19.2",
         "react-dom": "^19.1.1",
         "react-error-boundary": "^6.0.0",

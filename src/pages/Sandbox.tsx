@@ -14,6 +14,7 @@ import { RankingFull } from "/@/components/ranking";
 import BalanceChart from "/@/components/ranking/BalanceChart";
 import { type Copia, type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
 
+import { EditProjectModal } from "../components/EditProjectModal";
 import { SYSTEM_NAME } from "../config/constants";
 
 const TrendIndicatorSample = () => (
@@ -554,62 +555,101 @@ const BalanceChartSample = () => (
     </Accordion.Item>
 );
 
+const mockProjectName = toBranded<ProjectName>("traP Portal");
+
+const EditProjectModalSample = ({ projectName }: { projectName: ProjectName }) => {
+    const [opened, { open, close }] = useDisclosure(false);
+    return (
+        <Accordion.Item value="edit-project-modal">
+            <Accordion.Control>
+                <Group>
+                    <Text fw={500}>EditProjectModal</Text>
+                    <Text
+                        c="dimmed"
+                        size="xs"
+                    >
+                        プロジェクト編集モーダル
+                    </Text>
+                </Group>
+            </Accordion.Control>
+            <Accordion.Panel>
+                <Stack gap="sm">
+                    <EditProjectModal
+                        projectName={projectName}
+                        opened={opened}
+                        onClose={close}
+                    />
+                    <Button
+                        variant="default"
+                        onClick={open}
+                    >
+                        プロジェクトを編集
+                    </Button>
+                </Stack>
+            </Accordion.Panel>
+        </Accordion.Item>
+    );
+};
+
 export const Sandbox = () => {
     return (
-        <Stack
-            gap="md"
-            p="md"
-        >
-            <Title order={1}>Sandbox</Title>
-            <Text
-                c="dimmed"
-                size="sm"
+        <ErrorBoundary>
+            <Stack
+                gap="md"
+                p="md"
             >
-                コンポーネントのデバッグ・動作確認用ページ
-            </Text>
-
-            {/* 基本部品 */}
-            <Accordion
-                variant="separated"
-                multiple
-                defaultValue={["trend-indicator"]}
-            >
-                <Title
-                    order={3}
-                    mb="xs"
+                <Title order={1}>Sandbox</Title>
+                <Text
+                    c="dimmed"
+                    size="sm"
                 >
-                    基本部品
-                </Title>
+                    コンポーネントのデバッグ・動作確認用ページ
+                </Text>
 
-                <TrendIndicatorSample />
-
-                <PAmountSample />
-
-                <PAvatarSample />
-
-                <EntityCardSample />
-
-                <BalanceChartSample />
-            </Accordion>
-
-            {/* 複合コンポーネント */}
-            <Accordion
-                variant="separated"
-                multiple
-            >
-                <Title
-                    order={3}
-                    mb="xs"
+                {/* 基本部品 */}
+                <Accordion
+                    variant="separated"
+                    multiple
+                    defaultValue={["trend-indicator"]}
                 >
-                    複合コンポーネント
-                </Title>
+                    <Title
+                        order={3}
+                        mb="xs"
+                    >
+                        基本部品
+                    </Title>
 
-                <RankingFullSample />
+                    <TrendIndicatorSample />
 
-                <CreateProjectModalSample />
-                <TransactionListSample />
-            </Accordion>
-        </Stack>
+                    <PAmountSample />
+
+                    <PAvatarSample />
+
+                    <EntityCardSample />
+
+                    <BalanceChartSample />
+                </Accordion>
+
+                {/* 複合コンポーネント */}
+                <Accordion
+                    variant="separated"
+                    multiple
+                >
+                    <Title
+                        order={3}
+                        mb="xs"
+                    >
+                        複合コンポーネント
+                    </Title>
+
+                    <RankingFullSample />
+
+                    <CreateProjectModalSample />
+                    <TransactionListSample />
+                    <EditProjectModalSample projectName={mockProjectName} />
+                </Accordion>
+            </Stack>
+        </ErrorBoundary>
     );
 };
 

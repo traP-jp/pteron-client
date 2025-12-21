@@ -1,6 +1,6 @@
-import { Suspense, use, useState } from "react";
+import { Suspense, use, useMemo, useState } from "react";
 
-import { Button, Flex, Select, SimpleGrid, Text } from "@mantine/core";
+import { Button, Center, Flex, Loader, Select, SimpleGrid, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 
@@ -13,19 +13,49 @@ import { type Copia, type ProjectName, type Url, toBranded } from "/@/types/enti
 
 type SortOption = "balance-desc" | "balance-asc" | "name-asc" | "name-desc";
 
-const CreateNewProject = ({ onProjectCreated }: { onProjectCreated: () => void }) => {
+type ProjectsData = {
+    projects: Project[];
+    ownProjects: Project[];
+};
+
+type Fetcher = Promise<ProjectsData>;
+
+const fetchProjectsData = async (): Promise<ProjectsData> => {
+    const {
+        data: { id },
+    } = await apis.internal.me.getCurrentUser();
+
+    const {
+        data: { items: projects },
+    } = await apis.internal.projects.getProjects();
+
+    const {
+        data: { items: ownProjects },
+    } = (await apis.internal.users.getUserProjects(id)) as unknown as {
+        data: { items: Project[] };
+    };
+
+    return { projects, ownProjects };
+};
+
+const CreateNewProject = ({
+    onProjectCreated,
+}: {
+    onProjectCreated: (project: Project) => void;
+}) => {
     const [opened, { open, close }] = useDisclosure(false);
 
-    const handleSuccess = () => {
+    const handleSuccess = (project: Project) => {
         close();
-        onProjectCreated();
+        onProjectCreated(project);
     };
 
     return (
         <ErrorBoundary>
             <CreateProjectModal
                 opened={opened}
-                onClose={handleSuccess}
+                onClose={close}
+                onSuccess={handleSuccess}
             />
             <Button
                 color="green"
@@ -62,8 +92,17 @@ const sortProjects = (projects: Project[], sortBy: SortOption) => {
     });
 };
 
-export const AllProjects = ({ sortBy, fetcher }: { sortBy: SortOption; fetcher: Fetcher }) => {
-    const { projects } = use(fetcher);
+export const AllProjects = ({
+    sortBy,
+    fetcher,
+    additionalProjects,
+}: {
+    sortBy: SortOption;
+    fetcher: Fetcher;
+    additionalProjects: Project[];
+}) => {
+    const { projects: initialProjects } = use(fetcher);
+    const projects = [...initialProjects, ...additionalProjects];
     const sortedProjects = sortProjects(projects, sortBy);
 
     return (
@@ -91,8 +130,17 @@ export const AllProjects = ({ sortBy, fetcher }: { sortBy: SortOption; fetcher: 
     );
 };
 
-export const OwnProjects = ({ sortBy, fetcher }: { sortBy: SortOption; fetcher: Fetcher }) => {
-    const { ownProjects } = use(fetcher);
+export const OwnProjects = ({
+    sortBy,
+    fetcher,
+    additionalProjects,
+}: {
+    sortBy: SortOption;
+    fetcher: Fetcher;
+    additionalProjects: Project[];
+}) => {
+    const { ownProjects: initialOwnProjects } = use(fetcher);
+    const ownProjects = [...initialOwnProjects, ...additionalProjects];
 
     return (
         <ErrorBoundary>
@@ -119,30 +167,15 @@ export const OwnProjects = ({ sortBy, fetcher }: { sortBy: SortOption; fetcher: 
     );
 };
 
-type Fetcher = Promise<{
-    projects: Project[];
-    ownProjects: Project[];
-}>;
-
 const Projects = () => {
     const [sortBy, setSortBy] = useState<SortOption>("balance-desc");
+    const [newProjects, setNewProjects] = useState<Project[]>([]);
 
-    const fetch = async () => {
-        const {
-            data: { id },
-        } = await apis.internal.me.getCurrentUser();
+    const fetcher = useMemo(() => fetchProjectsData(), []);
 
-        const {
-            data: { items: projects },
-        } = await apis.internal.projects.getProjects();
-        const { data: ownProjects } = await apis.internal.users.getUserProjects(id);
-
-        return { projects, ownProjects };
+    const handleProjectCreated = (project: Project) => {
+        setNewProjects(prev => [...prev, project]);
     };
-
-    const [fetcher, setFetcher] = useState<Fetcher>(fetch());
-
-    const refresh = () => setFetcher(fetch());
 
     return (
         <ErrorBoundary>
@@ -169,12 +202,19 @@ const Projects = () => {
                         >
                             <Text size="xl">所有しているプロジェクト</Text>
                         </Flex>
-                        <CreateNewProject onProjectCreated={refresh} />
+                        <CreateNewProject onProjectCreated={handleProjectCreated} />
                     </Flex>
-                    <Suspense>
+                    <Suspense
+                        fallback={
+                            <Center h="20vh">
+                                <Loader size="lg" />
+                            </Center>
+                        }
+                    >
                         <OwnProjects
                             sortBy={sortBy}
                             fetcher={fetcher}
+                            additionalProjects={newProjects}
                         />
                     </Suspense>
                 </Flex>
@@ -206,10 +246,17 @@ const Projects = () => {
                             allowDeselect={false}
                         />
                     </Flex>
-                    <Suspense>
+                    <Suspense
+                        fallback={
+                            <Center h="20vh">
+                                <Loader size="lg" />
+                            </Center>
+                        }
+                    >
                         <AllProjects
                             sortBy={sortBy}
                             fetcher={fetcher}
+                            additionalProjects={newProjects}
                         />
                     </Suspense>
                 </Flex>

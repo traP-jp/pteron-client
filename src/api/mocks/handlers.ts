@@ -50,7 +50,7 @@ const internalHandlers = [
         }
         // モックなので状態を変更しないが、成功を返す
         return HttpResponse.json({
-            redirect_url: "https://example.com/success",
+            redirectUrl: bill.project?.url ?? "https://example.com/success",
         });
     }),
 
@@ -287,7 +287,10 @@ const internalHandlers = [
     http.get("/api/internal/users/:user_id/projects", ({ params }) => {
         const userId = params.user_id as string;
         const userProjects = getProjectsByOwnerOrAdminIdOrName(userId);
-        return HttpResponse.json(userProjects);
+        return HttpResponse.json({
+            items: userProjects,
+            nextCursor: null,
+        });
     }),
 
     // GET /internal/projects - 全プロジェクト一覧
@@ -439,9 +442,9 @@ const internalHandlers = [
             return new HttpResponse(null, { status: 404 });
         }
         const newClient = {
-            client_id: `client_${generateUUID().substring(0, 8)}`,
-            client_secret: `secret_${generateUUID()}`, // 作成時のみ返却
-            created_at: new Date().toISOString(),
+            clientId: `client_${generateUUID().substring(0, 8)}`,
+            clientSecret: `secret_${generateUUID()}`, // 作成時のみ返却
+            createdAt: new Date().toISOString(),
         };
         return HttpResponse.json(newClient, { status: 201 });
     }),

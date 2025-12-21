@@ -213,18 +213,54 @@ export const mockBills: Bill[] = [
         amount: 800,
         user: mockCurrentUser,
         description: "イベント参加費",
-        project: mockProjects[0]!,
+        project: mockProjects[0]!, // traP Portal - has url: "https://portal.trap.jp"
         status: "PENDING",
-        createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30分前
+        createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
     },
     {
         id: "880e8400-e29b-41d4-a716-446655440002",
         amount: 1200,
         user: mockCurrentUser,
         description: "プレミアム機能利用料",
-        project: mockProjects[1]!,
+        project: mockProjects[1]!, // NeoShowcase - has url: "https://ns.trap.jp"
         status: "COMPLETED",
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2日前
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+    },
+    {
+        id: "880e8400-e29b-41d4-a716-446655440003",
+        amount: 5000,
+        user: mockCurrentUser,
+        description: "年間サブスクリプション",
+        project: mockProjects[2]!, // traQ - has url: "https://q.trap.jp"
+        status: "PENDING",
+        createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
+    },
+    {
+        id: "880e8400-e29b-41d4-a716-446655440004",
+        amount: 250,
+        user: mockCurrentUser,
+        description: "追加ストレージ料金",
+        project: mockProjects[0]!, // traP Portal
+        status: "REJECTED",
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(),
+    },
+    {
+        id: "880e8400-e29b-41d4-a716-446655440005",
+        amount: 10000,
+        user: mockCurrentUser,
+        description: "大規模イベント参加費",
+        project: mockProjects[1]!, // NeoShowcase
+        status: "PENDING",
+        createdAt: new Date(Date.now() - 1000 * 60 * 2).toISOString(),
+    },
+    {
+        id: "880e8400-e29b-41d4-a716-446655440006",
+        amount: 3000,
+        user: mockCurrentUser,
+        description: "決済処理エラー",
+        project: mockProjects[2]!, // traQ
+        status: "FAILED",
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
     },
 ];
 

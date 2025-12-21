@@ -66,6 +66,10 @@ export const router = createBrowserRouter([
                       },
                   ]
                 : []),
+            {
+                path: "*",
+                Component: lazy(() => import("./pages/NotFound")),
+            },
         ],
     },
     {
