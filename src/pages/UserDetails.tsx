@@ -126,7 +126,7 @@ const UserProfileProjectList = ({ projects }: { projects: Project[] }) => {
                 order={2}
                 fw={400}
             >
-                所属しているプロジェクト
+                所有しているプロジェクト
             </Title>
 
             <SimpleGrid

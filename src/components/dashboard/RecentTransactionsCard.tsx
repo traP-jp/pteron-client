@@ -1,14 +1,21 @@
+import { use } from "react";
+
 import { Card, Stack, Text } from "@mantine/core";
 
 import type { Transaction } from "/@/api/schema/internal";
 import ErrorBoundary from "/@/components/ErrorBoundary";
 import { TransactionList } from "/@/components/TransactionList";
 
-interface RecentTransactionsCardProps {
+interface RecentTransactionsData {
     transactions: Transaction[];
 }
 
-export const RecentTransactionsCard = ({ transactions }: RecentTransactionsCardProps) => {
+interface RecentTransactionsCardProps {
+    fetcher: Promise<RecentTransactionsData>;
+}
+
+export const RecentTransactionsCard = ({ fetcher }: RecentTransactionsCardProps) => {
+    const { transactions } = use(fetcher);
     return (
         <Card
             padding="lg"

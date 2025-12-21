@@ -20,6 +20,8 @@ const formatTransactionData = (start: number, transactions: Transaction[]): Char
         return [];
     }
 
+    console.log({ transactions });
+
     let sum = start;
 
     const data: ChartData = [];
