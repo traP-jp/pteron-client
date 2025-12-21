@@ -12,6 +12,7 @@ import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
 import BalanceChart from "/@/components/ranking/BalanceChart";
+import { UserRankingBadges, UserRankingCards } from "/@/components/ranking/RankingBadges";
 import { type Copia, type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
 
 const UserProfileHeder = ({ name, balance }: { name: UserName; balance: Copia }) => {
@@ -21,6 +22,7 @@ const UserProfileHeder = ({ name, balance }: { name: UserName; balance: Copia })
                 direction="column"
                 mt="lg"
                 mb="xs"
+                gap="sm"
             >
                 <Flex
                     direction="row"
@@ -54,6 +56,9 @@ const UserProfileHeder = ({ name, balance }: { name: UserName; balance: Copia })
                         size="custom"
                         customSize={2}
                     />
+                </Flex>
+                <Flex ml="xl">
+                    <UserRankingBadges userName={name} />
                 </Flex>
             </Flex>
         </ErrorBoundary>
@@ -168,6 +173,16 @@ const TheUserProfile = ({
             <UserProfileDetail transactions={transactions} />
             <Divider />
             <UserProfileProjectList projects={projects} />
+            <Divider />
+            <ErrorBoundary>
+                <Title
+                    order={2}
+                    fw={400}
+                >
+                    ランキング
+                </Title>
+                <UserRankingCards userName={name} />
+            </ErrorBoundary>
         </Flex>
     );
 };
