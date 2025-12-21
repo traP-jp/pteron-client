@@ -13,6 +13,7 @@ import {
     Text,
     Title,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { IconExternalLink } from "@tabler/icons-react";
 
 import apis from "/@/api";
@@ -24,9 +25,11 @@ import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
 import BalanceChart from "/@/components/ranking/BalanceChart";
-import { createExternalLinkHander } from "/@/lib/link";
+import { createExternalLinkHandler } from "/@/lib/link";
 import { type Copia, type ProjectName, type UserName, toBranded } from "/@/types/entity";
 import type { Url } from "/@/types/entity";
+
+import { EditProjectModal } from "../components/EditProjectModal";
 
 const ProjectHeader = ({
     name,
@@ -39,7 +42,8 @@ const ProjectHeader = ({
     isAdmin: boolean;
     url?: Url;
 }) => {
-    const handleExternalLinkClick = url ? createExternalLinkHander(url) : undefined;
+    const handleExternalLinkClick = url ? createExternalLinkHandler(url) : undefined;
+    const [opened, { open, close }] = useDisclosure(false);
 
     return (
         <Flex
@@ -86,12 +90,20 @@ const ProjectHeader = ({
                         )}
                     </Flex>
                     {isAdmin && (
-                        <Button
-                            variant="light"
-                            size="sm"
-                        >
-                            プロジェクトを管理
-                        </Button>
+                        <>
+                            <EditProjectModal
+                                projectName={name}
+                                opened={opened}
+                                onClose={close}
+                            />
+                            <Button
+                                variant="light"
+                                size="sm"
+                                onClick={open}
+                            >
+                                プロジェクトを管理
+                            </Button>
+                        </>
                     )}
                 </Flex>
 
@@ -259,20 +271,16 @@ const ProjectDetails = () => {
     return (
         <>
             <ErrorBoundary>
-                <div>
-                    <h1>Project Details</h1>
-                    <p>Project ID: {projectId}</p>
-                </div>
+                <Suspense
+                    fallback={
+                        <Center h="50vh">
+                            <Loader size="lg" />
+                        </Center>
+                    }
+                >
+                    <TheProjectDetails fetcher={fetch()} />
+                </Suspense>
             </ErrorBoundary>
-            <Suspense
-                fallback={
-                    <Center h="50vh">
-                        <Loader size="lg" />
-                    </Center>
-                }
-            >
-                <TheProjectDetails fetcher={fetch()} />
-            </Suspense>
         </>
     );
 };
