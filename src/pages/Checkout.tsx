@@ -1,8 +1,10 @@
+import ErrorBoundary from "/@/components/ErrorBoundary";
+
 const Checkout = () => {
     return (
-        <div>
+        <ErrorBoundary>
             <h1>Checkout</h1>
-        </div>
+        </ErrorBoundary>
     );
 };
 

@@ -2,6 +2,7 @@ import { Accordion, Stack } from "@mantine/core";
 
 import type { Transaction } from "/@/api/schema/internal";
 
+import ErrorBoundary from "./ErrorBoundary";
 import { TransactionItem } from "./TransactionItem";
 
 export type TransactionListProps =
@@ -41,16 +42,18 @@ export const TransactionList = ({
     };
 
     return (
-        <Stack gap="md">
-            <Accordion radius="md">
-                {transactions.map(transaction => (
-                    <TransactionItem
-                        key={transaction.id}
-                        transaction={transaction}
-                        direction={getDirection(transaction)}
-                    />
-                ))}
-            </Accordion>
-        </Stack>
+        <ErrorBoundary>
+            <Stack gap="md">
+                <Accordion radius="md">
+                    {transactions.map(transaction => (
+                        <TransactionItem
+                            key={transaction.id}
+                            transaction={transaction}
+                            direction={getDirection(transaction)}
+                        />
+                    ))}
+                </Accordion>
+            </Stack>
+        </ErrorBoundary>
     );
 };

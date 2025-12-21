@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-import App from "./App.tsx";
+import App from "/@/App.tsx";
 
 async function enableMocking() {
     // VITE_USE_MOCK が "false" の場合はMSWを無効化
@@ -9,7 +9,7 @@ async function enableMocking() {
     const useMock = import.meta.env.VITE_USE_MOCK !== "false";
 
     if (import.meta.env.DEV && useMock) {
-        const { worker } = await import("./mocks/browser");
+        const { worker } = await import("/@/api/mocks/browser");
         return worker.start({
             onUnhandledRequest: "bypass",
         });

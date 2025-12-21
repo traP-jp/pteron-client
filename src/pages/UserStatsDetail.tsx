@@ -1,4 +1,4 @@
-import { Suspense, use, useState } from "react";
+import { Suspense, use, useMemo, useState } from "react";
 import { Link, useOutletContext, useParams } from "react-router-dom";
 
 import { ActionIcon, Center, Group, Loader, Pagination, Stack, Text, Title } from "@mantine/core";
@@ -6,6 +6,7 @@ import { IconArrowLeft } from "@tabler/icons-react";
 
 import apis from "/@/api";
 import type { User } from "/@/api/schema/internal";
+import ErrorBoundary from "/@/components/ErrorBoundary";
 import { RankingFull } from "/@/components/ranking/RankingFull";
 import type { RankedItem } from "/@/components/ranking/RankingTypes";
 
@@ -102,36 +103,39 @@ const UserStatsDetail = () => {
     const validRankingName = (rankingName as RankingName) || "balance";
     const title = rankingTitles[validRankingName] || "ランキング";
 
-    const fetch = async () => {
-        const {
-            data: { items },
-        } = await apis.internal.stats.getUserRankings(validRankingName, {
-            term: period,
-            limit: 100,
-        });
-
-        return (
-            items?.map(item => ({
-                rank: item.rank,
-                rankDiff: item.difference,
-                entity: item.user,
-            })) ?? []
-        );
-    };
+    const fetcher = useMemo(
+        () =>
+            apis.internal.stats
+                .getUserRankings(validRankingName, {
+                    term: period,
+                    limit: 100,
+                })
+                .then(
+                    ({ data: { items } }) =>
+                        items?.map(item => ({
+                            rank: item.rank,
+                            rankDiff: item.difference,
+                            entity: item.user,
+                        })) ?? []
+                ),
+        [validRankingName, period]
+    );
 
     return (
-        <Suspense
-            fallback={
-                <Center py="xl">
-                    <Loader size="lg" />
-                </Center>
-            }
-        >
-            <TheUserStatsDetail
-                title={title}
-                fetcher={fetch()}
-            />
-        </Suspense>
+        <ErrorBoundary>
+            <Suspense
+                fallback={
+                    <Center py="xl">
+                        <Loader size="lg" />
+                    </Center>
+                }
+            >
+                <TheUserStatsDetail
+                    title={title}
+                    fetcher={fetcher}
+                />
+            </Suspense>
+        </ErrorBoundary>
     );
 };
 

@@ -1,7 +1,10 @@
+import { Link } from "react-router-dom";
+
 import { Card, Group, Stack, Text } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
 import { IconCrown } from "@tabler/icons-react";
 
+import ErrorBoundary from "/@/components/ErrorBoundary";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
@@ -41,23 +44,29 @@ interface RankingTop3ItemProps<T extends RankingEntity = RankingEntity> {
 const RankingTop3Item = <T extends RankingEntity>({
     type,
     rankedItem,
-    onItemClick,
     valueDisplay = "copia",
     isNarrow = false,
 }: RankingTop3ItemProps<T>) => {
     const { rank, rankDiff, entity } = rankedItem;
     const crownStyle = getCrownStyle(rank);
     const isFirst = rank === 1;
+    const detailPath = type === "user" ? `/users/${entity.name}` : `/projects/${entity.name}`;
 
     return (
         <Card
+            component={Link}
+            to={detailPath}
             className={`flex-1 cursor-pointer transition-transform hover:scale-105 ${isFirst ? "border-2 border-yellow-400" : ""}`}
-            onClick={() => onItemClick?.(rankedItem)}
             padding="md"
             radius="md"
             shadow="sm"
             withBorder
-            style={{ minWidth: isNarrow ? undefined : 200, width: isNarrow ? "100%" : undefined }}
+            style={{
+                minWidth: isNarrow ? undefined : 200,
+                width: isNarrow ? "100%" : undefined,
+                textDecoration: "none",
+                color: "inherit",
+            }}
         >
             <Stack
                 align="center"
@@ -84,6 +93,7 @@ const RankingTop3Item = <T extends RankingEntity>({
                 {valueDisplay === "copia" ? (
                     <PAmount
                         coloring
+                        compact
                         fw={700}
                         leadingIcon
                         size={isFirst ? "lg" : "md"}
@@ -178,42 +188,46 @@ export const RankingTop3 = <T extends RankingEntity>({
 
     if (isNarrow) {
         return (
-            <Stack
+            <ErrorBoundary>
+                <Stack
+                    ref={ref}
+                    align="center"
+                    gap="md"
+                >
+                    {orderedItems.map(rankedItem => (
+                        <RankingTop3Item
+                            key={rankedItem.entity.id}
+                            isNarrow
+                            onItemClick={onItemClick}
+                            rankedItem={rankedItem}
+                            type={type}
+                            valueDisplay={valueDisplay}
+                        />
+                    ))}
+                </Stack>
+            </ErrorBoundary>
+        );
+    }
+
+    return (
+        <ErrorBoundary>
+            <Group
                 ref={ref}
-                align="center"
+                align="end" // 下揃えにして表彰台の高低差を自然に見せる
                 gap="md"
+                grow
+                wrap="nowrap"
             >
                 {orderedItems.map(rankedItem => (
                     <RankingTop3Item
                         key={rankedItem.entity.id}
-                        isNarrow
                         onItemClick={onItemClick}
                         rankedItem={rankedItem}
                         type={type}
                         valueDisplay={valueDisplay}
                     />
                 ))}
-            </Stack>
-        );
-    }
-
-    return (
-        <Group
-            ref={ref}
-            align="end" // 下揃えにして表彰台の高低差を自然に見せる
-            gap="md"
-            grow
-            wrap="nowrap"
-        >
-            {orderedItems.map(rankedItem => (
-                <RankingTop3Item
-                    key={rankedItem.entity.id}
-                    onItemClick={onItemClick}
-                    rankedItem={rankedItem}
-                    type={type}
-                    valueDisplay={valueDisplay}
-                />
-            ))}
-        </Group>
+            </Group>
+        </ErrorBoundary>
     );
 };

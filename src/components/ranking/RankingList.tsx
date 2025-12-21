@@ -1,6 +1,9 @@
+import { Link } from "react-router-dom";
+
 import { Flex, Group, Paper, Stack, Text } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 
+import ErrorBoundary from "/@/components/ErrorBoundary";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TrendIndicator } from "/@/components/TrendIndicator";
@@ -28,19 +31,21 @@ interface RankingListItemProps<T extends RankingEntity = RankingEntity> {
 const RankingListItem = <T extends RankingEntity>({
     type,
     rankedItem,
-    onItemClick,
     valueDisplay = "copia",
 }: RankingListItemProps<T>) => {
     const { rank, rankDiff, entity } = rankedItem;
     const isVerySmall = useMediaQuery("(max-width: 400px)");
+    const detailPath = type === "user" ? `/users/${entity.name}` : `/projects/${entity.name}`;
 
     return (
         <Paper
+            component={Link}
+            to={detailPath}
             className="cursor-pointer transition-colors hover:bg-gray-50"
-            onClick={() => onItemClick?.(rankedItem)}
             p="sm"
             radius="sm"
             withBorder
+            style={{ textDecoration: "none", color: "inherit" }}
         >
             {isVerySmall ? (
                 <Stack
@@ -94,6 +99,7 @@ const RankingListItem = <T extends RankingEntity>({
                     {valueDisplay === "copia" ? (
                         <PAmount
                             coloring
+                            compact
                             leadingIcon
                             size="sm"
                             value={toBranded<Copia>(BigInt(entity.balance ?? 0))}
@@ -171,6 +177,7 @@ const RankingListItem = <T extends RankingEntity>({
                     {valueDisplay === "copia" ? (
                         <PAmount
                             coloring
+                            compact
                             leadingIcon
                             size="md"
                             value={toBranded<Copia>(BigInt(entity.balance ?? 0))}
@@ -220,25 +227,27 @@ export const RankingList = <T extends RankingEntity>({
     }
 
     return (
-        <div className="flex flex-col gap-2">
-            {title && (
-                <Text
-                    fw={600}
-                    mb="xs"
-                    size="sm"
-                >
-                    {title}
-                </Text>
-            )}
-            {items.map(rankedItem => (
-                <RankingListItem
-                    key={rankedItem.entity.id}
-                    onItemClick={onItemClick}
-                    rankedItem={rankedItem}
-                    type={type}
-                    valueDisplay={valueDisplay}
-                />
-            ))}
-        </div>
+        <ErrorBoundary>
+            <div className="flex flex-col gap-2">
+                {title && (
+                    <Text
+                        fw={600}
+                        mb="xs"
+                        size="sm"
+                    >
+                        {title}
+                    </Text>
+                )}
+                {items.map(rankedItem => (
+                    <RankingListItem
+                        key={rankedItem.entity.id}
+                        onItemClick={onItemClick}
+                        rankedItem={rankedItem}
+                        type={type}
+                        valueDisplay={valueDisplay}
+                    />
+                ))}
+            </div>
+        </ErrorBoundary>
     );
 };

@@ -1,12 +1,10 @@
 import { lazy } from "react";
 import { Navigate, createBrowserRouter } from "react-router-dom";
 
-import { DashboardLayout } from "./Layout";
-
 export const router = createBrowserRouter([
     {
         path: "/",
-        Component: DashboardLayout,
+        Component: lazy(() => import("./Layout")),
         children: [
             {
                 path: "",
@@ -68,6 +66,10 @@ export const router = createBrowserRouter([
                       },
                   ]
                 : []),
+            {
+                path: "*",
+                Component: lazy(() => import("./pages/NotFound")),
+            },
         ],
     },
     {

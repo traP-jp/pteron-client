@@ -1,10 +1,11 @@
-import { Suspense, use, useState } from "react";
+import { Suspense, use, useMemo, useState } from "react";
 
 import { Center, Flex, Loader, Select, SimpleGrid, Text } from "@mantine/core";
 
 import apis from "/@/api";
 import type { User } from "/@/api/schema/internal";
 import { EntityCard } from "/@/components/EntityCard";
+import ErrorBoundary from "/@/components/ErrorBoundary";
 import { type Copia, type UserName, toBranded } from "/@/types/entity";
 
 type SortOption = "balance-desc" | "balance-asc" | "name-asc" | "name-desc";
@@ -13,22 +14,25 @@ const TheUsers = ({ fetcher }: { fetcher: Promise<User[]> }) => {
     const [sortBy, setSortBy] = useState<SortOption>("balance-desc");
     const users = use(fetcher);
 
-    if (!users) return <></>;
+    const sortedUsers = useMemo(() => {
+        if (!users) return [];
+        return [...users].sort((a, b) => {
+            switch (sortBy) {
+                case "balance-desc":
+                    return b.balance - a.balance;
+                case "balance-asc":
+                    return a.balance - b.balance;
+                case "name-asc":
+                    return a.name.localeCompare(b.name);
+                case "name-desc":
+                    return b.name.localeCompare(a.name);
+                default:
+                    return 0;
+            }
+        });
+    }, [users, sortBy]);
 
-    users.sort((a, b) => {
-        switch (sortBy) {
-            case "balance-desc":
-                return b.balance - a.balance;
-            case "balance-asc":
-                return a.balance - b.balance;
-            case "name-asc":
-                return a.name.localeCompare(b.name);
-            case "name-desc":
-                return b.name.localeCompare(a.name);
-            default:
-                return 0;
-        }
-    });
+    if (!users) return <></>;
 
     return (
         <>
@@ -61,7 +65,7 @@ const TheUsers = ({ fetcher }: { fetcher: Promise<User[]> }) => {
                 cols={{ base: 1, md: 2, xl: 3 }}
                 spacing="md"
             >
-                {users.map(user => (
+                {sortedUsers.map(user => (
                     <EntityCard
                         key={user.id}
                         type="user"
@@ -79,24 +83,23 @@ const TheUsers = ({ fetcher }: { fetcher: Promise<User[]> }) => {
 };
 
 export const Users = () => {
-    const fetch = async () => {
-        const {
-            data: { items: users },
-        } = await apis.internal.users.getUsers();
-
-        return users;
-    };
+    const fetcher = useMemo(
+        () => apis.internal.users.getUsers().then(({ data: { items } }) => items),
+        []
+    );
 
     return (
-        <Suspense
-            fallback={
-                <Center h="50vh">
-                    <Loader size="lg" />
-                </Center>
-            }
-        >
-            <TheUsers fetcher={fetch()} />
-        </Suspense>
+        <ErrorBoundary>
+            <Suspense
+                fallback={
+                    <Center h="50vh">
+                        <Loader size="lg" />
+                    </Center>
+                }
+            >
+                <TheUsers fetcher={fetcher} />
+            </Suspense>
+        </ErrorBoundary>
     );
 };
 

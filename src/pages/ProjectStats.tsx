@@ -1,10 +1,11 @@
-import { Suspense, use } from "react";
+import { Suspense, use, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 
 import { Center, Loader, SimpleGrid, Text } from "@mantine/core";
 
 import apis from "/@/api";
 import type { Project } from "/@/api/schema/internal";
+import ErrorBoundary from "/@/components/ErrorBoundary";
 import { RankingFull } from "/@/components/ranking/RankingFull";
 import type { RankedItem } from "/@/components/ranking/RankingTypes";
 
@@ -62,37 +63,43 @@ const TheProjectStats = ({ fetcher }: { fetcher: Promise<RankingData[]> }) => {
 const ProjectStats = () => {
     const { period } = useOutletContext<StatsContext>();
 
-    const fetcher = Promise.all(
-        rankingConfigs.map(async config => {
-            const {
-                data: { items },
-            } = await apis.internal.stats.getProjectRankings(config.rankingName, {
-                term: period,
-                limit: 8,
-            });
+    const fetcher = useMemo(
+        () =>
+            Promise.all(
+                rankingConfigs.map(async config => {
+                    const {
+                        data: { items },
+                    } = await apis.internal.stats.getProjectRankings(config.rankingName, {
+                        term: period,
+                        limit: 8,
+                    });
 
-            return {
-                ...config,
-                items:
-                    items?.map(item => ({
-                        rank: item.rank,
-                        rankDiff: item.difference,
-                        entity: item.project,
-                    })) ?? [],
-            };
-        })
+                    return {
+                        ...config,
+                        items:
+                            items?.map(item => ({
+                                rank: item.rank,
+                                rankDiff: item.difference,
+                                entity: item.project,
+                            })) ?? [],
+                    };
+                })
+            ),
+        [period]
     );
 
     return (
-        <Suspense
-            fallback={
-                <Center py="xl">
-                    <Loader size="lg" />
-                </Center>
-            }
-        >
-            <TheProjectStats fetcher={fetcher} />
-        </Suspense>
+        <ErrorBoundary>
+            <Suspense
+                fallback={
+                    <Center py="xl">
+                        <Loader size="lg" />
+                    </Center>
+                }
+            >
+                <TheProjectStats fetcher={fetcher} />
+            </Suspense>
+        </ErrorBoundary>
     );
 };
 

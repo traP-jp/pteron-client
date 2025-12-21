@@ -1,4 +1,4 @@
-import { Accordion, Group, Stack, Text } from "@mantine/core";
+import { Accordion, Flex, Group, Stack, Text } from "@mantine/core";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 
 import type { Transaction } from "/@/api/schema/internal";
@@ -31,11 +31,11 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
     };
 
     const getProjectName = () => {
-        return toBranded<ProjectName>(transaction.project.name);
+        return toBranded<ProjectName>(transaction.project?.name ?? "");
     };
 
     const getUserName = () => {
-        return toBranded<UserName>(transaction.user.name);
+        return toBranded<UserName>(transaction.user?.name ?? "");
     };
 
     const fromAvatar = (
@@ -76,9 +76,12 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
                 <Group
                     px="xs"
                     justify="space-between"
-                    wrap="nowrap"
+                    wrap="wrap"
                 >
-                    <Group gap="md">
+                    <Flex
+                        gap="md"
+                        align="center"
+                    >
                         {direction === "from" && (
                             <>
                                 {fromAvatar}
@@ -98,12 +101,20 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
                                 {toAvatar}
                             </>
                         )}
-                    </Group>
+                    </Flex>
 
-                    <Stack
-                        gap="xs"
-                        align="flex-end"
+                    <Flex
+                        direction={{ base: "column", xs: "row" }}
+                        align={{ base: "flex-start", xs: "center" }}
+                        gap="sm"
                     >
+                        <Text
+                            size="xs"
+                            c="dimmed"
+                            display={{ base: "none", xs: "contents" }}
+                        >
+                            {formatDate(transaction.createdAt)}
+                        </Text>
                         <PAmount
                             value={toBranded<Copia>(
                                 BigInt(
@@ -114,16 +125,18 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
                             )}
                             leadingIcon
                             coloring={direction !== "both"}
+                            compact
                             fw={600}
                             size="lg"
                         />
                         <Text
                             size="xs"
                             c="dimmed"
+                            display={{ base: "flex", xs: "none" }}
                         >
-                            {formatDate(transaction.created_at)}
+                            {formatDate(transaction.createdAt)}
                         </Text>
-                    </Stack>
+                    </Flex>
                 </Group>
             </Accordion.Control>
             <Accordion.Panel>
@@ -190,7 +203,7 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
                         >
                             日時:
                         </Text>
-                        <Text size="sm">{formatDate(transaction.created_at)}</Text>
+                        <Text size="sm">{formatDate(transaction.createdAt)}</Text>
                     </Group>
                     <Group gap="xs">
                         <Text

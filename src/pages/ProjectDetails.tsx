@@ -19,6 +19,7 @@ import apis from "/@/api";
 import type { Project, User } from "/@/api/schema/internal";
 import type { Transaction } from "/@/api/schema/internal";
 import { EntityCard } from "/@/components/EntityCard";
+import ErrorBoundary from "/@/components/ErrorBoundary";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
@@ -256,15 +257,23 @@ const ProjectDetails = () => {
     };
 
     return (
-        <Suspense
-            fallback={
-                <Center h="50vh">
-                    <Loader size="lg" />
-                </Center>
-            }
-        >
-            <TheProjectDetails fetcher={fetch()} />
-        </Suspense>
+        <>
+            <ErrorBoundary>
+                <div>
+                    <h1>Project Details</h1>
+                    <p>Project ID: {projectId}</p>
+                </div>
+            </ErrorBoundary>
+            <Suspense
+                fallback={
+                    <Center h="50vh">
+                        <Loader size="lg" />
+                    </Center>
+                }
+            >
+                <TheProjectDetails fetcher={fetch()} />
+            </Suspense>
+        </>
     );
 };
 export default ProjectDetails;
