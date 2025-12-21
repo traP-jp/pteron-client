@@ -34,6 +34,8 @@ export const TransactionList = ({
             return "both";
         }
 
+        if (transaction.type === "SYSTEM") return "from";
+
         if (transaction.type === "TRANSFER") {
             return currentType === "user" ? "from" : "to";
         } else {
