@@ -155,7 +155,10 @@ const TheUserProfile = ({
 }: {
     fetcher: Promise<{ user: User; transactions: Transaction[]; projects: Project[] }>;
 }) => {
-    const { user, transactions, projects } = use(fetcher);
+    const { user, transactions: _transactions, projects } = use(fetcher);
+    const transactions = _transactions.sort((a, b) => {
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    });
 
     const name = toBranded<UserName>(user.name);
     const balance = toBranded<Copia>(BigInt(user.balance));
