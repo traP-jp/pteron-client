@@ -22,11 +22,12 @@ const formatTransactionData = (start: number, transactions: Transaction[]): Char
     for (const { amount, createdAt, type } of transactions) {
         const d = new Date(createdAt);
         const key = d.toISOString().slice(0, 10); // YYYY-MM-DD
-        const delta = type === "TRANSFER" ? amount : -amount;
+        const delta = type === "BILL_PAYMENT" ? -amount : amount;
         dayDelta.set(key, (dayDelta.get(key) ?? 0) + delta);
     }
     const startDate = new Date(transactions[0]!.createdAt);
     startDate.setHours(0, 0, 0, 0);
+
     const endDate = new Date();
     endDate.setHours(0, 0, 0, 0);
 
@@ -42,7 +43,6 @@ const formatTransactionData = (start: number, transactions: Transaction[]): Char
             date: d.toLocaleDateString(),
         });
     }
-
     return data;
 };
 

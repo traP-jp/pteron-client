@@ -82,7 +82,7 @@ const ProjectStats = () => {
 
     return (
         <SimpleGrid
-            cols={{ base: 1, xl: 2 }}
+            cols={{ base: 1, md: 2, lg: 3 }}
             spacing="xs"
         >
             {fetchers.map((fetcher, index) => (
