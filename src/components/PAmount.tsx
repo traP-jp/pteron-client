@@ -126,6 +126,10 @@ export const PAmount = <Size extends PAmountSize = undefined>(_props: PAmountPro
         size,
         locales,
         value,
+        // customSize を明示的に抽出して spread に含まれないようにする
+        // @ts-expect-error - customSize は Size が "custom" の場合のみ存在
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        customSize: _customSize,
         ...props
     } = _props;
 
