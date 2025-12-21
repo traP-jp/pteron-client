@@ -1,6 +1,6 @@
 import { Suspense, use, useMemo, useState } from "react";
 
-import { Button, Flex, Select, SimpleGrid, Text } from "@mantine/core";
+import { Button, Center, Flex, Loader, Select, SimpleGrid, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 
@@ -28,7 +28,14 @@ const fetchProjectsData = async (): Promise<ProjectsData> => {
     const {
         data: { items: projects },
     } = await apis.internal.projects.getProjects();
-    const { data: ownProjects } = await apis.internal.users.getUserProjects(id);
+    const { data: ownProjectsResponse } = await apis.internal.users.getUserProjects(id);
+
+    // Normalize ownProjects - handle both array and { items: [] } responses
+    const ownProjects = Array.isArray(ownProjectsResponse)
+        ? ownProjectsResponse
+        : Array.isArray((ownProjectsResponse as { items?: Project[] })?.items)
+          ? (ownProjectsResponse as { items: Project[] }).items
+          : [];
 
     return { projects, ownProjects };
 };
@@ -199,7 +206,13 @@ const Projects = () => {
                         </Flex>
                         <CreateNewProject onProjectCreated={handleProjectCreated} />
                     </Flex>
-                    <Suspense>
+                    <Suspense
+                        fallback={
+                            <Center h="20vh">
+                                <Loader size="lg" />
+                            </Center>
+                        }
+                    >
                         <OwnProjects
                             sortBy={sortBy}
                             fetcher={fetcher}
@@ -235,7 +248,13 @@ const Projects = () => {
                             allowDeselect={false}
                         />
                     </Flex>
-                    <Suspense>
+                    <Suspense
+                        fallback={
+                            <Center h="20vh">
+                                <Loader size="lg" />
+                            </Center>
+                        }
+                    >
                         <AllProjects
                             sortBy={sortBy}
                             fetcher={fetcher}
