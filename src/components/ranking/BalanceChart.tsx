@@ -17,14 +17,27 @@ interface ChartRecord {
 
 type ChartData = ChartRecord[];
 
-const formatTransactionData = (
+/** 取引金額の符号を計算 */
+const getTransactionDelta = (
+    amount: number,
+    type: string,
+    viewType: "user" | "project"
+): number => {
+    if (viewType === "project") {
+        // プロジェクト視点: BILL_PAYMENTとSYSTEMは収入、TRANSFERは支出
+        return type === "TRANSFER" ? -amount : amount;
+    } else {
+        // ユーザー視点: BILL_PAYMENTは支出、それ以外は収入
+        return type === "BILL_PAYMENT" ? -amount : amount;
+    }
+};
+
+/** 日単位でデータを集約 */
+const formatDailyData = (
     start: number,
     transactions: Transaction[],
     viewType: "user" | "project"
 ): ChartData => {
-    if (!transactions || transactions.length === 0) return [];
-
-    // ローカル日付文字列を取得するヘルパー (YYYY-MM-DD形式)
     const toLocalDateKey = (date: Date): string => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -35,21 +48,11 @@ const formatTransactionData = (
     const dayDelta = new Map<string, number>();
     for (const { amount, createdAt, type } of transactions) {
         const d = new Date(createdAt);
-        const key = toLocalDateKey(d); // ローカル日付を使用
-
-        // 視点によって符号を変える
-        // ユーザー視点: BILL_PAYMENT は支払い（マイナス）、それ以外はプラス
-        // プロジェクト視点: BILL_PAYMENT は収入（プラス）、TRANSFER は支出（マイナス）
-        let delta: number;
-        if (viewType === "project") {
-            // プロジェクト視点: BILL_PAYMENTとSYSTEMは収入、TRANSFERは支出
-            delta = type === "TRANSFER" ? -amount : amount;
-        } else {
-            // ユーザー視点: BILL_PAYMENTは支出、それ以外は収入
-            delta = type === "BILL_PAYMENT" ? -amount : amount;
-        }
+        const key = toLocalDateKey(d);
+        const delta = getTransactionDelta(amount, type, viewType);
         dayDelta.set(key, (dayDelta.get(key) ?? 0) + delta);
     }
+
     const startDate = new Date(transactions[0]!.createdAt);
     startDate.setHours(0, 0, 0, 0);
 
@@ -60,7 +63,7 @@ const formatTransactionData = (
     let running = start;
 
     for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-        const key = toLocalDateKey(d); // ローカル日付を使用
+        const key = toLocalDateKey(d);
         const delta = dayDelta.get(key) ?? 0;
         running += delta;
         data.push({
@@ -69,6 +72,81 @@ const formatTransactionData = (
         });
     }
     return data;
+};
+
+/** 時間単位でデータを集約（データが少ない場合用） */
+const formatHourlyData = (
+    start: number,
+    transactions: Transaction[],
+    viewType: "user" | "project"
+): ChartData => {
+    // 1時間単位のキーを取得するヘルパー (例: "14:00")
+    const toHourKey = (date: Date): string => {
+        const hour = String(date.getHours()).padStart(2, "0");
+        return `${hour}:00`;
+    };
+
+    // 時間ごとにデルタを集約
+    const hourDelta = new Map<string, number>();
+    for (const { amount, createdAt, type } of transactions) {
+        const d = new Date(createdAt);
+        const key = toHourKey(d);
+        const delta = getTransactionDelta(amount, type, viewType);
+        hourDelta.set(key, (hourDelta.get(key) ?? 0) + delta);
+    }
+
+    // 取引の時間範囲を取得
+    const dates = transactions.map(t => new Date(t.createdAt));
+    const minHour = Math.min(...dates.map(d => d.getHours()));
+    const maxHour = Math.max(...dates.map(d => d.getHours()));
+
+    const data: ChartData = [];
+    let running = start;
+
+    // 最初の時間から最後の時間まで1時間ごとにデータポイントを作成
+    for (let h = minHour; h <= maxHour; h++) {
+        const key = `${String(h).padStart(2, "0")}:00`;
+        const delta = hourDelta.get(key) ?? 0;
+        running += delta;
+        data.push({
+            sum: running,
+            date: key,
+        });
+    }
+
+    // 現在時刻の次の時間まで表示（最新の状態を見せる）
+    const nowHour = new Date().getHours();
+    if (nowHour > maxHour) {
+        data.push({
+            sum: running,
+            date: `${String(nowHour).padStart(2, "0")}:00`,
+        });
+    }
+
+    return data;
+};
+
+const formatTransactionData = (
+    start: number,
+    transactions: Transaction[],
+    viewType: "user" | "project"
+): ChartData => {
+    if (!transactions || transactions.length === 0) return [];
+
+    // 日数範囲を計算
+    const dates = transactions.map(t => new Date(t.createdAt));
+    const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
+    const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
+
+    // 日数差を計算（ミリ秒 → 日）
+    const daysDiff = Math.floor((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    // 2日以内なら時間単位、それ以上なら日単位
+    if (daysDiff <= 1) {
+        return formatHourlyData(start, transactions, viewType);
+    } else {
+        return formatDailyData(start, transactions, viewType);
+    }
 };
 
 const BalanceChart = ({
