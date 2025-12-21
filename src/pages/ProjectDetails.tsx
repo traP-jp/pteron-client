@@ -140,6 +140,7 @@ const ProjectDetail = ({ transactions }: { transactions: Transaction[] }) => {
                 <BalanceChart
                     h={320}
                     transactions={transactions}
+                    viewType="project"
                 />
             </Card>
 
