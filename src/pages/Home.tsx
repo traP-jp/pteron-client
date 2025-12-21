@@ -111,10 +111,15 @@ const TheHome = ({ fetcher }: { fetcher: Promise<HomeData> }) => {
             gap="md"
             p="md"
         >
-            <Title order={1}>Dashboard</Title>
+            <Title
+                order={1}
+                size="h2"
+            >
+                Dashboard
+            </Title>
 
             <SimpleGrid
-                cols={{ base: 2, sm: 4 }}
+                cols={{ base: 1, xs: 2, sm: 4 }}
                 spacing="md"
             >
                 <SystemBalanceCard
