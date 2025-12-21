@@ -1,4 +1,4 @@
-import React, { Suspense, use, useCallback, useMemo, useState } from "react";
+import React, { Suspense, use, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import {
@@ -526,6 +526,15 @@ class CheckoutErrorBoundary extends React.Component<
 export default function Checkout() {
     const [searchParams] = useSearchParams();
     const billId = searchParams.get("id");
+    const themeParam = searchParams.get("theme");
+
+    const { setColorScheme } = useMantineColorScheme();
+
+    useEffect(() => {
+        if (themeParam === "light" || themeParam === "dark" || themeParam === "auto") {
+            setColorScheme(themeParam);
+        }
+    }, [themeParam, setColorScheme]);
 
     const fetcher = useMemo(() => {
         if (!billId) return Promise.reject(new Error("billId is required"));
