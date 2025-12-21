@@ -5,7 +5,6 @@ import { IconUser } from "@tabler/icons-react";
 
 import ErrorBoundary from "/@/components/ErrorBoundary";
 import { PAmount } from "/@/components/PAmount";
-import { TrendIndicator } from "/@/components/TrendIndicator";
 import { type Copia, toBranded } from "/@/types/entity";
 
 interface UserBalanceData {
@@ -57,10 +56,14 @@ export const UserBalanceCard = ({ fetcher }: UserBalanceCardProps) => {
                         gap="xs"
                         mt="xs"
                     >
-                        <TrendIndicator
-                            diff={recentChange}
+                        <Text
                             size="xs"
-                        />
+                            c={recentChange > 0 ? "green" : recentChange < 0 ? "red" : "dimmed"}
+                            fw={500}
+                        >
+                            {recentChange > 0 ? "+" : ""}
+                            {recentChange.toLocaleString()}
+                        </Text>
                         <Text
                             size="xs"
                             c="dimmed"
