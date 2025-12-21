@@ -32,14 +32,14 @@ export const RankingFull = <T extends RankingEntity>({
     onItemClick,
     valueDisplay = "copia",
 }: RankingFullProps<T>) => {
-    // 最大件数でフィルタ
-    const limitedItems = items.slice(0, maxItems);
+    // ランク順にソート (APIがソートされていない可能性を考慮)
+    const sortedItems = [...items].sort((a, b) => a.rank - b.rank);
+    // 最大件数で制限
+    const limitedItems = sortedItems.slice(0, maxItems);
 
-    // 3位までとそれ以降を分割
-    const top3Items: RankedItem<T>[] = showTop3 ? limitedItems.filter(u => u.rank <= 3) : [];
-    const restItems: RankedItem<T>[] = showTop3
-        ? limitedItems.filter(u => u.rank > 3)
-        : limitedItems;
+    // 3位までとそれ以降を分割 (ランク値ではなく、ソート後の順序で決定)
+    const top3Items: RankedItem<T>[] = showTop3 ? limitedItems.slice(0, 3) : [];
+    const restItems: RankedItem<T>[] = showTop3 ? limitedItems.slice(3) : limitedItems;
 
     if (limitedItems.length === 0) {
         return (
