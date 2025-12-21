@@ -156,24 +156,29 @@ export const RankingTop3 = <T extends RankingEntity>({
     valueDisplay = "copia",
 }: RankingTop3Props<T>) => {
     const { ref, width } = useElementSize();
-    const isNarrow = width < 620; // コンテナ幅が600px未満の場合は縦並び
+    // コンテナ幅が600px未満の場合は縦並び
+    const isNarrow = width < 620;
 
-    // 1位〜3位のみ取得
-    const top3Items = items.filter(u => u.rank >= 1 && u.rank <= 3);
+    // 狭い場合は順位順 (1位, 2位, 3位 ...)
+    // 広い場合は表彰台形式 (2位, 1位, 3位 ...)
+    // itemsは既にソートされている前提だが、念のためここでもソートは維持して配置する
 
-    // 狭い場合は順位順 (1位, 2位, 3位)
-    // 広い場合は表彰台形式 (2位, 1位, 3位)
-    const orderedItems = isNarrow
-        ? ([
-              top3Items.find(u => u.rank === 1),
-              top3Items.find(u => u.rank === 2),
-              top3Items.find(u => u.rank === 3),
-          ].filter(u => u !== undefined) as RankedItem<T>[])
-        : ([
-              top3Items.find(u => u.rank === 2),
-              top3Items.find(u => u.rank === 1),
-              top3Items.find(u => u.rank === 3),
-          ].filter(u => u !== undefined) as RankedItem<T>[]);
+    let orderedItems: RankedItem<T>[];
+
+    if (isNarrow) {
+        // そのまま表示
+        orderedItems = items;
+    } else {
+        // 表彰台形式への並び替え
+        const first = items[0];
+        const second = items[1];
+        const third = items[2];
+
+        orderedItems = [];
+        if (second) orderedItems.push(second);
+        if (first) orderedItems.push(first);
+        if (third) orderedItems.push(third);
+    }
 
     if (orderedItems.length === 0) {
         return (

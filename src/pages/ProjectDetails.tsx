@@ -179,7 +179,10 @@ const ProjectDetail = ({ transactions }: { transactions: Transaction[] }) => {
 };
 
 const ProjectMemberList = ({ owner, admins }: { owner?: User; admins?: User[] }) => {
-    const members = [...(owner ? [owner] : []), ...(admins ?? [])].filter(Boolean);
+    const members = [
+        ...(owner ? [owner] : []),
+        ...(admins ?? []).filter(admin => admin.id !== owner?.id),
+    ].filter(Boolean);
 
     return (
         <>
