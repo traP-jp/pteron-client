@@ -3,7 +3,7 @@ import { Suspense, use, useCallback, useMemo, useState } from "react";
 import { SimpleGrid, Stack, Title } from "@mantine/core";
 
 import apis from "/@/api";
-import type { Project, Transaction, User } from "/@/api/schema/internal";
+import type { Transaction } from "/@/api/schema/internal";
 import ErrorBoundary from "/@/components/ErrorBoundary";
 import { RecentTransactionsCard } from "/@/components/dashboard/RecentTransactionsCard";
 import { SystemBalanceCard } from "/@/components/dashboard/SystemBalanceCard";
@@ -11,7 +11,6 @@ import { SystemCountCard } from "/@/components/dashboard/SystemCountCard";
 import { SystemTotalCard } from "/@/components/dashboard/SystemTotalCard";
 import { UserBalanceCard } from "/@/components/dashboard/UserBalanceCard";
 import { RankingFull } from "/@/components/ranking";
-import type { RankedItem } from "/@/components/ranking/RankingTypes";
 import {
     RankingCardSkeleton,
     RecentTransactionsCardSkeleton,
@@ -33,42 +32,49 @@ const calculateBalance = (txs: Transaction[]): number => {
     }, 0);
 };
 
-const TopUsersRanking = ({ fetcher }: { fetcher: Promise<RankedItem<User>[]> }) => {
-    const topUsers = use(fetcher);
+const TopUsersRanking = ({ fetcher }: { fetcher: Promise<{ items: RankedItem<User>[] }> }) => {
+    const { items } = use(fetcher);
 
     return (
         <RankingFull
             type="user"
-            items={topUsers}
+            items={items}
             title="残高変動トップ 5"
+            titleLink="/stats/users/difference"
             showTop3
             maxItems={5}
         />
     );
 };
 
-const WorstUsersRanking = ({ fetcher }: { fetcher: Promise<RankedItem<User>[]> }) => {
-    const worstUsers = use(fetcher);
+const WorstUsersRanking = ({ fetcher }: { fetcher: Promise<{ items: RankedItem<User>[] }> }) => {
+    const { items } = use(fetcher);
 
     return (
         <RankingFull
             type="user"
-            items={worstUsers}
-            title="ワースト 5"
+            items={items}
+            title="残高変動ワースト 5"
+            titleLink="/stats/users/difference"
             showTop3
             maxItems={5}
         />
     );
 };
 
-const FeaturedProjectsRanking = ({ fetcher }: { fetcher: Promise<RankedItem<Project>[]> }) => {
-    const featuredProjects = use(fetcher);
+const TopProjectsRanking = ({
+    fetcher,
+}: {
+    fetcher: Promise<{ items: RankedItem<Project>[] }>;
+}) => {
+    const { items } = use(fetcher);
 
     return (
         <RankingFull
             type="project"
-            items={featuredProjects}
-            title="注目プロジェクト トップ 5"
+            items={items}
+            title="取引総額トップ 5"
+            titleLink="/stats/projects/total"
             showTop3
             maxItems={5}
         />
@@ -155,49 +161,56 @@ export const Home = () => {
 
     const topUsersFetcher = useMemo(
         () =>
-            apis.internal.users.getUsers().then(({ data }) => {
-                const users = data.items;
-                return [...users]
-                    .sort((a, b) => b.balance - a.balance)
-                    .slice(0, 5)
-                    .map((user, index) => ({
-                        rank: index + 1,
-                        rankDiff: index === 0 ? 1 : index === 1 ? -1 : 0,
-                        entity: user,
-                    }));
-            }),
+            apis.internal.stats
+                .getUserRankings("difference", {
+                    term: "7days",
+                    limit: 5,
+                })
+                .then(({ data }) => ({
+                    items:
+                        data.items?.map(item => ({
+                            rank: item.rank,
+                            rankDiff: item.difference,
+                            entity: item.user,
+                        })) ?? [],
+                })),
         []
     );
 
     const worstUsersFetcher = useMemo(
         () =>
-            apis.internal.users.getUsers().then(({ data }) => {
-                const users = data.items;
-                return [...users]
-                    .sort((a, b) => a.balance - b.balance)
-                    .slice(0, 5)
-                    .map((user, index) => ({
-                        rank: index + 1,
-                        rankDiff: index === 0 ? 1 : index === 1 ? -1 : index === 2 ? 2 : 0,
-                        entity: user,
-                    }));
-            }),
+            apis.internal.stats
+                .getUserRankings("difference", {
+                    term: "7days",
+                    limit: 5,
+                    order: "asc",
+                })
+                .then(({ data }) => ({
+                    items:
+                        data.items?.map(item => ({
+                            rank: item.rank,
+                            rankDiff: item.difference,
+                            entity: item.user,
+                        })) ?? [],
+                })),
         []
     );
 
-    const featuredProjectsFetcher = useMemo(
+    const topProjectsFetcher = useMemo(
         () =>
-            apis.internal.projects.getProjects().then(({ data }) => {
-                const projects = data.items;
-                return [...projects]
-                    .sort((a, b) => b.balance - a.balance)
-                    .slice(0, 5)
-                    .map((project, index) => ({
-                        rank: index + 1,
-                        rankDiff: index === 0 ? 1 : index === 1 ? -1 : 0,
-                        entity: project,
-                    }));
-            }),
+            apis.internal.stats
+                .getProjectRankings("total", {
+                    term: "7days",
+                    limit: 5,
+                })
+                .then(({ data }) => ({
+                    items:
+                        data.items?.map(item => ({
+                            rank: item.rank,
+                            rankDiff: item.difference,
+                            entity: item.project,
+                        })) ?? [],
+                })),
         []
     );
 
@@ -267,7 +280,7 @@ export const Home = () => {
 
                 <ErrorBoundary>
                     <Suspense fallback={<RankingCardSkeleton />}>
-                        <FeaturedProjectsRanking fetcher={featuredProjectsFetcher} />
+                        <TopProjectsRanking fetcher={topProjectsFetcher} />
                     </Suspense>
                 </ErrorBoundary>
             </SimpleGrid>
