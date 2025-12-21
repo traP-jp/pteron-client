@@ -182,11 +182,18 @@ const UserProfile = () => {
                 apis.internal.users.getUser(userName),
                 apis.internal.transactions.getUserTransactions(userName),
                 apis.internal.users.getUserProjects(userName),
-            ]).then(([userRes, transRes, projectsRes]) => ({
-                user: userRes.data,
-                transactions: transRes.data.items,
-                projects: projectsRes.data,
-            })),
+            ]).then(([userRes, transRes, projectsRes]) => {
+                // APIスキーマは Project[] だが、本番APIは { items: [...] } を返す場合がある
+                const projectsData = projectsRes.data;
+                const projects = Array.isArray(projectsData)
+                    ? projectsData
+                    : (projectsData as unknown as { items: typeof projectsData }).items;
+                return {
+                    user: userRes.data,
+                    transactions: transRes.data.items,
+                    projects,
+                };
+            }),
         [userName]
     );
 

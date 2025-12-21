@@ -146,7 +146,7 @@ export const mockCurrentUser: User = mockUsers[0]!;
 export const mockProjects: Project[] = [
     {
         id: "660e8400-e29b-41d4-a716-446655440001",
-        name: "traP Portal",
+        name: "traP_Portal",
         url: "https://portal.trap.jp",
         owner: mockUsers[0]!,
         admins: [mockUsers[1]!, mockUsers[2]!],
@@ -203,6 +203,34 @@ export const mockTransactions: Transaction[] = [
         user: mockCurrentUser,
         description: "コントリビューション報酬",
         createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(), // 3日前
+    },
+    // 各プロジェクトに複数の取引を追加
+    {
+        id: "770e8400-e29b-41d4-a716-446655440004",
+        type: "TRANSFER",
+        amount: 1500,
+        project: mockProjects[0]!,
+        user: mockUsers[1]!,
+        description: "機能実装報酬",
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
+    },
+    {
+        id: "770e8400-e29b-41d4-a716-446655440005",
+        type: "TRANSFER",
+        amount: 800,
+        project: mockProjects[1]!,
+        user: mockUsers[2]!,
+        description: "ドキュメント作成",
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
+    },
+    {
+        id: "770e8400-e29b-41d4-a716-446655440006",
+        type: "BILL_PAYMENT",
+        amount: 300,
+        project: mockProjects[2]!,
+        user: mockUsers[3]!,
+        description: "サーバー利用料",
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(),
     },
 ];
 
@@ -367,7 +395,12 @@ export function getTransactionsByUserIdOrName(userIdOrName: string) {
 
 export function getTransactionsByProjectIdOrName(projectIdOrName: string) {
     const project = getProjectByIdOrName(projectIdOrName);
-    if (!project) return [];
+    // プロジェクトが見つからない場合も空配列を返すが、ログ出力で確認
+    if (!project) {
+        console.warn(`Project not found: ${projectIdOrName}`);
+        return [];
+    }
 
-    return mockTransactions.filter(t => t.project?.id === project.id);
+    // undefined を除外してフィルタリング
+    return mockTransactions.filter(t => t && t.project?.id === project.id);
 }
