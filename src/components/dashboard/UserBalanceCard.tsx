@@ -1,8 +1,9 @@
 import { Card, Group, Stack, Text } from "@mantine/core";
-import { IconWallet } from "@tabler/icons-react";
+import { IconUser } from "@tabler/icons-react";
 
 import ErrorBoundary from "/@/components/ErrorBoundary";
 import { PAmount } from "/@/components/PAmount";
+import { TrendIndicator } from "/@/components/TrendIndicator";
 import { type Copia, toBranded } from "/@/types/entity";
 
 interface UserBalanceCardProps {
@@ -15,8 +16,8 @@ export const UserBalanceCard = ({ balance, recentChange }: UserBalanceCardProps)
         <Card
             padding="md"
             radius="md"
-            withBorder
-            style={{ borderColor: "var(--mantine-color-violet-light)" }}
+            bg="gray.1"
+            withBorder={false}
         >
             <ErrorBoundary>
                 <Stack gap="md">
@@ -30,7 +31,7 @@ export const UserBalanceCard = ({ balance, recentChange }: UserBalanceCardProps)
                         >
                             あなたの残高
                         </Text>
-                        <IconWallet
+                        <IconUser
                             size={20}
                             style={{ color: "var(--mantine-color-violet-6)" }}
                         />
@@ -46,18 +47,15 @@ export const UserBalanceCard = ({ balance, recentChange }: UserBalanceCardProps)
                         gap="xs"
                         mt="xs"
                     >
-                        <Text
+                        <TrendIndicator
+                            diff={recentChange}
                             size="xs"
-                            c={recentChange >= 0 ? "green" : "red"}
-                        >
-                            {recentChange >= 0 ? "+" : ""}
-                            {recentChange.toLocaleString()}
-                        </Text>
+                        />
                         <Text
                             size="xs"
                             c="dimmed"
                         >
-                            直近10件
+                            直近10件の変動
                         </Text>
                     </Group>
                 </Stack>

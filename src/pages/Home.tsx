@@ -1,4 +1,4 @@
-import { Suspense, use, useMemo } from "react";
+import { Suspense, use, useCallback, useEffect, useMemo, useState } from "react";
 
 import { Center, Loader, SimpleGrid, Stack, Title } from "@mantine/core";
 
@@ -28,7 +28,33 @@ interface HomeData {
 }
 
 const TheHome = ({ fetcher }: { fetcher: Promise<HomeData> }) => {
-    const { users, projects, transactions, userTransactions, systemStats } = use(fetcher);
+    const initialData = use(fetcher);
+    const [transactions, setTransactions] = useState(initialData.transactions);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const { users, projects, userTransactions, systemStats } = initialData;
+
+    // 取引を更新する関数
+    const refreshTransactions = useCallback(async () => {
+        setIsRefreshing(true);
+        try {
+            const res = await apis.internal.transactions.getTransactions();
+            setTransactions(res.data.items);
+        } catch (error) {
+            console.error("Failed to refresh transactions:", error);
+        } finally {
+            setIsRefreshing(false);
+        }
+    }, []);
+
+    // 15秒ごとに自動更新
+    useEffect(() => {
+        const interval = setInterval(() => {
+            refreshTransactions();
+        }, 15000);
+
+        return () => clearInterval(interval);
+    }, [refreshTransactions]);
 
     // トランザクション履歴から残高を逆算
     // TRANSFER (プロジェクト→ユーザー): 残高増加
@@ -111,7 +137,7 @@ const TheHome = ({ fetcher }: { fetcher: Promise<HomeData> }) => {
             gap="md"
             p="md"
         >
-            <Title order={1}>Dashboard</Title>
+            <Title order={1}>Pteron – Plutus Network</Title>
 
             <SimpleGrid
                 cols={{ base: 2, sm: 4 }}
@@ -133,7 +159,11 @@ const TheHome = ({ fetcher }: { fetcher: Promise<HomeData> }) => {
                 cols={{ base: 1, lg: 2 }}
                 spacing="md"
             >
-                <RecentTransactionsCard transactions={transactions} />
+                <RecentTransactionsCard
+                    transactions={transactions}
+                    onRefresh={refreshTransactions}
+                    isRefreshing={isRefreshing}
+                />
 
                 <ErrorBoundary>
                     <RankingFull
@@ -177,7 +207,6 @@ export const Home = () => {
                 apis.internal.users.getUsers(),
                 apis.internal.projects.getProjects(),
                 apis.internal.transactions.getTransactions(),
-                // Stats APIが404でもクラッシュしないように個別にcatch
                 apis.internal.stats.getSystemStats({ term: "7days" }).catch(() => null),
             ]).then(async ([currentUserRes, usersRes, projectsRes, transactionsRes, statsRes]) => {
                 const { data: userTransactionsRes } =
@@ -202,7 +231,7 @@ export const Home = () => {
                         gap="md"
                         p="md"
                     >
-                        <Title order={1}>Dashboard</Title>
+                        <Title order={1}>Pteron – Plutus Network</Title>
                         <Center h="50vh">
                             <Loader size="lg" />
                         </Center>
