@@ -5,6 +5,7 @@ import { Button, Modal, type ModalProps, TextInput } from "@mantine/core";
 import apis from "/@/api";
 import type { Project } from "/@/api/schema/internal";
 import ErrorBoundary from "/@/components/ErrorBoundary";
+import { normalizeUrl, validateUrl } from "/@/lib/validation";
 
 export type CreateProjectModalProps = Omit<ModalProps, "title"> & {
     onSuccess?: (project: Project) => void;
@@ -24,26 +25,53 @@ function CreateProjectModalContents({
 }: Pick<CreateProjectModalProps, "onClose" | "onSuccess">) {
     const [name, setName] = useState("");
     const [url, setUrl] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
+    const [nameError, setNameError] = useState("");
+    const [urlError, setUrlError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleNameChange = (newName: string) => {
         setName(newName);
-        setErrorMessage(validateProjectName(newName));
+        setNameError(validateProjectName(newName));
+    };
+
+    const handleUrlChange = (newUrl: string) => {
+        setUrl(newUrl);
+        setUrlError(validateUrl(newUrl));
     };
 
     const handleCreate = async () => {
-        if (name.length === 0) return;
+        // 再度バリデーションを実行
+        const nameValidationError = validateProjectName(name);
+        const urlValidationError = validateUrl(url);
 
-        const { data } = await apis.internal.projects.createProject({
-            name,
-            url: url || undefined,
-        });
+        if (nameValidationError) {
+            setNameError(nameValidationError);
+            return;
+        }
 
-        onSuccess?.(data);
-        onClose?.();
+        if (urlValidationError) {
+            setUrlError(urlValidationError);
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            const normalizedUrl = normalizeUrl(url);
+
+            const { data } = await apis.internal.projects.createProject({
+                name,
+                url: normalizedUrl || undefined,
+            });
+
+            onSuccess?.(data);
+            onClose?.();
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
-    const isSubmitDisabled = !name || !!errorMessage;
+    const isSubmitDisabled = !name || !!nameError || !!urlError || isSubmitting;
 
     return (
         <>
@@ -52,18 +80,21 @@ function CreateProjectModalContents({
                 description="プロジェクト名は後から変更することはできません"
                 required
                 value={name}
-                error={errorMessage}
+                error={nameError}
                 onChange={e => handleNameChange(e.currentTarget.value)}
             />
             <TextInput
                 label="プロジェクトURL"
                 description="プロジェクトURLは後から変更することができます"
+                placeholder="https://example.com"
                 value={url}
-                onChange={e => setUrl(e.currentTarget.value)}
+                error={urlError}
+                onChange={e => handleUrlChange(e.currentTarget.value)}
             />
             <div className="flex justify-end mt-4">
                 <Button
                     disabled={isSubmitDisabled}
+                    loading={isSubmitting}
                     onClick={handleCreate}
                 >
                     作成
