@@ -1,14 +1,13 @@
 import React, { Suspense, use, useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import {
     Alert,
+    Box,
     Button,
     Center,
     Container,
     Flex,
-    Grid,
     Group,
     Loader,
     Stack,
@@ -16,7 +15,8 @@ import {
     UnstyledButton,
     rem,
 } from "@mantine/core";
-import { IconCheck, IconX } from "@tabler/icons-react";
+import { useMediaQuery } from "@mantine/hooks";
+import { IconArrowDown, IconArrowRight, IconCheck, IconX } from "@tabler/icons-react";
 import axios from "axios";
 
 import type { Bill, User } from "/@/api/schema/internal";
@@ -98,6 +98,9 @@ const CheckoutContent = ({
     const [completedAction, setCompletedAction] = useState<"approve" | "decline" | null>(null);
     const [resultMessage, setResultMessage] = useState<string | null>(null);
 
+    // モバイル判定（xs: 576px未満）
+    const isMobile = useMediaQuery("(max-width: 576px)");
+
     const isCompleted = bill.status !== "PENDING";
 
     const currentBalance = BigInt(currentUser.balance);
@@ -153,208 +156,321 @@ const CheckoutContent = ({
         }
     }, [billId, bill.project.url]);
 
-    return (
-        <Container className="relative h-screen overflow-hidden">
-            <Center mt="md">
-                <CopiaLogo />
-            </Center>
-            <Grid
-                gutter="md"
-                align="center"
-                justify="center"
-                mt="xl"
+    // ユーザー/プロジェクト表示コンポーネント
+    const EntityDisplay = ({ type, name }: { type: "user" | "project"; name: string }) => (
+        <Flex
+            gap={{ base: "xs", sm: "lg" }}
+            justify="center"
+            align="center"
+            direction="column"
+            wrap="wrap"
+            py="md"
+        >
+            <PAvatar
+                size={isMobile ? "lg" : "checkout"}
+                type={type}
+                name={type === "user" ? toBranded<UserName>(name) : toBranded<ProjectName>(name)}
+            />
+            <Text
+                size={isMobile ? "md" : "xl"}
+                fw={600}
+                className="text-wrap break-all"
+                ta="center"
+                maw="100%"
+                px="xs"
             >
-                <Grid.Col
-                    span={4}
-                    className="mb-auto"
-                >
-                    <Flex
-                        mih={50}
-                        bg="lime.2"
-                        gap="lg"
-                        justify="center"
-                        align="center"
-                        direction="column"
-                        wrap="wrap"
-                    >
-                        <PAvatar
-                            size="checkout"
-                            type="user"
-                            name={toBranded<UserName>(bill.user.name)}
-                        ></PAvatar>
-                        <Text
-                            size="xl"
-                            fw={600}
-                            className="text-wrap break-all"
-                        >
-                            {bill.user.name}
-                        </Text>
-                    </Flex>
-                </Grid.Col>
-                <Grid.Col span={3}>
-                    <DotLottieReact
-                        className="rotate-90"
-                        src="/@/assets/icons/Swipe_up_Arrows.lottie"
-                        loop
-                        autoplay
-                        layout={{
-                            fit: "fit-height",
-                        }}
-                    />
-                </Grid.Col>
-                <Grid.Col
-                    span={4}
-                    className="mb-auto"
-                >
-                    <Flex
-                        mih={50}
-                        bg="lime.2"
-                        gap="lg"
-                        justify="center"
-                        align="center"
-                        direction="column"
-                        wrap="wrap"
-                    >
-                        <PAvatar
-                            size="checkout"
-                            type="project"
-                            name={toBranded<ProjectName>(bill.project.name)}
-                        ></PAvatar>
-                        <Text
-                            size="xl"
-                            fw={600}
-                            className="text-wrap break-all"
-                        >
-                            {bill.project.name}
-                        </Text>
-                    </Flex>
-                </Grid.Col>
-            </Grid>
-            <Center mt="xl">
-                <PAmount
-                    value={toBranded<Copia>(billAmount)}
-                    size="custom"
-                    customSize={5}
-                    leadingIcon
-                    trailingDash
+                {name}
+            </Text>
+        </Flex>
+    );
+
+    // 矢印アイコン
+    const ArrowIcon = () => (
+        <Center p={isMobile ? "xs" : "md"}>
+            {isMobile ? (
+                <IconArrowDown
+                    size={32}
+                    stroke={1.5}
+                    color="gray"
                 />
-            </Center>
-            {bill.description && (
-                <Center mt="md">
-                    <Text
-                        size="sm"
-                        c="dimmed"
-                    >
-                        {bill.description}
-                    </Text>
-                </Center>
+            ) : (
+                <IconArrowRight
+                    size={48}
+                    stroke={1.5}
+                    color="gray"
+                />
             )}
-            {/* 残高情報 - PENDINGの場合のみ表示 */}
-            {!isCompleted && (
-                <Center mt="lg">
-                    <Stack
-                        gap="xs"
-                        align="stretch"
-                    >
-                        <Flex
-                            gap="xs"
-                            align="center"
-                        >
-                            <Text
-                                size="sm"
-                                c="dimmed"
-                                style={{ width: 120, textAlign: "right" }}
-                            >
-                                現在の残高
-                            </Text>
-                            <Text
-                                size="sm"
-                                c="dimmed"
-                            >
-                                :
-                            </Text>
-                            <PAmount
-                                value={toBranded<Copia>(currentBalance)}
-                                size="sm"
-                                leadingIcon
-                            />
-                        </Flex>
-                        <Flex
-                            gap="xs"
-                            align="center"
-                        >
-                            <Text
-                                size="sm"
-                                c="dimmed"
-                                style={{ width: 120, textAlign: "right" }}
-                            >
-                                支払い後の残高
-                            </Text>
-                            <Text
-                                size="sm"
-                                c="dimmed"
-                            >
-                                :
-                            </Text>
-                            <PAmount
-                                value={toBranded<Copia>(balanceAfterPayment)}
-                                size="sm"
-                                leadingIcon
-                            />
-                        </Flex>
-                    </Stack>
-                </Center>
-            )}
-            {isCompleted && (
-                <Center mt="xl">
-                    <Alert
-                        color="red"
-                        title="処理できません"
-                        icon={<IconX />}
-                    >
-                        {getCompletedMessage()}
-                    </Alert>
-                </Center>
-            )}
-            {resultMessage && (
-                <Center mt="xl">
-                    <Alert
-                        color={resultMessage.includes("失敗") ? "red" : "green"}
-                        icon={resultMessage.includes("失敗") ? <IconX /> : <IconCheck />}
-                    >
-                        {resultMessage}
-                    </Alert>
-                </Center>
-            )}
-            <Group
-                justify="center"
-                grow
-                gap="xl"
-                className="absolute bottom-12 left-0 right-0 w-full px-12"
+        </Center>
+    );
+
+    return (
+        <Container
+            className="h-screen overflow-auto"
+            px="md"
+        >
+            <Stack
+                h="100%"
+                justify="space-between"
+                pb="md"
             >
-                <Button
-                    size="xl"
-                    disabled={isCompleted || isProcessing || completedAction !== null}
-                    loading={actionType === "decline" && isProcessing}
-                    onClick={handleDecline}
-                    leftSection={
-                        completedAction === "decline" ? <IconCheck size={24} /> : undefined
-                    }
+                {/* 上部コンテンツ */}
+                <Box>
+                    <Center mt="md">
+                        <CopiaLogo />
+                    </Center>
+
+                    {/* ユーザー → 矢印 → プロジェクト */}
+                    {isMobile ? (
+                        // モバイル: 縦並び
+                        <Stack
+                            align="center"
+                            mt="xl"
+                            gap={0}
+                        >
+                            <EntityDisplay
+                                type="user"
+                                name={bill.user.name}
+                            />
+                            <ArrowIcon />
+                            <EntityDisplay
+                                type="project"
+                                name={bill.project.name}
+                            />
+                        </Stack>
+                    ) : (
+                        // デスクトップ: 横並び（中央揃え）
+                        <Group
+                            justify="center"
+                            align="center"
+                            mt="xl"
+                            gap="md"
+                            wrap="nowrap"
+                        >
+                            <Box
+                                flex={1}
+                                maw={200}
+                            >
+                                <EntityDisplay
+                                    type="user"
+                                    name={bill.user.name}
+                                />
+                            </Box>
+                            <ArrowIcon />
+                            <Box
+                                flex={1}
+                                maw={200}
+                            >
+                                <EntityDisplay
+                                    type="project"
+                                    name={bill.project.name}
+                                />
+                            </Box>
+                        </Group>
+                    )}
+
+                    {/* 請求金額 */}
+                    <Center mt="xl">
+                        <PAmount
+                            value={toBranded<Copia>(billAmount)}
+                            size="custom"
+                            customSize={isMobile ? 3 : 5}
+                            leadingIcon
+                            trailingDash
+                            compact
+                        />
+                    </Center>
+
+                    {bill.description && (
+                        <Center mt="md">
+                            <Text
+                                size="sm"
+                                c="dimmed"
+                                ta="center"
+                                px="md"
+                            >
+                                {bill.description}
+                            </Text>
+                        </Center>
+                    )}
+
+                    {/* 残高情報 - PENDINGの場合のみ表示 */}
+                    {!isCompleted && (
+                        <Center mt="lg">
+                            <Stack
+                                gap="xs"
+                                align="stretch"
+                            >
+                                <Flex
+                                    gap="xs"
+                                    align="center"
+                                    wrap="wrap"
+                                    justify="center"
+                                >
+                                    <Text
+                                        size="sm"
+                                        c="dimmed"
+                                        style={{ minWidth: 100, textAlign: "right" }}
+                                    >
+                                        現在の残高
+                                    </Text>
+                                    <Text
+                                        size="sm"
+                                        c="dimmed"
+                                    >
+                                        :
+                                    </Text>
+                                    <PAmount
+                                        value={toBranded<Copia>(currentBalance)}
+                                        size="sm"
+                                        leadingIcon
+                                        compact
+                                    />
+                                </Flex>
+                                <Flex
+                                    gap="xs"
+                                    align="center"
+                                    wrap="wrap"
+                                    justify="center"
+                                >
+                                    <Text
+                                        size="sm"
+                                        c="dimmed"
+                                        style={{ minWidth: 100, textAlign: "right" }}
+                                    >
+                                        支払い後の残高
+                                    </Text>
+                                    <Text
+                                        size="sm"
+                                        c="dimmed"
+                                    >
+                                        :
+                                    </Text>
+                                    <PAmount
+                                        value={toBranded<Copia>(balanceAfterPayment)}
+                                        size="sm"
+                                        leadingIcon
+                                        compact
+                                    />
+                                </Flex>
+                            </Stack>
+                        </Center>
+                    )}
+
+                    {isCompleted && (
+                        <Center
+                            mt="xl"
+                            px="md"
+                        >
+                            <Alert
+                                color="red"
+                                title="処理できません"
+                                icon={<IconX />}
+                                w="100%"
+                                maw={400}
+                            >
+                                {getCompletedMessage()}
+                            </Alert>
+                        </Center>
+                    )}
+
+                    {resultMessage && (
+                        <Center
+                            mt="xl"
+                            px="md"
+                        >
+                            <Alert
+                                color={resultMessage.includes("失敗") ? "red" : "green"}
+                                icon={resultMessage.includes("失敗") ? <IconX /> : <IconCheck />}
+                                w="100%"
+                                maw={400}
+                            >
+                                {resultMessage}
+                            </Alert>
+                        </Center>
+                    )}
+                </Box>
+
+                {/* ボタン - 常に下部に配置 */}
+                <Stack
+                    gap="md"
+                    px={isMobile ? "md" : "xl"}
                 >
-                    {completedAction === "decline" ? "" : "拒否する"}
-                </Button>
-                <Button
-                    size="xl"
-                    disabled={isCompleted || isProcessing || completedAction !== null}
-                    loading={actionType === "approve" && isProcessing}
-                    onClick={handleApprove}
-                    leftSection={
-                        completedAction === "approve" ? <IconCheck size={24} /> : undefined
-                    }
-                >
-                    {completedAction === "approve" ? "" : "送金する"}
-                </Button>
-            </Group>
+                    {isMobile ? (
+                        // モバイル: 縦並び、フル幅
+                        <>
+                            <Button
+                                size="lg"
+                                fullWidth
+                                disabled={isCompleted || isProcessing || completedAction !== null}
+                                loading={actionType === "approve" && isProcessing}
+                                onClick={handleApprove}
+                                leftSection={
+                                    completedAction === "approve" ? (
+                                        <IconCheck size={24} />
+                                    ) : undefined
+                                }
+                            >
+                                {completedAction === "approve" ? "" : "送金する"}
+                            </Button>
+                            <Button
+                                size="lg"
+                                fullWidth
+                                variant="outline"
+                                styles={{ root: { borderWidth: 2 } }}
+                                disabled={isCompleted || isProcessing || completedAction !== null}
+                                loading={actionType === "decline" && isProcessing}
+                                onClick={handleDecline}
+                                leftSection={
+                                    completedAction === "decline" ? (
+                                        <IconCheck size={24} />
+                                    ) : undefined
+                                }
+                            >
+                                {completedAction === "decline" ? "" : "拒否する"}
+                            </Button>
+                        </>
+                    ) : (
+                        // デスクトップ: 横並び
+                        <Group
+                            justify="center"
+                            grow
+                            gap="xl"
+                            maw={600}
+                            mx="auto"
+                            w="100%"
+                        >
+                            <Button
+                                size="xl"
+                                variant="outline"
+                                styles={{ root: { borderWidth: 2 } }}
+                                disabled={isCompleted || isProcessing || completedAction !== null}
+                                loading={actionType === "decline" && isProcessing}
+                                onClick={handleDecline}
+                                leftSection={
+                                    completedAction === "decline" ? (
+                                        <IconCheck size={24} />
+                                    ) : undefined
+                                }
+                            >
+                                {completedAction === "decline" ? "" : "拒否する"}
+                            </Button>
+                            <Button
+                                size="xl"
+                                disabled={isCompleted || isProcessing || completedAction !== null}
+                                loading={actionType === "approve" && isProcessing}
+                                onClick={handleApprove}
+                                leftSection={
+                                    completedAction === "approve" ? (
+                                        <IconCheck size={24} />
+                                    ) : undefined
+                                }
+                            >
+                                {completedAction === "approve" ? "" : "送金する"}
+                            </Button>
+                        </Group>
+                    )}
+                </Stack>
+            </Stack>
         </Container>
     );
 };

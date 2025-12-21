@@ -195,6 +195,110 @@ const PAmountSample = () => (
                             fw={500}
                             mb="xs"
                         >
+                            安全な省略表示 (compact=&quot;safe&quot;)
+                        </Text>
+                        <Text
+                            size="xs"
+                            c="dimmed"
+                            mb="xs"
+                        >
+                            キリの良い数字のみ省略（整数または小数1桁で割り切れる場合のみ）
+                        </Text>
+                        <Stack gap="xs">
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={180}
+                                    c="dimmed"
+                                >
+                                    1,000,000 → 1M ✅
+                                </Text>
+                                <PAmount
+                                    value={toBranded<Copia>(1000000n)}
+                                    compact="safe"
+                                    leadingIcon
+                                />
+                            </Group>
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={180}
+                                    c="dimmed"
+                                >
+                                    1,500,000 → 1.5M ✅
+                                </Text>
+                                <PAmount
+                                    value={toBranded<Copia>(1500000n)}
+                                    compact="safe"
+                                    leadingIcon
+                                />
+                            </Group>
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={180}
+                                    c="dimmed"
+                                >
+                                    1,234,567 → そのまま
+                                </Text>
+                                <PAmount
+                                    value={toBranded<Copia>(1234567n)}
+                                    compact="safe"
+                                    leadingIcon
+                                />
+                            </Group>
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={180}
+                                    c="dimmed"
+                                >
+                                    10,000 → 10K ✅
+                                </Text>
+                                <PAmount
+                                    value={toBranded<Copia>(10000n)}
+                                    compact="safe"
+                                    leadingIcon
+                                />
+                            </Group>
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={180}
+                                    c="dimmed"
+                                >
+                                    12,345 → そのまま
+                                </Text>
+                                <PAmount
+                                    value={toBranded<Copia>(12345n)}
+                                    compact="safe"
+                                    leadingIcon
+                                />
+                            </Group>
+                            <Group>
+                                <Text
+                                    size="xs"
+                                    w={180}
+                                    c="dimmed"
+                                >
+                                    -2,000,000 → -2M ✅ (負数)
+                                </Text>
+                                <PAmount
+                                    value={toBranded<Copia>(-2000000n)}
+                                    compact="safe"
+                                    leadingIcon
+                                    coloring
+                                />
+                            </Group>
+                        </Stack>
+                    </div>
+
+                    <div>
+                        <Text
+                            size="sm"
+                            fw={500}
+                            mb="xs"
+                        >
                             スタイル・オプション
                         </Text>
                         <Stack gap="xs">
@@ -555,7 +659,7 @@ const BalanceChartSample = () => (
     </Accordion.Item>
 );
 
-const mockProjectName = toBranded<ProjectName>("traP Portal");
+const mockProjectName = toBranded<ProjectName>("traP_Portal");
 
 const EditProjectModalSample = ({ projectName }: { projectName: ProjectName }) => {
     const [opened, { open, close }] = useDisclosure(false);
