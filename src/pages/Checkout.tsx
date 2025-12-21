@@ -404,13 +404,12 @@ const CheckoutContent = ({
                                 disabled={isCompleted || isProcessing || completedAction !== null}
                                 loading={actionType === "approve" && isProcessing}
                                 onClick={handleApprove}
-                                leftSection={
-                                    completedAction === "approve" ? (
-                                        <IconCheck size={24} />
-                                    ) : undefined
-                                }
                             >
-                                {completedAction === "approve" ? "" : "送金する"}
+                                {completedAction === "approve" ? (
+                                    <IconCheck size={24} />
+                                ) : (
+                                    "送金する"
+                                )}
                             </Button>
                             <Button
                                 size="lg"
@@ -420,13 +419,12 @@ const CheckoutContent = ({
                                 disabled={isCompleted || isProcessing || completedAction !== null}
                                 loading={actionType === "decline" && isProcessing}
                                 onClick={handleDecline}
-                                leftSection={
-                                    completedAction === "decline" ? (
-                                        <IconCheck size={24} />
-                                    ) : undefined
-                                }
                             >
-                                {completedAction === "decline" ? "" : "拒否する"}
+                                {completedAction === "decline" ? (
+                                    <IconCheck size={24} />
+                                ) : (
+                                    "拒否する"
+                                )}
                             </Button>
                         </>
                     ) : (
@@ -446,26 +444,24 @@ const CheckoutContent = ({
                                 disabled={isCompleted || isProcessing || completedAction !== null}
                                 loading={actionType === "decline" && isProcessing}
                                 onClick={handleDecline}
-                                leftSection={
-                                    completedAction === "decline" ? (
-                                        <IconCheck size={24} />
-                                    ) : undefined
-                                }
                             >
-                                {completedAction === "decline" ? "" : "拒否する"}
+                                {completedAction === "decline" ? (
+                                    <IconCheck size={24} />
+                                ) : (
+                                    "拒否する"
+                                )}
                             </Button>
                             <Button
                                 size="xl"
                                 disabled={isCompleted || isProcessing || completedAction !== null}
                                 loading={actionType === "approve" && isProcessing}
                                 onClick={handleApprove}
-                                leftSection={
-                                    completedAction === "approve" ? (
-                                        <IconCheck size={24} />
-                                    ) : undefined
-                                }
                             >
-                                {completedAction === "approve" ? "" : "送金する"}
+                                {completedAction === "approve" ? (
+                                    <IconCheck size={24} />
+                                ) : (
+                                    "送金する"
+                                )}
                             </Button>
                         </Group>
                     )}
