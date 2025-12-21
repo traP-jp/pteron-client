@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-import { Anchor, Divider, Paper, Stack, Text } from "@mantine/core";
+import { Anchor, Paper, Stack, Text } from "@mantine/core";
 
 import ErrorBoundary from "/@/components/ErrorBoundary";
 
@@ -88,15 +88,12 @@ export const RankingFull = <T extends RankingEntity>({
 
                     {/* 3位まで */}
                     {showTop3 && top3Items.length > 0 && (
-                        <>
-                            <RankingTop3
-                                items={top3Items}
-                                onItemClick={onItemClick}
-                                type={type}
-                                valueDisplay={valueDisplay}
-                            />
-                            {restItems.length > 0 && <Divider my="sm" />}
-                        </>
+                        <RankingTop3
+                            items={top3Items}
+                            onItemClick={onItemClick}
+                            type={type}
+                            valueDisplay={valueDisplay}
+                        />
                     )}
 
                     {/* 4位以降 */}

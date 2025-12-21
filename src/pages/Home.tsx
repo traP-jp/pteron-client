@@ -147,7 +147,7 @@ export const Home = () => {
     const recentTransactionsFetcher = useMemo(
         () =>
             apis.internal.transactions.getTransactions().then(({ data }) => ({
-                transactions: data.items,
+                transactions: data.items.slice(0, 20),
             })),
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [transactionsKey]
