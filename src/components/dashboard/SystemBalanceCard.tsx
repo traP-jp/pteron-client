@@ -37,6 +37,7 @@ export const SystemBalanceCard = ({ balance, difference }: SystemBalanceCardProp
                     <PAmount
                         value={toBranded<Copia>(BigInt(balance))}
                         leadingIcon
+                        compact
                         size="lg"
                         fw={700}
                     />

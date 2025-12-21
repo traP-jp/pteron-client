@@ -1,4 +1,4 @@
-import { Suspense, use } from "react";
+import { Suspense, use, useMemo } from "react";
 import { useParams } from "react-router-dom";
 
 import { Card, Center, Divider, Flex, Loader, SimpleGrid, Text, Title } from "@mantine/core";
@@ -50,6 +50,7 @@ const UserProfileHeder = ({ name, balance }: { name: UserName; balance: Copia })
                         value={balance}
                         leadingIcon
                         coloring
+                        compact
                         size="custom"
                         customSize={2}
                     />
@@ -175,16 +176,19 @@ const UserProfile = () => {
     const { userId: _userName } = useParams();
     const userName = toBranded<UserName>(_userName ?? "");
 
-    const fetch = async () => {
-        const { data: user } = await apis.internal.users.getUser(userName);
-        const {
-            data: { items: transactions },
-        } = await apis.internal.transactions.getUserTransactions(userName);
-
-        const { data: projects } = await apis.internal.users.getUserProjects(userName);
-
-        return { user, transactions, projects };
-    };
+    const fetcher = useMemo(
+        () =>
+            Promise.all([
+                apis.internal.users.getUser(userName),
+                apis.internal.transactions.getUserTransactions(userName),
+                apis.internal.users.getUserProjects(userName),
+            ]).then(([userRes, transRes, projectsRes]) => ({
+                user: userRes.data,
+                transactions: transRes.data.items,
+                projects: projectsRes.data,
+            })),
+        [userName]
+    );
 
     return (
         <ErrorBoundary>
@@ -195,7 +199,7 @@ const UserProfile = () => {
                     </Center>
                 }
             >
-                <TheUserProfile fetcher={fetch()} />
+                <TheUserProfile fetcher={fetcher} />
             </Suspense>
         </ErrorBoundary>
     );
