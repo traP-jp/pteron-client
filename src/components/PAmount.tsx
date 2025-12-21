@@ -121,7 +121,7 @@ export const PAmount = <Size extends PAmountSize = undefined>(_props: PAmountPro
         leadingIcon = false,
         trailingDash = false,
         coloring = false,
-        compact = false,
+        compact = "safe",
         formatOptions,
         size,
         locales,
