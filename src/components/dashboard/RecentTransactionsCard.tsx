@@ -1,3 +1,5 @@
+import { use } from "react";
+
 import { ActionIcon, Card, Group, Loader, Stack, Text } from "@mantine/core";
 import { IconRefresh } from "@tabler/icons-react";
 
@@ -5,17 +7,23 @@ import type { Transaction } from "/@/api/schema/internal";
 import ErrorBoundary from "/@/components/ErrorBoundary";
 import { TransactionList } from "/@/components/TransactionList";
 
-interface RecentTransactionsCardProps {
+interface RecentTransactionsData {
     transactions: Transaction[];
+}
+
+interface RecentTransactionsCardProps {
+    fetcher: Promise<RecentTransactionsData>;
     onRefresh?: () => void;
     isRefreshing?: boolean;
 }
 
 export const RecentTransactionsCard = ({
-    transactions,
+    fetcher,
     onRefresh,
     isRefreshing = false,
 }: RecentTransactionsCardProps) => {
+    const { transactions } = use(fetcher);
+
     return (
         <Card
             padding="lg"

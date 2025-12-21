@@ -1,13 +1,20 @@
+import { use } from "react";
+
 import { Card, Group, Stack, Text } from "@mantine/core";
 import { IconReceipt } from "@tabler/icons-react";
 
 import ErrorBoundary from "/@/components/ErrorBoundary";
 
-interface SystemCountCardProps {
+interface SystemCountData {
     count?: number;
 }
 
-export const SystemCountCard = ({ count }: SystemCountCardProps) => {
+interface SystemCountCardProps {
+    fetcher: Promise<SystemCountData>;
+}
+
+export const SystemCountCard = ({ fetcher }: SystemCountCardProps) => {
+    const { count } = use(fetcher);
     const isAvailable = count !== undefined;
 
     return (
