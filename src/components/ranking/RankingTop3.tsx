@@ -7,7 +7,6 @@ import { IconCrown } from "@tabler/icons-react";
 import ErrorBoundary from "/@/components/ErrorBoundary";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
-import { TrendIndicator } from "/@/components/TrendIndicator";
 import { type Copia, toBranded } from "/@/types/entity";
 import type { ProjectName, UserName } from "/@/types/entity";
 
@@ -47,7 +46,7 @@ const RankingTop3Item = <T extends RankingEntity>({
     valueDisplay = "copia",
     isNarrow = false,
 }: RankingTop3ItemProps<T>) => {
-    const { rank, rankDiff, entity } = rankedItem;
+    const { rank, entity } = rankedItem;
     const crownStyle = getCrownStyle(rank);
     const isFirst = rank === 1;
     const detailPath = type === "user" ? `/users/${entity.name}` : `/projects/${entity.name}`;
@@ -74,22 +73,14 @@ const RankingTop3Item = <T extends RankingEntity>({
                 align="center"
                 gap="xs"
             >
-                <Stack
-                    align="center"
-                    gap={0}
-                >
-                    {/* 順位変動がある場合のみ表示 */}
-                    {rankDiff !== undefined && <TrendIndicator diff={rankDiff} />}
-
-                    {/* 王冠アイコン */}
-                    <IconCrown
-                        aria-label={`Rank ${rank} crown`}
-                        color={crownStyle.color}
-                        fill={crownStyle.color}
-                        role="img"
-                        size={crownStyle.size}
-                    />
-                </Stack>
+                {/* 王冠アイコン */}
+                <IconCrown
+                    aria-label={`Rank ${rank} crown`}
+                    color={crownStyle.color}
+                    fill={crownStyle.color}
+                    role="img"
+                    size={crownStyle.size}
+                />
 
                 {/* ポイント */}
                 {valueDisplay === "copia" ? (
