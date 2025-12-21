@@ -33,7 +33,7 @@ const Stats = () => {
                 p="md"
             >
                 <Group justify="space-between">
-                    <Title order={2}>統計ダッシュボード</Title>
+                    <Title order={2}>ランキング</Title>
                     <Group gap="md">
                         <Text
                             c="dimmed"
@@ -53,8 +53,8 @@ const Stats = () => {
 
                 <SegmentedControl
                     data={[
-                        { value: "users", label: "ユーザーランキング" },
-                        { value: "projects", label: "プロジェクトランキング" },
+                        { value: "users", label: "ユーザー" },
+                        { value: "projects", label: "プロジェクト" },
                     ]}
                     onChange={handleTabChange}
                     value={currentTab}
