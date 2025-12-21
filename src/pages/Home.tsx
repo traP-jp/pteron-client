@@ -18,7 +18,7 @@ interface HomeData {
     projects: Project[];
     transactions: Transaction[];
     userTransactions: Transaction[];
-    systemStats: {
+    systemStats?: {
         balance: number;
         count: number;
         difference: number;
@@ -118,11 +118,11 @@ const TheHome = ({ fetcher }: { fetcher: Promise<HomeData> }) => {
                 spacing="md"
             >
                 <SystemBalanceCard
-                    balance={systemStats.balance}
-                    difference={systemStats.difference}
+                    balance={systemStats?.balance}
+                    difference={systemStats?.difference}
                 />
-                <SystemTotalCard total={systemStats.total} />
-                <SystemCountCard count={systemStats.count} />
+                <SystemTotalCard total={systemStats?.total} />
+                <SystemCountCard count={systemStats?.count} />
                 <UserBalanceCard
                     balance={calculatedBalance}
                     recentChange={recentBalanceChange}
@@ -177,7 +177,8 @@ export const Home = () => {
                 apis.internal.users.getUsers(),
                 apis.internal.projects.getProjects(),
                 apis.internal.transactions.getTransactions(),
-                apis.internal.stats.getSystemStats({ term: "7days" }),
+                // Stats APIが404でもクラッシュしないように個別にcatch
+                apis.internal.stats.getSystemStats({ term: "7days" }).catch(() => null),
             ]).then(async ([currentUserRes, usersRes, projectsRes, transactionsRes, statsRes]) => {
                 const { data: userTransactionsRes } =
                     await apis.internal.transactions.getUserTransactions(currentUserRes.data.name);
@@ -187,7 +188,7 @@ export const Home = () => {
                     projects: projectsRes.data.items,
                     transactions: transactionsRes.data.items,
                     userTransactions: userTransactionsRes.items,
-                    systemStats: statsRes.data,
+                    systemStats: statsRes?.data,
                 };
             }),
         []

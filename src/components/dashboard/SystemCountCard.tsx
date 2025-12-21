@@ -4,10 +4,12 @@ import { IconReceipt2 } from "@tabler/icons-react";
 import ErrorBoundary from "/@/components/ErrorBoundary";
 
 interface SystemCountCardProps {
-    count: number;
+    count?: number;
 }
 
 export const SystemCountCard = ({ count }: SystemCountCardProps) => {
+    const isAvailable = count !== undefined;
+
     return (
         <Card
             padding="md"
@@ -34,15 +36,16 @@ export const SystemCountCard = ({ count }: SystemCountCardProps) => {
                     <Text
                         size="lg"
                         fw={700}
+                        c={isAvailable ? undefined : "dimmed"}
                     >
-                        {count.toLocaleString()}
+                        {isAvailable ? count.toLocaleString() : "-"}
                     </Text>
                     <Text
                         size="xs"
                         c="dimmed"
                         mt="xs"
                     >
-                        過去7日
+                        {isAvailable ? "過去7日" : "統計データは準備中です"}
                     </Text>
                 </Stack>
             </ErrorBoundary>
