@@ -416,6 +416,7 @@ const CheckoutContent = ({
                                 size="lg"
                                 fullWidth
                                 variant="outline"
+                                styles={{ root: { borderWidth: 2 } }}
                                 disabled={isCompleted || isProcessing || completedAction !== null}
                                 loading={actionType === "decline" && isProcessing}
                                 onClick={handleDecline}
@@ -440,6 +441,8 @@ const CheckoutContent = ({
                         >
                             <Button
                                 size="xl"
+                                variant="outline"
+                                styles={{ root: { borderWidth: 2 } }}
                                 disabled={isCompleted || isProcessing || completedAction !== null}
                                 loading={actionType === "decline" && isProcessing}
                                 onClick={handleDecline}
