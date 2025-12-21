@@ -56,7 +56,7 @@ const RankingTop3Item = <T extends RankingEntity>({
         <Card
             component={Link}
             to={detailPath}
-            className={`cursor-pointer transition-transform hover:scale-105 ${isFirst ? "border-2 border-yellow-400" : ""}`}
+            className="cursor-pointer transition-transform hover:scale-105"
             padding="sm"
             radius="md"
             shadow="sm"

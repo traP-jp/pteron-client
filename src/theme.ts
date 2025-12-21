@@ -1,4 +1,4 @@
-import { Avatar, Text, createTheme } from "@mantine/core";
+import { Avatar, Text, Tooltip, createTheme } from "@mantine/core";
 
 import textClasses from "/@/styles/p-amount.module.scss";
 import avatarClasses from "/@/styles/p-avatar.module.scss";
@@ -12,5 +12,14 @@ export const theme = createTheme({
     components: {
         Avatar: Avatar.extend({ classNames: avatarClasses }),
         Text: Text.extend({ classNames: textClasses }),
+        Tooltip: Tooltip.extend({
+            vars: () => ({
+                tooltip: {
+                    "--tooltip-bg":
+                        "light-dark(var(--mantine-color-gray-9), var(--mantine-color-dark-5))",
+                    "--tooltip-color": "var(--mantine-color-white)",
+                },
+            }),
+        }),
     },
 });
