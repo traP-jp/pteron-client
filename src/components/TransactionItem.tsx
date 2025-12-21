@@ -1,4 +1,6 @@
-import { Accordion, Flex, Group, Stack, Text } from "@mantine/core";
+import { Link } from "react-router-dom";
+
+import { Accordion, Anchor, Flex, Group, Stack, Text } from "@mantine/core";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 
 import type { Transaction } from "/@/api/schema/internal";
@@ -38,19 +40,41 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
         return toBranded<UserName>(transaction.user?.name ?? "");
     };
 
+    const getFromPath = () => {
+        return from === "user" ? `/users/${getUserName()}` : `/projects/${getProjectName()}`;
+    };
+
+    const getToPath = () => {
+        return to === "user" ? `/users/${getUserName()}` : `/projects/${getProjectName()}`;
+    };
+
     const fromAvatar = (
-        <PAvatar
-            size="md"
-            type={from}
-            name={from === "user" ? getUserName() : getProjectName()}
-        />
+        <Anchor
+            component={Link}
+            to={getFromPath()}
+            onClick={e => e.stopPropagation()}
+            c="inherit"
+        >
+            <PAvatar
+                size="md"
+                type={from}
+                name={from === "user" ? getUserName() : getProjectName()}
+            />
+        </Anchor>
     );
     const toAvatar = (
-        <PAvatar
-            size="md"
-            type={to}
-            name={to === "user" ? getUserName() : getProjectName()}
-        />
+        <Anchor
+            component={Link}
+            to={getToPath()}
+            onClick={e => e.stopPropagation()}
+            c="inherit"
+        >
+            <PAvatar
+                size="md"
+                type={to}
+                name={to === "user" ? getUserName() : getProjectName()}
+            />
+        </Anchor>
     );
     const arrowRight = (
         <IconArrowRight
@@ -142,32 +166,46 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
             <Accordion.Panel>
                 <Stack gap="sm">
                     <Group gap="md">
-                        <Group gap="xs">
-                            <PAvatar
-                                size="sm"
-                                type={from}
-                                name={from === "user" ? getUserName() : getProjectName()}
-                            />
-                            <Text size="sm">
-                                {from === "user" ? getUserName() : getProjectName()}
-                            </Text>
-                        </Group>
+                        <Anchor
+                            component={Link}
+                            to={getFromPath()}
+                            underline="never"
+                            c="inherit"
+                        >
+                            <Group gap="xs">
+                                <PAvatar
+                                    size="sm"
+                                    type={from}
+                                    name={from === "user" ? getUserName() : getProjectName()}
+                                />
+                                <Text size="sm">
+                                    {from === "user" ? getUserName() : getProjectName()}
+                                </Text>
+                            </Group>
+                        </Anchor>
                         <Text
                             size="sm"
                             c="dimmed"
                         >
                             →
                         </Text>
-                        <Group gap="xs">
-                            <PAvatar
-                                size="sm"
-                                type={to}
-                                name={to === "user" ? getUserName() : getProjectName()}
-                            />
-                            <Text size="sm">
-                                {to === "user" ? getUserName() : getProjectName()}
-                            </Text>
-                        </Group>
+                        <Anchor
+                            component={Link}
+                            to={getToPath()}
+                            underline="never"
+                            c="inherit"
+                        >
+                            <Group gap="xs">
+                                <PAvatar
+                                    size="sm"
+                                    type={to}
+                                    name={to === "user" ? getUserName() : getProjectName()}
+                                />
+                                <Text size="sm">
+                                    {to === "user" ? getUserName() : getProjectName()}
+                                </Text>
+                            </Group>
+                        </Anchor>
                     </Group>
                     {transaction.description && (
                         <Group gap="xs">
