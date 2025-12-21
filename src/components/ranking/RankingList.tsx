@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import { Flex, Group, Paper, Stack, Text } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 
@@ -29,19 +31,21 @@ interface RankingListItemProps<T extends RankingEntity = RankingEntity> {
 const RankingListItem = <T extends RankingEntity>({
     type,
     rankedItem,
-    onItemClick,
     valueDisplay = "copia",
 }: RankingListItemProps<T>) => {
     const { rank, rankDiff, entity } = rankedItem;
     const isVerySmall = useMediaQuery("(max-width: 400px)");
+    const detailPath = type === "user" ? `/users/${entity.name}` : `/projects/${entity.name}`;
 
     return (
         <Paper
+            component={Link}
+            to={detailPath}
             className="cursor-pointer transition-colors hover:bg-gray-50"
-            onClick={() => onItemClick?.(rankedItem)}
             p="sm"
             radius="sm"
             withBorder
+            style={{ textDecoration: "none", color: "inherit" }}
         >
             {isVerySmall ? (
                 <Stack
