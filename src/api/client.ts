@@ -1,6 +1,14 @@
+import axios from "axios";
 import type { AxiosInstance } from "axios";
 
 import type { Invocable } from "../types/entity";
+
+export const apiClient = axios.create({
+    baseURL: "",
+    headers: {
+        "Content-Type": "application/json",
+    },
+});
 
 export const makeInterceptorInjector =
     ({ request, response }: { request?: Invocable[]; response?: Invocable[] }) =>
