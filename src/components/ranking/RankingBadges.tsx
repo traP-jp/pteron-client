@@ -369,7 +369,8 @@ const RankingCardsContent = ({ fetcher, type, name }: RankingCardsContentProps) 
                     key={info.rankingName}
                     gap={0}
                     style={{
-                        backgroundColor: "var(--mantine-color-gray-0)",
+                        backgroundColor:
+                            "light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6))",
                         borderRadius: "var(--mantine-radius-md)",
                     }}
                 >

@@ -59,7 +59,11 @@ const CopiaLogo = ({ clickable = false }: { clickable?: boolean }) => {
         <img
             src={CopiaLogoSrc}
             alt="Copia Logo"
-            style={{ width: rem(32), height: rem(32) }}
+            style={{
+                width: rem(32),
+                height: rem(32),
+                filter: "var(--logo-filter)",
+            }}
         />
     );
 

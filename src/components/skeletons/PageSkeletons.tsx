@@ -53,7 +53,9 @@ export const UserBalanceCardSkeleton = () => (
     <Card
         padding="md"
         radius="md"
-        bg="gray.1"
+        style={{
+            backgroundColor: "light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-6))",
+        }}
         withBorder={false}
     >
         <Stack gap="md">
@@ -409,9 +411,10 @@ export const RankingCardsSkeleton = ({ count = 6 }: { count?: number }) => (
                 key={`ranking-card-${index}`}
                 gap={0}
                 style={{
-                    border: "1px solid var(--mantine-color-gray-3)",
+                    border: "1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))",
                     borderRadius: 8,
-                    backgroundColor: "var(--mantine-color-gray-0)",
+                    backgroundColor:
+                        "light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6))",
                 }}
             >
                 <Flex

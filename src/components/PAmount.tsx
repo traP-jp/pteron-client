@@ -134,7 +134,7 @@ export const PAmount = <Size extends PAmountSize = undefined>(_props: PAmountPro
     } = _props;
 
     const customSize = isCustomSize(_props) ? _props.customSize : null;
-    const color = value > 0 ? "green" : value < 0 ? "red" : "black";
+    const color = value > 0 ? "green" : value < 0 ? "red" : undefined;
 
     // 省略表示かどうかで表示形式を切り替え
     const getDisplayValue = (): { displayValue: string; isCompacted: boolean } => {

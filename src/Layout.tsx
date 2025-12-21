@@ -17,6 +17,7 @@ import CopiaLogoSrc from "/@/assets/icons/copiaLogo.svg";
 import { toBranded } from "/@/types/entity";
 import type { UserName } from "/@/types/entity";
 
+import { ColorSchemeToggle } from "./components/ColorSchemeToggle";
 import { PAvatar } from "./components/PAvatar";
 
 const navItems = [
@@ -44,6 +45,7 @@ function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
             <UnstyledButton
                 onClick={onClick}
                 data-active={active || undefined}
+                className="navbar-link"
                 style={{
                     width: rem(50),
                     height: rem(50),
@@ -171,7 +173,11 @@ function DashboardLayout() {
                             <img
                                 src={CopiaLogoSrc}
                                 alt="Copia Logo"
-                                style={{ width: rem(32), height: rem(32) }}
+                                style={{
+                                    width: rem(32),
+                                    height: rem(32),
+                                    filter: "var(--logo-filter)",
+                                }}
                             />
                         </div>
                         <div>
@@ -183,6 +189,7 @@ function DashboardLayout() {
                         align="center"
                         gap="xs"
                     >
+                        <ColorSchemeToggle />
                         <Suspense>
                             <UserLink fetcher={userFetcher} />
                         </Suspense>
@@ -214,7 +221,11 @@ function DashboardLayout() {
                         <img
                             src={CopiaLogoSrc}
                             alt="Copia Logo"
-                            style={{ width: rem(32), height: rem(32) }}
+                            style={{
+                                width: rem(32),
+                                height: rem(32),
+                                filter: "var(--logo-filter)",
+                            }}
                         />
                     </UnstyledButton>
                     {footerLinks.slice(2)}
