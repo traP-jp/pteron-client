@@ -281,13 +281,15 @@ function EditProjectModalContents({
                         userName={toBranded<UserName>(projectOwner.name)}
                         isOwner
                     />
-                    {admins.map(admin => (
-                        <Admin
-                            key={admin.id}
-                            userName={toBranded<UserName>(admin.name)}
-                            onDelete={() => handleDeleteAdmin(admin.id)}
-                        />
-                    ))}
+                    {admins
+                        .filter(admin => admin.id !== projectOwner.id)
+                        .map(admin => (
+                            <Admin
+                                key={admin.id}
+                                userName={toBranded<UserName>(admin.name)}
+                                onDelete={() => handleDeleteAdmin(admin.id)}
+                            />
+                        ))}
                 </Flex>
             </Flex>
             <Flex
