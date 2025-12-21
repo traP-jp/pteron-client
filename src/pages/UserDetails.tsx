@@ -15,118 +15,122 @@ import BalanceChart from "/@/components/ranking/BalanceChart";
 import { UserRankingBadges, UserRankingCards } from "/@/components/ranking/RankingBadges";
 import { type Copia, type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
 
-const UserProfileHeder = ({ name, balance }: { name: UserName; balance: Copia }) => {
+const UserProfileHeader = ({ fetcher }: { fetcher: Promise<User> }) => {
+    const user = use(fetcher);
+    const name = toBranded<UserName>(user.name);
+    const balance = toBranded<Copia>(BigInt(user.balance));
+
     return (
-        <ErrorBoundary>
+        <Flex
+            direction="column"
+            mt="lg"
+            mb="xs"
+            gap="sm"
+        >
             <Flex
-                direction="column"
-                mt="lg"
-                mb="xs"
-                gap="sm"
+                direction="row"
+                align="center"
             >
                 <Flex
                     direction="row"
                     align="center"
+                    gap="xl"
+                    ml="xl"
                 >
-                    <Flex
-                        direction="row"
-                        align="center"
-                        gap="xl"
-                        ml="xl"
-                    >
-                        <PAvatar
-                            size="xl"
-                            name={name}
-                            type="user"
-                        />
-                        <Text
-                            size="xl"
-                            fw={700}
-                        >
-                            {name}
-                        </Text>
-                    </Flex>
-                    <PAmount
-                        ml="auto"
-                        mr="xl"
-                        value={balance}
-                        leadingIcon
-                        coloring
-                        compact
-                        size="custom"
-                        customSize={2}
+                    <PAvatar
+                        size="xl"
+                        name={name}
+                        type="user"
                     />
+                    <Text
+                        size="xl"
+                        fw={700}
+                    >
+                        {name}
+                    </Text>
                 </Flex>
-                <Flex ml="xl">
-                    <UserRankingBadges userName={name} />
-                </Flex>
+                <PAmount
+                    ml="auto"
+                    mr="xl"
+                    value={balance}
+                    leadingIcon
+                    coloring
+                    compact
+                    size="custom"
+                    customSize={2}
+                />
             </Flex>
-        </ErrorBoundary>
+            <Flex ml="xl">
+                <UserRankingBadges userName={name} />
+            </Flex>
+        </Flex>
     );
 };
 
-const UserProfileDetail = ({ transactions }: { transactions: Transaction[] }) => {
+const UserProfileDetail = ({ fetcher }: { fetcher: Promise<Transaction[]> }) => {
+    const transactions = use(fetcher);
+
     return (
-        <ErrorBoundary>
-            <Flex
-                wrap="wrap"
-                direction="row"
-                gap="md"
+        <Flex
+            wrap="wrap"
+            direction="row"
+            gap="md"
+        >
+            <Card
+                className="flex-auto"
+                p="lg"
+                h="100%"
             >
-                <Card
-                    className="flex-auto"
-                    p="lg"
-                    h="100%"
+                <Title
+                    order={2}
+                    fw={400}
+                    mb="md"
                 >
-                    <Title
-                        order={2}
-                        fw={400}
-                        mb="md"
-                    >
-                        推移
-                    </Title>
-                    <BalanceChart
-                        h={320}
+                    推移
+                </Title>
+                <BalanceChart
+                    h={320}
+                    transactions={transactions}
+                />
+            </Card>
+
+            <Divider orientation="vertical" />
+
+            <Card
+                className="min-w-md"
+                p="lg"
+                h="100%"
+                style={{ display: "flex", flexDirection: "column" }}
+            >
+                <Title
+                    order={2}
+                    fw={400}
+                    mb="md"
+                >
+                    取引履歴
+                </Title>
+                {!transactions && <Text c="dimmed">取引履歴がありません</Text>}
+                <div className="h-80 overflow-auto">
+                    <TransactionList
                         transactions={transactions}
+                        currentType="user"
                     />
-                </Card>
-
-                <Divider orientation="vertical" />
-
-                <Card
-                    className="min-w-md"
-                    p="lg"
-                    h="100%"
-                    style={{ display: "flex", flexDirection: "column" }}
-                >
-                    <Title
-                        order={2}
-                        fw={400}
-                        mb="md"
-                    >
-                        取引履歴
-                    </Title>
-                    {!transactions && <Text c="dimmed">取引履歴がありません</Text>}
-                    <div className="h-80 overflow-auto">
-                        <TransactionList
-                            transactions={transactions}
-                            currentType="user"
-                        />
-                    </div>
-                </Card>
-            </Flex>
-        </ErrorBoundary>
+                </div>
+            </Card>
+        </Flex>
     );
 };
 
-const UserProfileProjectList = ({ projects }: { projects: Project[] }) => {
+const UserProfileProjectList = ({ fetcher }: { fetcher: Promise<Project[]> }) => {
+    const projects = use(fetcher);
+
     return (
-        <ErrorBoundary>
+        <>
             <Title
                 order={2}
                 fw={400}
             >
-                所有しているプロジェクト
+                所属しているプロジェクト
             </Title>
 
             <SimpleGrid
@@ -146,44 +150,7 @@ const UserProfileProjectList = ({ projects }: { projects: Project[] }) => {
                     />
                 ))}
             </SimpleGrid>
-        </ErrorBoundary>
-    );
-};
-
-const TheUserProfile = ({
-    fetcher,
-}: {
-    fetcher: Promise<{ user: User; transactions: Transaction[]; projects: Project[] }>;
-}) => {
-    const { user, transactions, projects } = use(fetcher);
-
-    const name = toBranded<UserName>(user.name);
-    const balance = toBranded<Copia>(BigInt(user.balance));
-
-    return (
-        <Flex
-            direction="column"
-            gap="md"
-        >
-            <UserProfileHeder
-                name={name}
-                balance={balance}
-            />
-            <Divider />
-            <UserProfileDetail transactions={transactions} />
-            <Divider />
-            <UserProfileProjectList projects={projects} />
-            <Divider />
-            <ErrorBoundary>
-                <Title
-                    order={2}
-                    fw={400}
-                >
-                    ランキング
-                </Title>
-                <UserRankingCards userName={name} />
-            </ErrorBoundary>
-        </Flex>
+        </>
     );
 };
 
@@ -191,39 +158,87 @@ const UserProfile = () => {
     const { userId: _userName } = useParams();
     const userName = toBranded<UserName>(_userName ?? "");
 
-    const fetcher = useMemo(
+    const userFetcher = useMemo(
+        () => apis.internal.users.getUser(userName).then(({ data }) => data),
+        [userName]
+    );
+
+    const transactionsFetcher = useMemo(
         () =>
-            Promise.all([
-                apis.internal.users.getUser(userName),
-                apis.internal.transactions.getUserTransactions(userName),
-                apis.internal.users.getUserProjects(userName),
-            ]).then(([userRes, transRes, projectsRes]) => {
+            apis.internal.transactions.getUserTransactions(userName).then(({ data }) => data.items),
+        [userName]
+    );
+
+    const projectsFetcher = useMemo(
+        () =>
+            apis.internal.users.getUserProjects(userName).then(({ data }) => {
                 // APIスキーマは Project[] だが、本番APIは { items: [...] } を返す場合がある
-                const projectsData = projectsRes.data;
-                const projects = Array.isArray(projectsData)
-                    ? projectsData
-                    : (projectsData as unknown as { items: typeof projectsData }).items;
-                return {
-                    user: userRes.data,
-                    transactions: transRes.data.items,
-                    projects,
-                };
+                return Array.isArray(data)
+                    ? data
+                    : (data as unknown as { items: typeof data }).items;
             }),
         [userName]
     );
 
     return (
-        <ErrorBoundary>
-            <Suspense
-                fallback={
-                    <Center h="50vh">
-                        <Loader size="lg" />
-                    </Center>
-                }
-            >
-                <TheUserProfile fetcher={fetcher} />
-            </Suspense>
-        </ErrorBoundary>
+        <Flex
+            direction="column"
+            gap="md"
+        >
+            <ErrorBoundary>
+                <Suspense
+                    fallback={
+                        <Center h="10vh">
+                            <Loader size="lg" />
+                        </Center>
+                    }
+                >
+                    <UserProfileHeader fetcher={userFetcher} />
+                </Suspense>
+            </ErrorBoundary>
+            <Divider />
+            <ErrorBoundary>
+                <Suspense
+                    fallback={
+                        <Center h="40vh">
+                            <Loader size="lg" />
+                        </Center>
+                    }
+                >
+                    <UserProfileDetail fetcher={transactionsFetcher} />
+                </Suspense>
+            </ErrorBoundary>
+            <Divider />
+            <ErrorBoundary>
+                <Suspense
+                    fallback={
+                        <Center h="20vh">
+                            <Loader size="lg" />
+                        </Center>
+                    }
+                >
+                    <UserProfileProjectList fetcher={projectsFetcher} />
+                </Suspense>
+            </ErrorBoundary>
+            <Divider />
+            <ErrorBoundary>
+                <Suspense
+                    fallback={
+                        <Center h="20vh">
+                            <Loader size="lg" />
+                        </Center>
+                    }
+                >
+                    <Title
+                        order={2}
+                        fw={400}
+                    >
+                        ランキング
+                    </Title>
+                    <UserRankingCards userName={userName} />
+                </Suspense>
+            </ErrorBoundary>
+        </Flex>
     );
 };
 export default UserProfile;
