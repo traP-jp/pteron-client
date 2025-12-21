@@ -6,10 +6,12 @@ import { PAmount } from "/@/components/PAmount";
 import { type Copia, toBranded } from "/@/types/entity";
 
 interface SystemTotalCardProps {
-    total: number;
+    total?: number;
 }
 
 export const SystemTotalCard = ({ total }: SystemTotalCardProps) => {
+    const isAvailable = total !== undefined;
+
     return (
         <Card
             padding="md"
@@ -33,19 +35,29 @@ export const SystemTotalCard = ({ total }: SystemTotalCardProps) => {
                             style={{ color: "var(--mantine-color-green-6)" }}
                         />
                     </Group>
-                    <PAmount
-                        value={toBranded<Copia>(BigInt(total))}
-                        leadingIcon
-                        compact
-                        size="lg"
-                        fw={700}
-                    />
+                    {isAvailable ? (
+                        <PAmount
+                            value={toBranded<Copia>(BigInt(total))}
+                            leadingIcon
+                            compact
+                            size="lg"
+                            fw={700}
+                        />
+                    ) : (
+                        <Text
+                            size="lg"
+                            fw={700}
+                            c="dimmed"
+                        >
+                            -
+                        </Text>
+                    )}
                     <Text
                         size="xs"
                         c="dimmed"
                         mt="xs"
                     >
-                        過去7日
+                        {isAvailable ? "過去7日" : "統計データは準備中です"}
                     </Text>
                 </Stack>
             </ErrorBoundary>

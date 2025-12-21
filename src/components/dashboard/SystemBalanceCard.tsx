@@ -6,11 +6,13 @@ import { PAmount } from "/@/components/PAmount";
 import { type Copia, toBranded } from "/@/types/entity";
 
 interface SystemBalanceCardProps {
-    balance: number;
-    difference: number;
+    balance?: number;
+    difference?: number;
 }
 
 export const SystemBalanceCard = ({ balance, difference }: SystemBalanceCardProps) => {
+    const isAvailable = balance !== undefined && difference !== undefined;
+
     return (
         <Card
             padding="md"
@@ -34,30 +36,51 @@ export const SystemBalanceCard = ({ balance, difference }: SystemBalanceCardProp
                             style={{ color: "var(--mantine-color-blue-6)" }}
                         />
                     </Group>
-                    <PAmount
-                        value={toBranded<Copia>(BigInt(balance))}
-                        leadingIcon
-                        compact
-                        size="lg"
-                        fw={700}
-                    />
+                    {isAvailable ? (
+                        <PAmount
+                            value={toBranded<Copia>(BigInt(balance))}
+                            leadingIcon
+                            compact
+                            size="lg"
+                            fw={700}
+                        />
+                    ) : (
+                        <Text
+                            size="lg"
+                            fw={700}
+                            c="dimmed"
+                        >
+                            -
+                        </Text>
+                    )}
                     <Group
                         gap="xs"
                         mt="xs"
                     >
-                        <Text
-                            size="xs"
-                            c={difference >= 0 ? "green" : "red"}
-                        >
-                            {difference >= 0 ? "+" : ""}
-                            {difference.toLocaleString()}
-                        </Text>
-                        <Text
-                            size="xs"
-                            c="dimmed"
-                        >
-                            過去7日
-                        </Text>
+                        {isAvailable ? (
+                            <>
+                                <Text
+                                    size="xs"
+                                    c={difference >= 0 ? "green" : "red"}
+                                >
+                                    {difference >= 0 ? "+" : ""}
+                                    {difference.toLocaleString()}
+                                </Text>
+                                <Text
+                                    size="xs"
+                                    c="dimmed"
+                                >
+                                    過去7日
+                                </Text>
+                            </>
+                        ) : (
+                            <Text
+                                size="xs"
+                                c="dimmed"
+                            >
+                                統計データは準備中です
+                            </Text>
+                        )}
                     </Group>
                 </Stack>
             </ErrorBoundary>
