@@ -58,14 +58,12 @@ export const RecentTransactionsCard = ({
             <ErrorBoundary>
                 <Stack
                     gap="md"
-                    style={{ flex: 1, minHeight: 0 }}
+                    style={{ flex: 1, minHeight: 0, maxHeight: 300, overflow: "auto" }}
                 >
-                    <div className="flex-1 overflow-auto min-h-0">
-                        <TransactionList
-                            transactions={transactions}
-                            direction="both"
-                        />
-                    </div>
+                    <TransactionList
+                        transactions={transactions}
+                        direction="both"
+                    />
                 </Stack>
             </ErrorBoundary>
         </Card>
