@@ -1,6 +1,6 @@
 import { Suspense, use, useCallback, useMemo, useState } from "react";
 
-import { Center, Loader, SimpleGrid, Stack, Title } from "@mantine/core";
+import { SimpleGrid, Stack, Title } from "@mantine/core";
 
 import apis from "/@/api";
 import type { Project, Transaction, User } from "/@/api/schema/internal";
@@ -12,6 +12,12 @@ import { SystemTotalCard } from "/@/components/dashboard/SystemTotalCard";
 import { UserBalanceCard } from "/@/components/dashboard/UserBalanceCard";
 import { RankingFull } from "/@/components/ranking";
 import type { RankedItem } from "/@/components/ranking/RankingTypes";
+import {
+    RankingCardSkeleton,
+    RecentTransactionsCardSkeleton,
+    StatCardSkeleton,
+    UserBalanceCardSkeleton,
+} from "/@/components/skeletons/PageSkeletons";
 
 // トランザクション履歴から残高を逆算
 // TRANSFER (プロジェクト→ユーザー): 残高増加
@@ -212,46 +218,22 @@ export const Home = () => {
                 spacing="md"
             >
                 <ErrorBoundary>
-                    <Suspense
-                        fallback={
-                            <Center>
-                                <Loader size="sm" />
-                            </Center>
-                        }
-                    >
+                    <Suspense fallback={<StatCardSkeleton />}>
                         <SystemBalanceCard fetcher={systemBalanceFetcher} />
                     </Suspense>
                 </ErrorBoundary>
                 <ErrorBoundary>
-                    <Suspense
-                        fallback={
-                            <Center>
-                                <Loader size="sm" />
-                            </Center>
-                        }
-                    >
+                    <Suspense fallback={<StatCardSkeleton />}>
                         <SystemTotalCard fetcher={systemTotalFetcher} />
                     </Suspense>
                 </ErrorBoundary>
                 <ErrorBoundary>
-                    <Suspense
-                        fallback={
-                            <Center>
-                                <Loader size="sm" />
-                            </Center>
-                        }
-                    >
+                    <Suspense fallback={<StatCardSkeleton />}>
                         <SystemCountCard fetcher={systemCountFetcher} />
                     </Suspense>
                 </ErrorBoundary>
                 <ErrorBoundary>
-                    <Suspense
-                        fallback={
-                            <Center>
-                                <Loader size="sm" />
-                            </Center>
-                        }
-                    >
+                    <Suspense fallback={<UserBalanceCardSkeleton />}>
                         <UserBalanceCard fetcher={userBalanceFetcher} />
                     </Suspense>
                 </ErrorBoundary>
@@ -262,13 +244,7 @@ export const Home = () => {
                 spacing="md"
             >
                 <ErrorBoundary>
-                    <Suspense
-                        fallback={
-                            <Center py="xl">
-                                <Loader size="lg" />
-                            </Center>
-                        }
-                    >
+                    <Suspense fallback={<RecentTransactionsCardSkeleton />}>
                         <RecentTransactionsCard
                             fetcher={recentTransactionsFetcher}
                             onRefresh={refreshTransactions}
@@ -278,37 +254,19 @@ export const Home = () => {
                 </ErrorBoundary>
 
                 <ErrorBoundary>
-                    <Suspense
-                        fallback={
-                            <Center py="xl">
-                                <Loader size="lg" />
-                            </Center>
-                        }
-                    >
+                    <Suspense fallback={<RankingCardSkeleton />}>
                         <TopUsersRanking fetcher={topUsersFetcher} />
                     </Suspense>
                 </ErrorBoundary>
 
                 <ErrorBoundary>
-                    <Suspense
-                        fallback={
-                            <Center py="xl">
-                                <Loader size="lg" />
-                            </Center>
-                        }
-                    >
+                    <Suspense fallback={<RankingCardSkeleton />}>
                         <WorstUsersRanking fetcher={worstUsersFetcher} />
                     </Suspense>
                 </ErrorBoundary>
 
                 <ErrorBoundary>
-                    <Suspense
-                        fallback={
-                            <Center py="xl">
-                                <Loader size="lg" />
-                            </Center>
-                        }
-                    >
+                    <Suspense fallback={<RankingCardSkeleton />}>
                         <FeaturedProjectsRanking fetcher={featuredProjectsFetcher} />
                     </Suspense>
                 </ErrorBoundary>

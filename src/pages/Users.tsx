@@ -1,11 +1,12 @@
 import { Suspense, use, useMemo, useState } from "react";
 
-import { Center, Flex, Loader, Select, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { Flex, Select, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 
 import apis from "/@/api";
 import type { User } from "/@/api/schema/internal";
 import { EntityCard } from "/@/components/EntityCard";
 import ErrorBoundary from "/@/components/ErrorBoundary";
+import { UsersPageSkeleton } from "/@/components/skeletons/PageSkeletons";
 import { type Copia, type UserName, toBranded } from "/@/types/entity";
 
 type SortOption = "balance-desc" | "balance-asc" | "name-asc" | "name-desc";
@@ -96,19 +97,7 @@ export const Users = () => {
 
     return (
         <ErrorBoundary>
-            <Suspense
-                fallback={
-                    <Stack
-                        gap="md"
-                        p="md"
-                    >
-                        <Title order={2}>ユーザー一覧</Title>
-                        <Center h="50vh">
-                            <Loader size="lg" />
-                        </Center>
-                    </Stack>
-                }
-            >
+            <Suspense fallback={<UsersPageSkeleton />}>
                 <TheUsers fetcher={fetcher} />
             </Suspense>
         </ErrorBoundary>

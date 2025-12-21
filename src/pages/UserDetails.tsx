@@ -1,7 +1,7 @@
 import { Suspense, use, useMemo } from "react";
 import { useParams } from "react-router-dom";
 
-import { Card, Center, Divider, Flex, Loader, SimpleGrid, Stack, Text } from "@mantine/core";
+import { Card, Divider, Flex, SimpleGrid, Stack, Text } from "@mantine/core";
 
 import apis from "/@/api";
 import type { Project, User } from "/@/api/schema/internal";
@@ -13,6 +13,7 @@ import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
 import BalanceChart from "/@/components/ranking/BalanceChart";
 import { UserRankingBadges, UserRankingCards } from "/@/components/ranking/RankingBadges";
+import { UserDetailsSkeleton } from "/@/components/skeletons/PageSkeletons";
 import { type Copia, type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
 
 const UserProfileHeder = ({ name, balance }: { name: UserName; balance: Copia }) => {
@@ -217,18 +218,7 @@ const UserProfile = () => {
 
     return (
         <ErrorBoundary>
-            <Suspense
-                fallback={
-                    <Stack
-                        gap="md"
-                        p="md"
-                    >
-                        <Center h="50vh">
-                            <Loader size="lg" />
-                        </Center>
-                    </Stack>
-                }
-            >
+            <Suspense fallback={<UserDetailsSkeleton />}>
                 <TheUserProfile fetcher={fetcher} />
             </Suspense>
         </ErrorBoundary>
