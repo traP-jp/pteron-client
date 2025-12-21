@@ -12,6 +12,7 @@ import {
     TextInput,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { showNotification } from "@mantine/notifications";
 import { IconPlus } from "@tabler/icons-react";
 import { encode } from "js-base64";
 
@@ -227,8 +228,13 @@ function EditProjectModalContents({
         setAdmins(prev => prev.filter(admin => admin.id !== userId));
     };
 
-    const handleUpdateUrl = () => {
-        apis.internal.projects.updateProject(projectName, { url });
+    const handleUpdateUrl = async () => {
+        await apis.internal.projects.updateProject(projectName, { url });
+        showNotification({
+            title: "URLを更新しました",
+            message: "プロジェクトURLが正常に更新されました",
+            color: "green",
+        });
     };
 
     return (
