@@ -1,6 +1,6 @@
 import { Suspense, use, useCallback, useMemo, useState } from "react";
 
-import { Center, Loader, SimpleGrid, Stack, Title } from "@mantine/core";
+import { Box, Center, Loader, SimpleGrid, Stack, Title } from "@mantine/core";
 
 import apis from "/@/api";
 import type { Project, Transaction, User } from "/@/api/schema/internal";
@@ -141,7 +141,7 @@ export const Home = () => {
     const recentTransactionsFetcher = useMemo(
         () =>
             apis.internal.transactions.getTransactions().then(({ data }) => ({
-                transactions: data.items,
+                transactions: data.items.slice(0, 20),
             })),
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [transactionsKey]
@@ -200,10 +200,15 @@ export const Home = () => {
             gap="md"
             p="md"
         >
-            <Title order={1}>Pteron – Plutus Network</Title>
+            <Title
+                order={1}
+                size="h2"
+            >
+                Pteron – Plutus Network
+            </Title>
 
             <SimpleGrid
-                cols={{ base: 2, sm: 4 }}
+                cols={{ base: 1, xs: 2, sm: 4 }}
                 spacing="md"
             >
                 <ErrorBoundary>
@@ -256,57 +261,65 @@ export const Home = () => {
                 cols={{ base: 1, lg: 2 }}
                 spacing="md"
             >
-                <ErrorBoundary>
-                    <Suspense
-                        fallback={
-                            <Center py="xl">
-                                <Loader size="lg" />
-                            </Center>
-                        }
-                    >
-                        <RecentTransactionsCard
-                            fetcher={recentTransactionsFetcher}
-                            onRefresh={refreshTransactions}
-                            isRefreshing={isRefreshing}
-                        />
-                    </Suspense>
-                </ErrorBoundary>
+                <Box style={{ display: "flex", flexDirection: "column" }}>
+                    <ErrorBoundary>
+                        <Suspense
+                            fallback={
+                                <Center py="xl">
+                                    <Loader size="lg" />
+                                </Center>
+                            }
+                        >
+                            <RecentTransactionsCard
+                                fetcher={recentTransactionsFetcher}
+                                onRefresh={refreshTransactions}
+                                isRefreshing={isRefreshing}
+                            />
+                        </Suspense>
+                    </ErrorBoundary>
+                </Box>
 
-                <ErrorBoundary>
-                    <Suspense
-                        fallback={
-                            <Center py="xl">
-                                <Loader size="lg" />
-                            </Center>
-                        }
-                    >
-                        <TopUsersRanking fetcher={topUsersFetcher} />
-                    </Suspense>
-                </ErrorBoundary>
+                <Box style={{ display: "flex", flexDirection: "column" }}>
+                    <ErrorBoundary>
+                        <Suspense
+                            fallback={
+                                <Center py="xl">
+                                    <Loader size="lg" />
+                                </Center>
+                            }
+                        >
+                            <TopUsersRanking fetcher={topUsersFetcher} />
+                        </Suspense>
+                    </ErrorBoundary>
+                </Box>
 
-                <ErrorBoundary>
-                    <Suspense
-                        fallback={
-                            <Center py="xl">
-                                <Loader size="lg" />
-                            </Center>
-                        }
-                    >
-                        <WorstUsersRanking fetcher={worstUsersFetcher} />
-                    </Suspense>
-                </ErrorBoundary>
+                <Box style={{ display: "flex", flexDirection: "column" }}>
+                    <ErrorBoundary>
+                        <Suspense
+                            fallback={
+                                <Center py="xl">
+                                    <Loader size="lg" />
+                                </Center>
+                            }
+                        >
+                            <WorstUsersRanking fetcher={worstUsersFetcher} />
+                        </Suspense>
+                    </ErrorBoundary>
+                </Box>
 
-                <ErrorBoundary>
-                    <Suspense
-                        fallback={
-                            <Center py="xl">
-                                <Loader size="lg" />
-                            </Center>
-                        }
-                    >
-                        <FeaturedProjectsRanking fetcher={featuredProjectsFetcher} />
-                    </Suspense>
-                </ErrorBoundary>
+                <Box style={{ display: "flex", flexDirection: "column" }}>
+                    <ErrorBoundary>
+                        <Suspense
+                            fallback={
+                                <Center py="xl">
+                                    <Loader size="lg" />
+                                </Center>
+                            }
+                        >
+                            <FeaturedProjectsRanking fetcher={featuredProjectsFetcher} />
+                        </Suspense>
+                    </ErrorBoundary>
+                </Box>
             </SimpleGrid>
         </Stack>
     );

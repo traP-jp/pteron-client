@@ -72,6 +72,7 @@ const CreateNewProject = ({
                 className="flex"
                 onClick={open}
                 size="compact-md"
+                w={{ base: "100%", xs: "auto" }}
             >
                 <IconPlus />
                 <Text
@@ -203,6 +204,7 @@ const Projects = () => {
                         align="center"
                         gap="md"
                         wrap="wrap"
+                        w="100%"
                     >
                         <Text
                             size="xl"

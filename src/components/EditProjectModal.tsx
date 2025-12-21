@@ -12,6 +12,7 @@ import {
     TextInput,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { showNotification } from "@mantine/notifications";
 import { IconPlus } from "@tabler/icons-react";
 import { encode } from "js-base64";
 
@@ -21,6 +22,7 @@ import SecretCopyInput from "./SecretCopyInput";
 
 import apis from "../api";
 import type { APIClient, Project, User } from "../api/schema/internal";
+import { normalizeUrl, validateUrl } from "../lib/validation";
 import { type ProjectName, type Url, type UserName, toBranded } from "../types/entity";
 
 export type EditProjectModalProps = Omit<ModalProps, "title"> & { projectName: ProjectName };
@@ -197,10 +199,17 @@ function EditProjectModalContents({
     const [apiClients, setApiClients] = useState<APIClient[]>(initialApiClients);
     const [admins, setAdmins] = useState<User[]>(project.admins);
     const [url, setUrl] = useState<Url>(toBranded<Url>(project.url ?? ""));
+    const [urlError, setUrlError] = useState("");
+    const [isUpdatingUrl, setIsUpdatingUrl] = useState(false);
 
     const [opened, { open, close }] = useDisclosure(false);
 
     const projectOwner = project.owner;
+
+    const handleUrlChange = (newUrl: string) => {
+        setUrl(toBranded<Url>(newUrl));
+        setUrlError(validateUrl(newUrl));
+    };
 
     const handleCreateApiClient = async () => {
         const { data } = await apis.internal.projects.createProjectApiClient(projectName);
@@ -227,24 +236,56 @@ function EditProjectModalContents({
         setAdmins(prev => prev.filter(admin => admin.id !== userId));
     };
 
-    const handleUpdateUrl = () => {
-        apis.internal.projects.updateProject(projectName, { url });
+    const handleUpdateUrl = async () => {
+        // 再度バリデーションを実行
+        const urlValidationError = validateUrl(url);
+        if (urlValidationError) {
+            setUrlError(urlValidationError);
+            return;
+        }
+
+        setIsUpdatingUrl(true);
+
+        try {
+            const normalizedUrl = normalizeUrl(url);
+
+            await apis.internal.projects.updateProject(projectName, { url: normalizedUrl });
+            setUrl(toBranded<Url>(normalizedUrl));
+            showNotification({
+                title: "URLを更新しました",
+                message: "プロジェクトURLが正常に更新されました",
+                color: "green",
+            });
+        } finally {
+            setIsUpdatingUrl(false);
+        }
     };
+
+    const isUrlUpdateDisabled = !!urlError || isUpdatingUrl;
 
     return (
         <>
             <Flex
                 direction="row"
                 gap="md"
-                align="flex-end"
+                align="flex-start"
             >
                 <TextInput
                     className="flex-auto"
                     label="URL"
+                    placeholder="https://example.com"
                     value={url}
-                    onChange={e => setUrl(toBranded<Url>(e.currentTarget.value))}
+                    error={urlError}
+                    onChange={e => handleUrlChange(e.currentTarget.value)}
                 />
-                <Button onClick={handleUpdateUrl}>更新</Button>
+                <Button
+                    mt={24}
+                    disabled={isUrlUpdateDisabled}
+                    loading={isUpdatingUrl}
+                    onClick={handleUpdateUrl}
+                >
+                    更新
+                </Button>
             </Flex>
             <Flex
                 direction="column"
