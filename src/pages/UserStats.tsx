@@ -1,13 +1,14 @@
 import { Suspense, use, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 
-import { Center, Loader, SimpleGrid, Text } from "@mantine/core";
+import { Center, SimpleGrid, Text } from "@mantine/core";
 
 import apis from "/@/api";
 import type { User } from "/@/api/schema/internal";
 import ErrorBoundary from "/@/components/ErrorBoundary";
 import { RankingFull } from "/@/components/ranking/RankingFull";
 import type { RankedItem } from "/@/components/ranking/RankingTypes";
+import { RankingCardSkeleton } from "/@/components/skeletons/PageSkeletons";
 
 interface StatsContext {
     period: "24hours" | "7days" | "30days" | "365days";
@@ -86,13 +87,7 @@ const UserStats = () => {
         >
             {fetchers.map((fetcher, index) => (
                 <ErrorBoundary key={index}>
-                    <Suspense
-                        fallback={
-                            <Center py="xl">
-                                <Loader size="lg" />
-                            </Center>
-                        }
-                    >
+                    <Suspense fallback={<RankingCardSkeleton />}>
                         <TheRanking fetcher={fetcher} />
                     </Suspense>
                 </ErrorBoundary>

@@ -1,18 +1,7 @@
 import { Suspense, use } from "react";
 import { useParams } from "react-router-dom";
 
-import {
-    ActionIcon,
-    Button,
-    Card,
-    Center,
-    Divider,
-    Flex,
-    Loader,
-    SimpleGrid,
-    Stack,
-    Text,
-} from "@mantine/core";
+import { ActionIcon, Button, Card, Divider, Flex, SimpleGrid, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconExternalLink } from "@tabler/icons-react";
 
@@ -26,6 +15,7 @@ import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
 import BalanceChart from "/@/components/ranking/BalanceChart";
 import { ProjectRankingBadges, ProjectRankingCards } from "/@/components/ranking/RankingBadges";
+import { ProjectDetailsSkeleton } from "/@/components/skeletons/PageSkeletons";
 import { createExternalLinkHandler } from "/@/lib/link";
 import { type Copia, type ProjectName, type UserName, toBranded } from "/@/types/entity";
 import type { Url } from "/@/types/entity";
@@ -294,18 +284,7 @@ const ProjectDetails = () => {
     return (
         <>
             <ErrorBoundary>
-                <Suspense
-                    fallback={
-                        <Stack
-                            gap="md"
-                            p="md"
-                        >
-                            <Center h="50vh">
-                                <Loader size="lg" />
-                            </Center>
-                        </Stack>
-                    }
-                >
+                <Suspense fallback={<ProjectDetailsSkeleton />}>
                     <TheProjectDetails fetcher={fetch()} />
                 </Suspense>
             </ErrorBoundary>

@@ -1,7 +1,7 @@
 import { Suspense, use, useMemo } from "react";
 import { useParams } from "react-router-dom";
 
-import { Card, Center, Divider, Flex, Loader, SimpleGrid, Text, Title } from "@mantine/core";
+import { Card, Divider, Flex, SimpleGrid, Text, Title } from "@mantine/core";
 
 import apis from "/@/api";
 import type { Project, Transaction } from "/@/api/schema/internal";
@@ -12,6 +12,7 @@ import { PAvatar } from "/@/components/PAvatar";
 import { TransactionList } from "/@/components/TransactionList";
 import BalanceChart from "/@/components/ranking/BalanceChart";
 import { UserRankingBadges, UserRankingCards } from "/@/components/ranking/RankingBadges";
+import { UserDetailsSkeleton } from "/@/components/skeletons/PageSkeletons";
 import { type Copia, type ProjectName, type Url, type UserName, toBranded } from "/@/types/entity";
 
 interface UserHeaderData {
@@ -193,56 +194,28 @@ const UserProfile = () => {
     );
 
     return (
-        <Flex
-            direction="column"
-            gap="md"
-        >
-            <ErrorBoundary>
-                <Suspense
-                    fallback={
-                        <Center h="20vh">
-                            <Loader size="lg" />
-                        </Center>
-                    }
+        <ErrorBoundary>
+            <Suspense fallback={<UserDetailsSkeleton />}>
+                <Flex
+                    direction="column"
+                    gap="md"
                 >
                     <UserProfileHeader fetcher={userHeaderFetcher} />
-                </Suspense>
-            </ErrorBoundary>
-            <Divider />
-            <ErrorBoundary>
-                <Suspense
-                    fallback={
-                        <Center h="40vh">
-                            <Loader size="lg" />
-                        </Center>
-                    }
-                >
+                    <Divider />
                     <UserProfileDetail fetcher={transactionsFetcher} />
-                </Suspense>
-            </ErrorBoundary>
-            <Divider />
-            <ErrorBoundary>
-                <Suspense
-                    fallback={
-                        <Center h="20vh">
-                            <Loader size="lg" />
-                        </Center>
-                    }
-                >
+                    <Divider />
                     <UserProfileProjectList fetcher={projectsFetcher} />
-                </Suspense>
-            </ErrorBoundary>
-            <Divider />
-            <ErrorBoundary>
-                <Title
-                    order={2}
-                    fw={400}
-                >
-                    ランキング
-                </Title>
-                <UserRankingCards userName={userName} />
-            </ErrorBoundary>
-        </Flex>
+                    <Divider />
+                    <Title
+                        order={2}
+                        fw={400}
+                    >
+                        ランキング
+                    </Title>
+                    <UserRankingCards userName={userName} />
+                </Flex>
+            </Suspense>
+        </ErrorBoundary>
     );
 };
 export default UserProfile;
