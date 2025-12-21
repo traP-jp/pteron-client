@@ -555,7 +555,7 @@ const BalanceChartSample = () => (
     </Accordion.Item>
 );
 
-const mockProjectName = toBranded<ProjectName>("traP Portal");
+const mockProjectName = toBranded<ProjectName>("traP_Portal");
 
 const EditProjectModalSample = ({ projectName }: { projectName: ProjectName }) => {
     const [opened, { open, close }] = useDisclosure(false);
