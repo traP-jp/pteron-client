@@ -1,7 +1,15 @@
-import { Suspense, memo, use, useCallback, useMemo } from "react";
+import { Suspense, memo, use, useCallback, useEffect, useMemo } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
-import { AppShell, Group, Stack, Tooltip, UnstyledButton, rem } from "@mantine/core";
+import {
+    AppShell,
+    Group,
+    Stack,
+    Tooltip,
+    UnstyledButton,
+    rem,
+    useMantineColorScheme,
+} from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import {
     IconChartBar,
@@ -14,6 +22,7 @@ import {
 import apis from "/@/api";
 import type { User } from "/@/api/schema/internal";
 import CopiaLogoSrc from "/@/assets/icons/copiaLogo.svg";
+import WhiteIconSrc from "/@/assets/icons/white_icon.svg";
 import { toBranded } from "/@/types/entity";
 import type { UserName } from "/@/types/entity";
 
@@ -143,6 +152,22 @@ function DashboardLayout() {
     );
 
     const isMobile = useMediaQuery("(max-width: 48em)");
+    const { colorScheme } = useMantineColorScheme();
+
+    const logoSrc = colorScheme === "dark" ? WhiteIconSrc : CopiaLogoSrc;
+
+    useEffect(() => {
+        const link = document.querySelector<HTMLLinkElement>("link[rel~='icon']");
+        if (!link) {
+            return;
+        }
+
+        if (colorScheme === "dark") {
+            link.href = "/white_icon.svg";
+        } else {
+            link.href = "/copiaLogo.svg";
+        }
+    }, [colorScheme]);
 
     return (
         <AppShell
@@ -171,12 +196,11 @@ function DashboardLayout() {
                     >
                         <div style={{ marginTop: rem(20), marginBottom: rem(20) }}>
                             <img
-                                src={CopiaLogoSrc}
+                                src={logoSrc}
                                 alt="Copia Logo"
                                 style={{
                                     width: rem(32),
                                     height: rem(32),
-                                    filter: "var(--logo-filter)",
                                 }}
                             />
                         </div>
@@ -219,7 +243,7 @@ function DashboardLayout() {
                         }}
                     >
                         <img
-                            src={CopiaLogoSrc}
+                            src={logoSrc}
                             alt="Copia Logo"
                             style={{
                                 width: rem(32),
