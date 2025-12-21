@@ -50,6 +50,7 @@ function Admin({
             {isOwner && <Text c="blue">(Owner)</Text>}
             {!isOwner && (
                 <Button
+                    variant="light"
                     color="red"
                     ml="auto"
                     onClick={onDelete}
@@ -104,6 +105,7 @@ function ClientKeyBox({
             >
                 <Text className="min-w-max">{createdAt.toLocaleDateString()} 作成</Text>
                 <Button
+                    variant="light"
                     color="red"
                     ml="auto"
                     onClick={onDelete}
@@ -298,7 +300,8 @@ function EditProjectModalContents({
                         onClose={close}
                     />
                     <Button
-                        color="green.5"
+                        variant="light"
+                        color="green"
                         size="xs"
                         onClick={open}
                     >
@@ -336,7 +339,8 @@ function EditProjectModalContents({
                 >
                     <Text>APIクライアント</Text>
                     <Button
-                        color="green.5"
+                        variant="light"
+                        color="green"
                         size="xs"
                         onClick={handleCreateApiClient}
                     >
