@@ -98,12 +98,12 @@ export const TransactionItem = ({ transaction, direction = "both" }: Transaction
         >
             <Accordion.Control>
                 <Group
-                    px="xs"
+                    px={{ base: 0, xs: "xs" }}
                     justify="space-between"
-                    wrap="wrap"
+                    wrap="nowrap"
                 >
                     <Flex
-                        gap="md"
+                        gap={{ base: "xs", sm: "md" }}
                         align="center"
                     >
                         {direction === "from" && (

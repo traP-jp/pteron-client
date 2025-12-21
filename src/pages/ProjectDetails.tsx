@@ -56,12 +56,14 @@ const ProjectHeader = ({
             <Flex
                 direction="row"
                 align="center"
+                wrap="wrap"
             >
                 <Flex
                     direction="row"
                     align="center"
-                    gap="xl"
-                    ml="xl"
+                    gap={{ base: "xs", sm: "xl" }}
+                    ml={{ base: "xs", sm: "xl" }}
+                    wrap="wrap"
                 >
                     <PAvatar
                         size="xl"
@@ -151,10 +153,13 @@ const ProjectDetail = ({ transactions }: { transactions: Transaction[] }) => {
                 />
             </Card>
 
-            <Divider orientation="vertical" />
+            <Divider
+                orientation="vertical"
+                visibleFrom="sm"
+            />
 
             <Card
-                className="min-w-md"
+                className="w-full sm:w-auto sm:min-w-md"
                 p="lg"
                 h="100%"
                 style={{ display: "flex", flexDirection: "column" }}

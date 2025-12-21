@@ -200,10 +200,15 @@ export const Home = () => {
             gap="md"
             p="md"
         >
-            <Title order={1}>Pteron – Plutus Network</Title>
+            <Title
+                order={1}
+                size="h2"
+            >
+                Pteron – Plutus Network
+            </Title>
 
             <SimpleGrid
-                cols={{ base: 2, sm: 4 }}
+                cols={{ base: 1, xs: 2, sm: 4 }}
                 spacing="md"
             >
                 <ErrorBoundary>
