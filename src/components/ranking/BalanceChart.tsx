@@ -16,33 +16,32 @@ interface ChartRecord {
 type ChartData = ChartRecord[];
 
 const formatTransactionData = (start: number, transactions: Transaction[]): ChartData => {
-    if (transactions.length === 0) {
-        return [];
-    }
+    if (!transactions || transactions.length === 0) return [];
 
-    let sum = start;
+    const dayDelta = new Map<string, number>();
+    for (const { amount, createdAt, type } of transactions) {
+        const d = new Date(createdAt);
+        const key = d.toISOString().slice(0, 10); // YYYY-MM-DD
+        const delta = type === "TRANSFER" ? amount : -amount;
+        dayDelta.set(key, (dayDelta.get(key) ?? 0) + delta);
+    }
+    const startDate = new Date(transactions[0]!.createdAt);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date();
+    endDate.setHours(0, 0, 0, 0);
 
     const data: ChartData = [];
+    let running = start;
 
-    let prevDate = new Date(transactions[0]!.createdAt);
-
-    transactions.forEach(({ amount, createdAt }: Transaction) => {
-        const date = new Date(createdAt);
-        if (prevDate.toDateString() != date.toDateString()) {
-            data.push({
-                sum,
-                date: date.toLocaleDateString(),
-            });
-        }
-
-        sum += amount;
-        prevDate = date;
-    });
-
-    data.push({
-        sum,
-        date: new Date().toLocaleDateString(),
-    });
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+        const key = d.toISOString().slice(0, 10);
+        const delta = dayDelta.get(key) ?? 0;
+        running += delta;
+        data.push({
+            sum: running,
+            date: d.toLocaleDateString(),
+        });
+    }
 
     return data;
 };

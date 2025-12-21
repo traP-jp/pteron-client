@@ -1,7 +1,7 @@
 import { Suspense, use, useMemo } from "react";
 import { useParams } from "react-router-dom";
 
-import { Card, Center, Divider, Flex, Loader, SimpleGrid, Text, Title } from "@mantine/core";
+import { Card, Center, Divider, Flex, Loader, SimpleGrid, Stack, Text } from "@mantine/core";
 
 import apis from "/@/api";
 import type { Project, User } from "/@/api/schema/internal";
@@ -78,13 +78,13 @@ const UserProfileDetail = ({ transactions }: { transactions: Transaction[] }) =>
                     p="lg"
                     h="100%"
                 >
-                    <Title
-                        order={2}
+                    <Text
+                        size="xl"
                         fw={400}
                         mb="md"
                     >
                         推移
-                    </Title>
+                    </Text>
                     <BalanceChart
                         h={320}
                         transactions={transactions}
@@ -99,13 +99,13 @@ const UserProfileDetail = ({ transactions }: { transactions: Transaction[] }) =>
                     h="100%"
                     style={{ display: "flex", flexDirection: "column" }}
                 >
-                    <Title
-                        order={2}
+                    <Text
+                        size="xl"
                         fw={400}
                         mb="md"
                     >
                         取引履歴
-                    </Title>
+                    </Text>
                     {!transactions && <Text c="dimmed">取引履歴がありません</Text>}
                     <div className="h-80 overflow-auto">
                         <TransactionList
@@ -122,12 +122,12 @@ const UserProfileDetail = ({ transactions }: { transactions: Transaction[] }) =>
 const UserProfileProjectList = ({ projects }: { projects: Project[] }) => {
     return (
         <ErrorBoundary>
-            <Title
-                order={2}
+            <Text
+                size="xl"
                 fw={400}
             >
                 所属しているプロジェクト
-            </Title>
+            </Text>
 
             <SimpleGrid
                 cols={{ base: 1, md: 2, xl: 3 }}
@@ -155,15 +155,18 @@ const TheUserProfile = ({
 }: {
     fetcher: Promise<{ user: User; transactions: Transaction[]; projects: Project[] }>;
 }) => {
-    const { user, transactions, projects } = use(fetcher);
+    const { user, transactions: _transactions, projects } = use(fetcher);
+    const transactions = _transactions.sort((a, b) => {
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    });
 
     const name = toBranded<UserName>(user.name);
     const balance = toBranded<Copia>(BigInt(user.balance));
 
     return (
-        <Flex
-            direction="column"
+        <Stack
             gap="md"
+            p="md"
         >
             <UserProfileHeder
                 name={name}
@@ -175,15 +178,15 @@ const TheUserProfile = ({
             <UserProfileProjectList projects={projects} />
             <Divider />
             <ErrorBoundary>
-                <Title
-                    order={2}
+                <Text
+                    size="xl"
                     fw={400}
                 >
                     ランキング
-                </Title>
+                </Text>
                 <UserRankingCards userName={name} />
             </ErrorBoundary>
-        </Flex>
+        </Stack>
     );
 };
 
@@ -216,9 +219,14 @@ const UserProfile = () => {
         <ErrorBoundary>
             <Suspense
                 fallback={
-                    <Center h="50vh">
-                        <Loader size="lg" />
-                    </Center>
+                    <Stack
+                        gap="md"
+                        p="md"
+                    >
+                        <Center h="50vh">
+                            <Loader size="lg" />
+                        </Center>
+                    </Stack>
                 }
             >
                 <TheUserProfile fetcher={fetcher} />

@@ -10,8 +10,8 @@ import {
     Flex,
     Loader,
     SimpleGrid,
+    Stack,
     Text,
-    Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconExternalLink } from "@tabler/icons-react";
@@ -140,13 +140,13 @@ const ProjectDetail = ({ transactions }: { transactions: Transaction[] }) => {
                 p="lg"
                 h="100%"
             >
-                <Title
-                    order={2}
+                <Text
+                    size="xl"
                     fw={400}
                     mb="md"
                 >
                     推移
-                </Title>
+                </Text>
                 <BalanceChart
                     h={320}
                     transactions={transactions}
@@ -164,13 +164,13 @@ const ProjectDetail = ({ transactions }: { transactions: Transaction[] }) => {
                 h="100%"
                 style={{ display: "flex", flexDirection: "column" }}
             >
-                <Title
-                    order={2}
+                <Text
+                    size="xl"
                     fw={400}
                     mb="md"
                 >
                     取引履歴
-                </Title>
+                </Text>
                 {!transactions && <Text c="dimmed">取引履歴がありません</Text>}
                 <div className="h-80 overflow-auto">
                     <TransactionList
@@ -191,12 +191,12 @@ const ProjectMemberList = ({ owner, admins }: { owner?: User; admins?: User[] })
 
     return (
         <>
-            <Title
-                order={2}
+            <Text
+                size="xl"
                 fw={400}
             >
                 メンバー
-            </Title>
+            </Text>
 
             <SimpleGrid
                 cols={{ base: 1, md: 2, xl: 3 }}
@@ -235,9 +235,9 @@ const TheProjectDetails = ({
         (project.admins ?? []).some(admin => admin.id === currentUserId);
 
     return (
-        <Flex
-            direction="column"
+        <Stack
             gap="md"
+            p="md"
         >
             <ProjectHeader
                 name={name}
@@ -254,15 +254,15 @@ const TheProjectDetails = ({
             />
             <Divider />
             <ErrorBoundary>
-                <Title
-                    order={2}
+                <Text
+                    size="xl"
                     fw={400}
                 >
                     ランキング
-                </Title>
+                </Text>
                 <ProjectRankingCards projectName={name} />
             </ErrorBoundary>
-        </Flex>
+        </Stack>
     );
 };
 
@@ -296,9 +296,14 @@ const ProjectDetails = () => {
             <ErrorBoundary>
                 <Suspense
                     fallback={
-                        <Center h="50vh">
-                            <Loader size="lg" />
-                        </Center>
+                        <Stack
+                            gap="md"
+                            p="md"
+                        >
+                            <Center h="50vh">
+                                <Loader size="lg" />
+                            </Center>
+                        </Stack>
                     }
                 >
                     <TheProjectDetails fetcher={fetch()} />

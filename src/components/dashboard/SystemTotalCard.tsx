@@ -1,15 +1,22 @@
+import { use } from "react";
+
 import { Card, Group, Stack, Text } from "@mantine/core";
-import { IconCoin } from "@tabler/icons-react";
+import { IconCoins } from "@tabler/icons-react";
 
 import ErrorBoundary from "/@/components/ErrorBoundary";
 import { PAmount } from "/@/components/PAmount";
 import { type Copia, toBranded } from "/@/types/entity";
 
-interface SystemTotalCardProps {
+interface SystemTotalData {
     total?: number;
 }
 
-export const SystemTotalCard = ({ total }: SystemTotalCardProps) => {
+interface SystemTotalCardProps {
+    fetcher: Promise<SystemTotalData>;
+}
+
+export const SystemTotalCard = ({ fetcher }: SystemTotalCardProps) => {
+    const { total } = use(fetcher);
     const isAvailable = total !== undefined;
 
     return (
@@ -30,7 +37,7 @@ export const SystemTotalCard = ({ total }: SystemTotalCardProps) => {
                         >
                             総取引額
                         </Text>
-                        <IconCoin
+                        <IconCoins
                             size={20}
                             style={{ color: "var(--mantine-color-green-6)" }}
                         />

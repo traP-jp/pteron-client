@@ -30,10 +30,10 @@ const rankingConfigs: { title: string; rankingName: RankingName }[] = [
     { title: "総額ランキング", rankingName: "total" },
 ];
 
-const TheProjectStats = ({ fetcher }: { fetcher: Promise<RankingData[]> }) => {
-    const rankings = use(fetcher);
+const TheRanking = ({ fetcher }: { fetcher: Promise<RankingData> }) => {
+    const ranking = use(fetcher);
 
-    if (rankings.every(({ items }) => items.length <= 0)) {
+    if (ranking.items.length <= 0) {
         return (
             <Center py="xl">
                 <Text c="dimmed">データの取得に失敗しました</Text>
@@ -42,65 +42,62 @@ const TheProjectStats = ({ fetcher }: { fetcher: Promise<RankingData[]> }) => {
     }
 
     return (
-        <SimpleGrid
-            cols={{ base: 1, xl: 2 }}
-            spacing="xs"
-        >
-            {rankings.map(ranking => (
-                <RankingFull
-                    key={ranking.rankingName}
-                    items={ranking.items}
-                    maxItems={5}
-                    title={ranking.title}
-                    titleLink={`/stats/projects/${ranking.rankingName}`}
-                    type="project"
-                />
-            ))}
-        </SimpleGrid>
+        <RankingFull
+            key={ranking.rankingName}
+            items={ranking.items}
+            maxItems={5}
+            title={ranking.title}
+            titleLink={`/stats/projects/${ranking.rankingName}`}
+            type="project"
+        />
     );
 };
 
 const ProjectStats = () => {
     const { period } = useOutletContext<StatsContext>();
 
-    const fetcher = useMemo(
+    const fetchers = useMemo(
         () =>
-            Promise.all(
-                rankingConfigs.map(async config => {
-                    const {
-                        data: { items },
-                    } = await apis.internal.stats.getProjectRankings(config.rankingName, {
-                        term: period,
-                        limit: 8,
-                    });
+            rankingConfigs.map(async config => {
+                const {
+                    data: { items },
+                } = await apis.internal.stats.getProjectRankings(config.rankingName, {
+                    term: period,
+                    limit: 8,
+                });
 
-                    return {
-                        ...config,
-                        items:
-                            items?.map(item => ({
-                                rank: item.rank,
-                                rankDiff: item.difference,
-                                entity: item.project,
-                            })) ?? [],
-                    };
-                })
-            ),
+                return {
+                    ...config,
+                    items:
+                        items?.map(item => ({
+                            rank: item.rank,
+                            rankDiff: item.difference,
+                            entity: item.project,
+                        })) ?? [],
+                };
+            }),
         [period]
     );
 
     return (
-        <ErrorBoundary>
-            <Suspense
-                fallback={
-                    <Center py="xl">
-                        <Loader size="lg" />
-                    </Center>
-                }
-            >
-                <TheProjectStats fetcher={fetcher} />
-            </Suspense>
-        </ErrorBoundary>
+        <SimpleGrid
+            cols={{ base: 1, xl: 2 }}
+            spacing="xs"
+        >
+            {fetchers.map((fetcher, index) => (
+                <ErrorBoundary key={index}>
+                    <Suspense
+                        fallback={
+                            <Center py="xl">
+                                <Loader size="lg" />
+                            </Center>
+                        }
+                    >
+                        <TheRanking fetcher={fetcher} />
+                    </Suspense>
+                </ErrorBoundary>
+            ))}
+        </SimpleGrid>
     );
 };
-
 export default ProjectStats;

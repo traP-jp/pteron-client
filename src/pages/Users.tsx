@@ -1,6 +1,6 @@
 import { Suspense, use, useMemo, useState } from "react";
 
-import { Center, Flex, Loader, Select, SimpleGrid, Text } from "@mantine/core";
+import { Center, Flex, Loader, Select, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 
 import apis from "/@/api";
 import type { User } from "/@/api/schema/internal";
@@ -35,19 +35,24 @@ const TheUsers = ({ fetcher }: { fetcher: Promise<User[]> }) => {
     if (!users) return <></>;
 
     return (
-        <>
+        <Stack
+            gap="md"
+            p="md"
+        >
+            <Title order={2}>ユーザー一覧</Title>
+
             <Flex
                 direction="row"
                 justify="space-between"
                 align="center"
                 wrap="wrap"
-                mb="md"
+                gap="md"
             >
                 <Text
-                    fw={700}
                     size="xl"
+                    fw={400}
                 >
-                    ユーザー一覧
+                    すべてのユーザー
                 </Text>
                 <Select
                     data={[
@@ -61,6 +66,7 @@ const TheUsers = ({ fetcher }: { fetcher: Promise<User[]> }) => {
                     allowDeselect={false}
                 />
             </Flex>
+
             <SimpleGrid
                 cols={{ base: 1, md: 2, xl: 3 }}
                 spacing="md"
@@ -78,7 +84,7 @@ const TheUsers = ({ fetcher }: { fetcher: Promise<User[]> }) => {
                     />
                 ))}
             </SimpleGrid>
-        </>
+        </Stack>
     );
 };
 
@@ -92,9 +98,15 @@ export const Users = () => {
         <ErrorBoundary>
             <Suspense
                 fallback={
-                    <Center h="50vh">
-                        <Loader size="lg" />
-                    </Center>
+                    <Stack
+                        gap="md"
+                        p="md"
+                    >
+                        <Title order={2}>ユーザー一覧</Title>
+                        <Center h="50vh">
+                            <Loader size="lg" />
+                        </Center>
+                    </Stack>
                 }
             >
                 <TheUsers fetcher={fetcher} />

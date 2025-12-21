@@ -12,8 +12,8 @@ export type CreateProjectModalProps = Omit<ModalProps, "title"> & {
 
 const validateProjectName = (name: string): string => {
     if (name.length === 0) return "プロジェクト名は必須項目です";
-    if (!/^[A-Za-z0-9_-]+$/.test(name)) {
-        return "プロジェクト名には英数字と '_'、'-' のみ使用できます";
+    if (!/^[A-Za-z0-9_]+$/.test(name)) {
+        return "プロジェクト名には英数字と '_' のみ使用できます";
     }
     return "";
 };

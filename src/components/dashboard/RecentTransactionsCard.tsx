@@ -1,30 +1,66 @@
-import { Card, Stack, Text } from "@mantine/core";
+import { use } from "react";
+
+import { ActionIcon, Card, Group, Loader, Stack, Text } from "@mantine/core";
+import { IconRefresh } from "@tabler/icons-react";
 
 import type { Transaction } from "/@/api/schema/internal";
 import ErrorBoundary from "/@/components/ErrorBoundary";
 import { TransactionList } from "/@/components/TransactionList";
 
-interface RecentTransactionsCardProps {
+interface RecentTransactionsData {
     transactions: Transaction[];
 }
 
-export const RecentTransactionsCard = ({ transactions }: RecentTransactionsCardProps) => {
+interface RecentTransactionsCardProps {
+    fetcher: Promise<RecentTransactionsData>;
+    onRefresh?: () => void;
+    isRefreshing?: boolean;
+}
+
+export const RecentTransactionsCard = ({
+    fetcher,
+    onRefresh,
+    isRefreshing = false,
+}: RecentTransactionsCardProps) => {
+    const { transactions } = use(fetcher);
+
     return (
         <Card
             padding="lg"
             radius="md"
             withBorder
+            h="100%"
             style={{ display: "flex", flexDirection: "column" }}
         >
-            <ErrorBoundary>
-                <Stack gap="md">
-                    <Text
-                        size="lg"
-                        fw={600}
+            <Group
+                justify="space-between"
+                mb="md"
+            >
+                <Text
+                    size="lg"
+                    fw={600}
+                >
+                    最近の取引
+                </Text>
+                {onRefresh && (
+                    <ActionIcon
+                        variant="subtle"
+                        color="gray"
+                        onClick={onRefresh}
+                        disabled={isRefreshing}
+                        aria-label="更新"
                     >
-                        最近の取引
-                    </Text>
-                    <div className="h-80 overflow-auto">
+                        {isRefreshing ? <Loader size={18} /> : <IconRefresh size={18} />}
+                    </ActionIcon>
+                )}
+            </Group>
+
+            <ErrorBoundary>
+                <Stack
+                    gap="md"
+                    style={{ flex: 1, minHeight: 0 }}
+                >
+                    <div className="flex-1 overflow-auto min-h-0">
                         <TransactionList
                             transactions={transactions}
                             direction="both"

@@ -1,3 +1,5 @@
+import { use } from "react";
+
 import { Card, Group, Stack, Text } from "@mantine/core";
 import { IconBuildingBank } from "@tabler/icons-react";
 
@@ -5,12 +7,17 @@ import ErrorBoundary from "/@/components/ErrorBoundary";
 import { PAmount } from "/@/components/PAmount";
 import { type Copia, toBranded } from "/@/types/entity";
 
-interface SystemBalanceCardProps {
+interface SystemBalanceData {
     balance?: number;
     difference?: number;
 }
 
-export const SystemBalanceCard = ({ balance, difference }: SystemBalanceCardProps) => {
+interface SystemBalanceCardProps {
+    fetcher: Promise<SystemBalanceData>;
+}
+
+export const SystemBalanceCard = ({ fetcher }: SystemBalanceCardProps) => {
+    const { balance, difference } = use(fetcher);
     const isAvailable = balance !== undefined && difference !== undefined;
 
     return (
