@@ -1,6 +1,16 @@
 import { Suspense, use, useMemo, useState } from "react";
 
-import { Button, Center, Flex, Loader, Select, SimpleGrid, Text } from "@mantine/core";
+import {
+    Button,
+    Center,
+    Flex,
+    Loader,
+    Select,
+    SimpleGrid,
+    Stack,
+    Text,
+    Title,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
 
@@ -87,6 +97,7 @@ const sortProjects = (projects: Project[], sortBy: SortOption) => {
                 return a.name.localeCompare(b.name);
             case "name-desc":
                 return b.name.localeCompare(a.name);
+            default:
                 return 0;
         }
     });
@@ -179,29 +190,26 @@ const Projects = () => {
 
     return (
         <ErrorBoundary>
-            <Flex
-                direction="column"
+            <Stack
                 gap="xl"
+                p="md"
             >
-                <Flex
-                    direction="column"
-                    gap="md"
-                >
+                <Title order={2}>プロジェクト一覧</Title>
+
+                <Stack gap="md">
                     <Flex
                         direction="row"
+                        justify="space-between"
                         align="center"
-                        mr="lg"
                         gap="md"
                         wrap="wrap"
                     >
-                        <Flex
-                            direction="row"
-                            align="center"
-                            wrap="wrap"
-                            gap="md"
+                        <Text
+                            size="xl"
+                            fw={400}
                         >
-                            <Text size="xl">所有しているプロジェクト</Text>
-                        </Flex>
+                            あなたが管理しているプロジェクト
+                        </Text>
                         <CreateNewProject onProjectCreated={handleProjectCreated} />
                     </Flex>
                     <Suspense
@@ -217,11 +225,9 @@ const Projects = () => {
                             additionalProjects={newProjects}
                         />
                     </Suspense>
-                </Flex>
-                <Flex
-                    direction="column"
-                    gap="md"
-                >
+                </Stack>
+
+                <Stack gap="md">
                     <Flex
                         direction="row"
                         justify="space-between"
@@ -229,16 +235,19 @@ const Projects = () => {
                         wrap="wrap"
                         gap="md"
                     >
-                        <Text size="xl">全プロジェクト一覧</Text>
+                        <Text
+                            size="xl"
+                            fw={400}
+                        >
+                            すべてのプロジェクト
+                        </Text>
                         <Select
-                            data={
-                                [
-                                    { value: "balance-desc", label: "総資産降順" },
-                                    { value: "balance-asc", label: "総資産昇順" },
-                                    { value: "name-asc", label: "名前昇順" },
-                                    { value: "name-desc", label: "名前降順" },
-                                ] as const
-                            }
+                            data={[
+                                { value: "balance-desc", label: "総資産降順" },
+                                { value: "balance-asc", label: "総資産昇順" },
+                                { value: "name-asc", label: "名前昇順" },
+                                { value: "name-desc", label: "名前降順" },
+                            ]}
                             value={sortBy}
                             onChange={value => {
                                 setSortBy(value as SortOption);
@@ -259,8 +268,8 @@ const Projects = () => {
                             additionalProjects={newProjects}
                         />
                     </Suspense>
-                </Flex>
-            </Flex>
+                </Stack>
+            </Stack>
         </ErrorBoundary>
     );
 };

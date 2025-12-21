@@ -1,4 +1,4 @@
-import { Suspense, use, useMemo } from "react";
+import { Suspense, use, useCallback, useMemo, useState } from "react";
 
 import { Center, Loader, SimpleGrid, Stack, Title } from "@mantine/core";
 
@@ -70,6 +70,15 @@ const FeaturedProjectsRanking = ({ fetcher }: { fetcher: Promise<RankedItem<Proj
 };
 
 export const Home = () => {
+    const [transactionsKey, setTransactionsKey] = useState(0);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const refreshTransactions = useCallback(async () => {
+        setIsRefreshing(true);
+        setTransactionsKey(prev => prev + 1);
+        setIsRefreshing(false);
+    }, []);
+
     const systemBalanceFetcher = useMemo(
         () =>
             apis.internal.stats
@@ -134,7 +143,8 @@ export const Home = () => {
             apis.internal.transactions.getTransactions().then(({ data }) => ({
                 transactions: data.items,
             })),
-        []
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [transactionsKey]
     );
 
     const topUsersFetcher = useMemo(
@@ -190,7 +200,7 @@ export const Home = () => {
             gap="md"
             p="md"
         >
-            <Title order={1}>Dashboard</Title>
+            <Title order={1}>Pteron – Plutus Network</Title>
 
             <SimpleGrid
                 cols={{ base: 2, sm: 4 }}
@@ -254,7 +264,11 @@ export const Home = () => {
                             </Center>
                         }
                     >
-                        <RecentTransactionsCard fetcher={recentTransactionsFetcher} />
+                        <RecentTransactionsCard
+                            fetcher={recentTransactionsFetcher}
+                            onRefresh={refreshTransactions}
+                            isRefreshing={isRefreshing}
+                        />
                     </Suspense>
                 </ErrorBoundary>
 
