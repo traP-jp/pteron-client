@@ -3,13 +3,14 @@ import { Suspense, use, useCallback, useMemo, useState } from "react";
 import { SimpleGrid, Stack, Title } from "@mantine/core";
 
 import apis from "/@/api";
-import type { Transaction } from "/@/api/schema/internal";
+import type { Project, Transaction, User } from "/@/api/schema/internal";
 import ErrorBoundary from "/@/components/ErrorBoundary";
 import { RecentTransactionsCard } from "/@/components/dashboard/RecentTransactionsCard";
 import { SystemBalanceCard } from "/@/components/dashboard/SystemBalanceCard";
 import { SystemCountCard } from "/@/components/dashboard/SystemCountCard";
 import { SystemTotalCard } from "/@/components/dashboard/SystemTotalCard";
 import { UserBalanceCard } from "/@/components/dashboard/UserBalanceCard";
+import type { RankedItem } from "/@/components/ranking";
 import { RankingFull } from "/@/components/ranking";
 import {
     RankingCardSkeleton,

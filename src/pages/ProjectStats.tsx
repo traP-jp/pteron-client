@@ -20,6 +20,7 @@ interface RankingData {
     title: string;
     rankingName: RankingName;
     items: RankedItem<Project>[];
+    order?: "asc" | "desc";
 }
 
 const rankingConfigs: { title: string; rankingName: RankingName; order?: "asc" | "desc" }[] = [
