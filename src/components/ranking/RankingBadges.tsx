@@ -94,18 +94,6 @@ const getBadgeColor = (rank: number | null) => {
     return "gray";
 };
 
-/**
- * ランキングカードの背景色を順位に応じて取得
- */
-const getRankingCardBackground = (rank: number | null) => {
-    if (rank === null) return "var(--mantine-color-gray-0)";
-    if (rank === 1) return "var(--mantine-color-yellow-0)";
-    if (rank === 2) return "var(--mantine-color-gray-1)";
-    if (rank === 3) return "var(--mantine-color-orange-0)";
-    if (rank <= 10) return "var(--mantine-color-cyan-0)";
-    return "var(--mantine-color-gray-0)";
-};
-
 const RankingBadgesContent = ({ fetcher, type }: RankingBadgesContentProps) => {
     const rankings = use(fetcher);
 
@@ -390,7 +378,7 @@ const RankingCardsContent = ({ fetcher, type, name }: RankingCardsContentProps) 
                     key={info.rankingName}
                     gap={0}
                     style={{
-                        backgroundColor: getRankingCardBackground(info.rank),
+                        backgroundColor: "var(--mantine-color-gray-0)",
                         borderRadius: "var(--mantine-radius-md)",
                     }}
                 >
