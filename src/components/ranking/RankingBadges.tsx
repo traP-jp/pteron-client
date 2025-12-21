@@ -11,7 +11,6 @@ import { toBranded } from "/@/types/entity";
 import ErrorBoundary from "../ErrorBoundary";
 import { PAmount } from "../PAmount";
 import { PAvatar } from "../PAvatar";
-import { TrendIndicator } from "../TrendIndicator";
 import { RankingBadgesSkeleton, RankingCardsSkeleton } from "../skeletons/PageSkeletons";
 
 type RankingName = "balance" | "difference" | "in" | "out" | "count" | "total" | "ratio";
@@ -230,7 +229,7 @@ interface RankingCardItemProps {
 }
 
 const RankingCardItem = ({ type, name, info }: RankingCardItemProps) => {
-    const { rankingName, rank, rankDiff, value } = info;
+    const { rankingName, rank, value } = info;
     const rankingDetailPath = `/stats/${type === "user" ? "users" : "projects"}/${rankingName}`;
     const entityDetailPath = type === "user" ? `/users/${name}` : `/projects/${name}`;
 
@@ -293,12 +292,6 @@ const RankingCardItem = ({ type, name, info }: RankingCardItemProps) => {
                     >
                         {rank}
                     </Text>
-                    {rankDiff !== null && (
-                        <TrendIndicator
-                            diff={rankDiff}
-                            size="xs"
-                        />
-                    )}
                     <Anchor
                         component={Link}
                         to={entityDetailPath}

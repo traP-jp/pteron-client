@@ -6,7 +6,6 @@ import { useMediaQuery } from "@mantine/hooks";
 import ErrorBoundary from "/@/components/ErrorBoundary";
 import { PAmount } from "/@/components/PAmount";
 import { PAvatar } from "/@/components/PAvatar";
-import { TrendIndicator } from "/@/components/TrendIndicator";
 import { toBranded } from "/@/types/entity";
 import type { Copia, ProjectName, UserName } from "/@/types/entity";
 
@@ -33,7 +32,7 @@ const RankingListItem = <T extends RankingEntity>({
     rankedItem,
     valueDisplay = "copia",
 }: RankingListItemProps<T>) => {
-    const { rank, rankDiff, entity } = rankedItem;
+    const { rank, entity } = rankedItem;
     const isVerySmall = useMediaQuery("(max-width: 400px)");
     const detailPath = type === "user" ? `/users/${entity.name}` : `/projects/${entity.name}`;
 
@@ -52,25 +51,15 @@ const RankingListItem = <T extends RankingEntity>({
                     align="center"
                     gap="sm"
                 >
-                    {/* 1行目：順位・順位変動 */}
-                    <Group
-                        gap="md"
-                        wrap="nowrap"
+                    {/* 順位 */}
+                    <Text
+                        c="dimmed"
+                        className="w-8 text-center"
+                        fw={600}
+                        size="sm"
                     >
-                        <Text
-                            c="dimmed"
-                            className="w-8 text-center"
-                            fw={600}
-                            size="sm"
-                        >
-                            {rank}
-                        </Text>
-                        {rankDiff !== undefined && (
-                            <div className="w-8 flex justify-center">
-                                <TrendIndicator diff={rankDiff} />
-                            </div>
-                        )}
-                    </Group>
+                        {rank}
+                    </Text>
 
                     {/* 2行目：アバター・名前 */}
                     <Group
@@ -143,13 +132,6 @@ const RankingListItem = <T extends RankingEntity>({
                         >
                             {rank}
                         </Text>
-
-                        {/* 順位変動 */}
-                        {rankDiff !== undefined && (
-                            <div className="w-8 flex justify-center">
-                                <TrendIndicator diff={rankDiff} />
-                            </div>
-                        )}
 
                         {/* アバター */}
                         <PAvatar
