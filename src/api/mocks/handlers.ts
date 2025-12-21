@@ -50,7 +50,7 @@ const internalHandlers = [
         }
         // モックなので状態を変更しないが、成功を返す
         return HttpResponse.json({
-            redirect_url: "https://example.com/success",
+            redirectUrl: bill.project?.url ?? "https://example.com/success",
         });
     }),
 
