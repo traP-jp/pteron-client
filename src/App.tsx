@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { RouterProvider } from "react-router-dom";
 
 import "@mantine/charts/styles.css";
-import { MantineProvider } from "@mantine/core";
+import { MantineProvider, localStorageColorSchemeManager } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
@@ -12,9 +12,17 @@ import "./index.css";
 import { router } from "./router";
 import { theme } from "./theme";
 
+const colorSchemeManager = localStorageColorSchemeManager({
+    key: "pteron-color-scheme",
+});
+
 export default function App() {
     return (
-        <MantineProvider theme={theme}>
+        <MantineProvider
+            theme={theme}
+            defaultColorScheme="auto"
+            colorSchemeManager={colorSchemeManager}
+        >
             <Notifications
                 position="bottom-left"
                 zIndex={9999}
