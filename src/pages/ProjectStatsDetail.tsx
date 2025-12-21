@@ -1,136 +1,138 @@
-import { Suspense, use, useMemo, useState } from "react";
-import { Link, useOutletContext, useParams } from "react-router-dom";
+import { Suspense, use, useEffect, useMemo } from "react";
+import { useOutletContext, useParams, useSearchParams } from "react-router-dom";
 
-import { ActionIcon, Center, Group, Pagination, Stack, Text, Title } from "@mantine/core";
-import { IconArrowLeft } from "@tabler/icons-react";
+import { Button, Center, Group, Stack, Text, Title } from "@mantine/core";
+import { IconArrowDown, IconArrowUp } from "@tabler/icons-react";
 
 import apis from "/@/api";
 import type { Project } from "/@/api/schema/internal";
 import ErrorBoundary from "/@/components/ErrorBoundary";
 import { RankingFull } from "/@/components/ranking/RankingFull";
 import type { RankedItem } from "/@/components/ranking/RankingTypes";
-import { RankingDetailSkeleton } from "/@/components/skeletons/PageSkeletons";
+import { RankingCardSkeleton } from "/@/components/skeletons/PageSkeletons";
 
 interface StatsContext {
     period: "24hours" | "7days" | "30days" | "365days";
 }
 
-type RankingName = "balance" | "difference" | "in" | "out" | "count" | "total" | "ratio";
+type RankingName = "balance" | "difference" | "in" | "out" | "count" | "total";
 
 const rankingTitles: Record<RankingName, string> = {
     balance: "残高ランキング",
-    difference: "差額ランキング",
+    difference: "残高変動ランキング",
     in: "収入ランキング",
     out: "支出ランキング",
     count: "取引数ランキング",
-    total: "総額ランキング",
-    ratio: "比率ランキング",
+    total: "取引総額ランキング",
 };
 
-const ITEMS_PER_PAGE = 20;
-
-const TheProjectStatsDetail = ({
-    title,
-    fetcher,
-}: {
-    title: string;
+interface RankingContentProps {
     fetcher: Promise<RankedItem<Project>[]>;
-}) => {
-    const [currentPage, setCurrentPage] = useState(1);
+}
 
-    const items: RankedItem<Project>[] = use(fetcher);
+const RankingContent = ({ fetcher }: RankingContentProps) => {
+    const items = use(fetcher);
 
-    // ページネーション計算
-    const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const paginatedItems = items.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
-    // 表示用にrankを再計算
-    const displayItems: RankedItem<Project>[] = paginatedItems.map((item, index) => ({
-        ...item,
-        rank: startIndex + index + 1,
-    }));
+    if (items.length === 0) {
+        return (
+            <Center py="xl">
+                <Text c="dimmed">データがありません</Text>
+            </Center>
+        );
+    }
 
     return (
-        <Stack gap="md">
-            {/* ヘッダー */}
-            <Group gap="md">
-                <ActionIcon
-                    component={Link}
-                    size="lg"
-                    to="/stats/projects"
-                    variant="subtle"
-                >
-                    <IconArrowLeft size={20} />
-                </ActionIcon>
-                <Title order={3}>{title}</Title>
-            </Group>
-
-            {/* ランキング表示 */}
-            {items.length === 0 ? (
-                <Center py="xl">
-                    <Text c="dimmed">データがありません</Text>
-                </Center>
-            ) : (
-                <>
-                    <RankingFull
-                        items={displayItems}
-                        maxItems={ITEMS_PER_PAGE}
-                        showTop3={currentPage === 1}
-                        type="project"
-                    />
-
-                    {/* ページネーション */}
-                    {totalPages > 1 && (
-                        <Center>
-                            <Pagination
-                                onChange={setCurrentPage}
-                                total={totalPages}
-                                value={currentPage}
-                            />
-                        </Center>
-                    )}
-                </>
-            )}
-        </Stack>
+        <RankingFull
+            type="project"
+            items={items}
+            showTop3
+            maxItems={100}
+        />
     );
 };
 
 const ProjectStatsDetail = () => {
-    const { rankingName } = useParams<{ rankingName: string }>();
     const { period } = useOutletContext<StatsContext>();
+    const { rankingName } = useParams<{ rankingName: RankingName }>();
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    // ランキング名のバリデーション
-    const validRankingName = (rankingName as RankingName) || "balance";
-    const title = rankingTitles[validRankingName] || "ランキング";
+    const order = (searchParams.get("order") as "asc" | "desc") || "desc";
 
-    const fetcher = useMemo(
-        () =>
-            apis.internal.stats
-                .getProjectRankings(validRankingName, {
-                    term: period,
-                    limit: 100,
-                })
-                .then(
-                    ({ data: { items } }) =>
-                        items?.map(item => ({
-                            rank: item.rank,
-                            rankDiff: item.difference,
-                            entity: item.project,
-                        })) ?? []
-                ),
-        [validRankingName, period]
-    );
+    // パラメータなしでアクセスした場合はdescを設定
+    useEffect(() => {
+        if (!searchParams.has("order")) {
+            setSearchParams({ order: "desc" }, { replace: true });
+        }
+    }, [searchParams, setSearchParams]);
+
+    const fetcher = useMemo(() => {
+        if (!rankingName || !(rankingName in rankingTitles)) {
+            return Promise.resolve([]);
+        }
+
+        return apis.internal.stats
+            .getProjectRankings(rankingName, {
+                term: period,
+                limit: 100,
+                order,
+            })
+            .then(
+                ({ data }) =>
+                    data.items?.map(item => ({
+                        rank: item.rank,
+                        rankDiff: item.difference,
+                        entity: item.project,
+                    })) ?? []
+            );
+    }, [rankingName, period, order]);
+
+    const baseTitle = rankingName
+        ? (rankingTitles[rankingName as RankingName] ?? "ランキング")
+        : "ランキング";
+
+    const orderSuffix = order === "desc" ? " (トップ)" : " (ワースト)";
+    const title = baseTitle + orderSuffix;
+
+    const toggleOrder = () => {
+        const newOrder = order === "desc" ? "asc" : "desc";
+        setSearchParams({ order: newOrder }, { replace: true });
+    };
+
+    // Suspenseを強制的にリセットするためのkey
+    const suspenseKey = `${rankingName}-${period}-${order}`;
 
     return (
-        <ErrorBoundary>
-            <Suspense fallback={<RankingDetailSkeleton />}>
-                <TheProjectStatsDetail
-                    title={title}
-                    fetcher={fetcher}
-                />
-            </Suspense>
-        </ErrorBoundary>
+        <Stack gap="md">
+            <Group
+                justify="space-between"
+                align="center"
+            >
+                <Title
+                    order={2}
+                    size="h3"
+                >
+                    {title}
+                </Title>
+                <Button
+                    variant="light"
+                    leftSection={
+                        order === "desc" ? <IconArrowDown size={16} /> : <IconArrowUp size={16} />
+                    }
+                    onClick={toggleOrder}
+                >
+                    {order === "desc" ? "降順で表示中" : "昇順で表示中"}
+                </Button>
+            </Group>
+
+            <ErrorBoundary>
+                <Suspense
+                    key={suspenseKey}
+                    fallback={<RankingCardSkeleton />}
+                >
+                    <RankingContent fetcher={fetcher} />
+                </Suspense>
+            </ErrorBoundary>
+        </Stack>
     );
 };
 
